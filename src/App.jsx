@@ -37,7 +37,7 @@ function App() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 )}
               </svg>
-            </button>
+        </button>
           </div>
           {/* Mobile Menu */}
           {mobileMenuOpen && (
@@ -97,9 +97,12 @@ function App() {
               >
                 Schedule a Demo
               </a>
-              <button className="px-8 py-4 bg-white/10 backdrop-blur-lg border border-white/20 text-foreground rounded-lg text-lg font-semibold hover:bg-white/20 transition-all hover:scale-105">
+              <a 
+                href="#pilot" 
+                className="px-8 py-4 bg-white/10 backdrop-blur-lg border border-white/20 text-foreground rounded-lg text-lg font-semibold hover:bg-white/20 transition-all hover:scale-105"
+              >
                 Learn More
-              </button>
+              </a>
             </div>
           </div>
         </div>
