@@ -1,16 +1,72 @@
-# React + Vite
+# Edviro Energy Landing Page
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern landing page for Edviro Energy, showcasing energy dashboarding and anomaly detection solutions for school districts.
 
-Currently, two official plugins are available:
+## Development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```bash
+# Install dependencies
+npm install
 
-## React Compiler
+# Start development server
+npm run dev
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Deployment to GitHub Pages
 
-## Expanding the ESLint configuration
+This project is configured for deployment to GitHub Pages using the `gh-pages` package.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Quick Deploy
+
+```bash
+npm run deploy
+```
+
+This command will:
+1. Build the project with the correct base path for GitHub Pages
+2. Deploy the `dist` folder to the `gh-pages` branch
+
+### Manual Steps
+
+1. **Build for GitHub Pages:**
+   ```bash
+   npm run build:gh-pages
+   ```
+
+2. **Deploy to gh-pages branch:**
+   ```bash
+   npm run deploy
+   ```
+
+### GitHub Pages Configuration
+
+1. Go to your repository settings on GitHub
+2. Navigate to **Pages** in the left sidebar
+3. Under **Source**, select the `gh-pages` branch
+4. Select the `/ (root)` folder
+5. Click **Save**
+
+Your site will be available at:
+- `https://[username].github.io/edviro-landing-page/` (if using project pages)
+- Or your custom domain if configured
+
+### Custom Domain
+
+If you're using a custom domain, update `vite.config.js` to set `base: '/'` instead of the project path.
+
+## Project Structure
+
+```
+├── public/          # Static assets
+├── src/
+│   ├── App.jsx     # Main landing page component
+│   └── index.css   # Global styles with Tailwind
+└── dist/           # Build output (generated)
+```
+
+## Technologies
+
+- React 19
+- Vite
+- Tailwind CSS v4
+- gh-pages (for deployment)
