@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: hsl(220 33% 98%);
+  --color-foreground: hsl(220 13% 20%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(220 13% 20%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(220 13% 20%);
+  --color-muted: hsl(220 13% 91%);
+  --color-muted-foreground: hsl(220 13% 45%);
+  --color-border: hsl(220 13% 91%);
+  --color-input: hsl(220 13% 91%);
+  
+  --color-primary: #4CAF84;
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #F7F9FC;
+  --color-secondary-foreground: #1A1D1F;
+  --color-accent: #9B87F5;
+  --color-accent-foreground: #FFFFFF;
+  
+  --radius-lg: 1rem;
+  --radius-md: calc(1rem - 2px);
+  --radius-sm: calc(1rem - 4px);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .glass-panel {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  .hover-card {
+    transition: all 0.3s ease;
+  }
+
+  .hover-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+}
