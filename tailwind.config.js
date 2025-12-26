@@ -22,15 +22,15 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#4CAF84",
+          DEFAULT: "#2563eb",
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#F7F9FC",
+          DEFAULT: "#F8F9FA",
           foreground: "#1A1D1F",
         },
         accent: {
-          DEFAULT: "#9B87F5",
+          DEFAULT: "#64748b",
           foreground: "#FFFFFF",
         },
         destructive: {
@@ -47,9 +47,12 @@ export default {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "0.5rem",
+        md: "calc(0.5rem - 2px)",
+        sm: "calc(0.5rem - 4px)",
+      },
+      fontFamily: {
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'sans-serif'],
       },
       keyframes: {
         "accordion-down": {
