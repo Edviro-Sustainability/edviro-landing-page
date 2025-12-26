@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "build:gh-pages": "vite build --base=/edviro-landing-page/",
-    "predeploy": "npm run build:gh-pages",
+    "build:custom-domain": "vite build --base=/",
+    "predeploy": "npm run build:custom-domain",
     "deploy": "gh-pages -d dist",
     "lint": "eslint .",
     "preview": "vite preview"
