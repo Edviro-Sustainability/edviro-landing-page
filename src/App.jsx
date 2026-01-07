@@ -65,13 +65,20 @@ function App() {
         </div>
       </nav>
 
-      {/* Main Layout with Fixed Center Divider */}
-      <div className="relative flex flex-col lg:flex-row">
-        {/* Left Content Column */}
-        <div className="flex-1 min-h-screen pt-20">
+      {/* Main Layout with Grid Structure */}
+      <div className="relative pt-16 sm:pt-20">
+        {/* Fixed Center Divider */}
+        <div className="hidden lg:block fixed left-1/2 top-0 bottom-0 w-0 -translate-x-1/2 z-10 pointer-events-none">
+          <div className="sticky top-0 h-screen flex items-center justify-center">
+            <div className="w-px h-full bg-border opacity-30"></div>
+          </div>
+        </div>
+
+        {/* Row 1: Hero | Features */}
+        <div className="relative flex flex-col lg:flex-row">
           {/* Hero Section */}
-          <section id="hero" className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-32 xl:px-40 overflow-hidden">
-            <div className={`w-full max-w-2xl space-y-8 transition-all duration-1000 ${isVisible.hero ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
+          <section id="hero" className="flex-1 py-12 sm:py-16 lg:min-h-screen lg:flex lg:items-center lg:justify-center px-4 sm:px-6 lg:px-32 xl:px-40 overflow-hidden">
+            <div className={`w-full max-w-2xl space-y-4 sm:space-y-6 lg:space-y-8 transition-all duration-1000 ${isVisible.hero ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
               <div className="text-sm uppercase tracking-wider text-primary font-medium">Energy Intelligence</div>
               <h1 className="text-3xl sm:text-4xl md:text-6xl font-semibold leading-tight text-foreground">
                 Save Your School
@@ -82,7 +89,7 @@ function App() {
               <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
                 Identify billing errors, optimize energy usage, and save thousands of dollars with our intelligent energy management platform.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4">
                 <a href="#contact" className="px-6 sm:px-8 py-3 sm:py-4 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all text-center text-sm sm:text-base">
                   Schedule a Demo
                 </a>
@@ -93,9 +100,36 @@ function App() {
             </div>
           </section>
 
+          {/* Features Section */}
+          <section id="features" className="flex-1 py-12 sm:py-16 lg:min-h-screen lg:flex lg:items-center lg:justify-center px-4 sm:px-6 lg:px-32 xl:px-40">
+            <div className={`w-full max-w-2xl space-y-4 sm:space-y-6 lg:space-y-8 transition-all duration-1000 delay-200 ${isVisible.features ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
+              <div className="space-y-3 sm:space-y-4 lg:space-y-6 pt-0 sm:pt-4 lg:pt-8">
+                {[
+                  { icon: 'fa-chart-line', title: 'Real-time Dashboarding', desc: 'Monitor energy consumption across all facilities with intuitive, real-time dashboards.' },
+                  { icon: 'fa-magnifying-glass', title: 'Anomaly Detection', desc: 'AI-powered algorithms automatically detect billing errors and unusual patterns.' },
+                  { icon: 'fa-dollar-sign', title: 'Cost Optimization', desc: 'Get actionable recommendations to reduce energy costs and improve efficiency.' }
+                ].map((feature, idx) => (
+                  <div 
+                    key={idx}
+                    className="bg-card border border-border rounded-lg p-4 sm:p-6 hover:shadow-sm transition-all"
+                  >
+                    <div className="text-xl sm:text-2xl mb-2 sm:mb-3 text-primary">
+                      <i className={`fas ${feature.icon}`}></i>
+                    </div>
+                    <h3 className="text-lg sm:text-xl font-semibold mb-2 text-foreground">{feature.title}</h3>
+                    <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">{feature.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/* Row 2: About | Call to Action */}
+        <div className="relative flex flex-col lg:flex-row">
           {/* About Section - Team */}
-          <section id="about" className="relative py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-32 xl:px-40">
-            <div className={`w-full max-w-2xl space-y-8 transition-all duration-1000 ${isVisible.about ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
+          <section id="about" className="flex-1 py-12 sm:py-16 lg:py-24 xl:py-32 px-4 sm:px-6 lg:px-32 xl:px-40">
+            <div className={`w-full max-w-2xl space-y-4 sm:space-y-6 lg:space-y-8 transition-all duration-1000 ${isVisible.about ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
               <div className="text-sm uppercase tracking-wider text-primary font-medium">Our Story</div>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-foreground">
                 Meet the
@@ -105,7 +139,7 @@ function App() {
                 Edviro Energy is run by two passionate college students who grew fed up with seeing their hometown high schools lose thousands of valuable tax payer money to inefficiences, overbillings, and simple oversights that can be fixed with proper dashboarding and modern day API tools
               </p>
               
-              <div className="space-y-4 sm:space-y-6 pt-6 sm:pt-8">
+              <div className="space-y-3 sm:space-y-4 lg:space-y-6 pt-4 sm:pt-6 lg:pt-8">
                 <div className="bg-card border border-border rounded-lg p-4 sm:p-6 hover:shadow-sm transition-all">
                   <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
                     <img src="https://picsum.photos/seed/hursh/100/100" alt="Hursh Shah" className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-border flex-shrink-0" />
@@ -133,64 +167,15 @@ function App() {
             </div>
           </section>
 
-          {/* Pilot Program Success Story */}
-          <section id="pilot" className="relative py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-32 xl:px-40">
-            <div className={`w-full max-w-2xl space-y-6 sm:space-y-8 transition-all duration-1000 ${isVisible.pilot ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
-              <h2 className="text-3xl sm:text-4xl md:text-6xl font-semibold leading-tight text-foreground">
-                $360,000+ in
-                <span className="block text-primary">
-                  Overbilling Identified
-                </span>
-              </h2>
-              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
-                Our pilot program with local school districts uncovered significant billing discrepancies and energy inefficiencies. Using our advanced anomaly detection algorithms, we identified <span className="text-primary font-semibold">over $360,000 in overbilling</span> that schools were able to recover.
-              </p>
-            </div>
-          </section>
-        </div>
-
-        {/* Fixed Center Divider Column */}
-        <div className="hidden lg:block fixed left-1/2 top-0 bottom-0 w-0 -translate-x-1/2 z-10 pointer-events-none">
-          <div className="sticky top-0 h-screen flex items-center justify-center">
-            <div className="w-px h-full bg-border opacity-30"></div>
-          </div>
-        </div>
-
-        {/* Right Content Column */}
-        <div className="flex-1 min-h-screen pt-20 lg:pt-20">
-          {/* Features Section */}
-          <section id="features" className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-32 xl:px-40">
-            <div className={`w-full max-w-2xl space-y-8 transition-all duration-1000 delay-200 ${isVisible.features ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
-              <div className="space-y-4 sm:space-y-6 pt-6 sm:pt-8">
-                {[
-                  { icon: 'fa-chart-line', title: 'Real-time Dashboarding', desc: 'Monitor energy consumption across all facilities with intuitive, real-time dashboards.' },
-                  { icon: 'fa-magnifying-glass', title: 'Anomaly Detection', desc: 'AI-powered algorithms automatically detect billing errors and unusual patterns.' },
-                  { icon: 'fa-dollar-sign', title: 'Cost Optimization', desc: 'Get actionable recommendations to reduce energy costs and improve efficiency.' }
-                ].map((feature, idx) => (
-                  <div 
-                    key={idx}
-                    className="bg-card border border-border rounded-lg p-4 sm:p-6 hover:shadow-sm transition-all"
-                  >
-                    <div className="text-xl sm:text-2xl mb-2 sm:mb-3 text-primary">
-                      <i className={`fas ${feature.icon}`}></i>
-                    </div>
-                    <h3 className="text-lg sm:text-xl font-semibold mb-2 text-foreground">{feature.title}</h3>
-                    <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">{feature.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
           {/* Call to Action */}
-          <section id="contact" className="relative py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-32 xl:px-40">
-            <div className={`w-full max-w-2xl space-y-6 sm:space-y-8 transition-all duration-1000 delay-300 ${isVisible.contact ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
-              <div className="bg-primary rounded-lg p-6 sm:p-8 md:p-12 lg:p-16 text-center">
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold mb-4 sm:mb-6 text-primary-foreground">Join Us in Q1 2026</h2>
-                <p className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 text-primary-foreground/90 leading-relaxed">
+          <section id="contact" className="flex-1 py-12 sm:py-16 lg:py-24 xl:py-32 px-4 sm:px-6 lg:px-32 xl:px-40">
+            <div className={`w-full max-w-2xl space-y-4 sm:space-y-6 lg:space-y-8 transition-all duration-1000 delay-300 ${isVisible.contact ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
+              <div className="bg-primary rounded-lg p-5 sm:p-6 md:p-8 lg:p-12 xl:p-16 text-center">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold mb-3 sm:mb-4 lg:mb-6 text-primary-foreground">Join Us in Q1 2026</h2>
+                <p className="text-base sm:text-lg md:text-xl mb-4 sm:mb-6 lg:mb-8 text-primary-foreground/90 leading-relaxed">
                   We're expanding to our first clients in Q1 2026 and are looking for forward-thinking school districts to join our mission of energy optimization.
                 </p>
-                <p className="text-sm sm:text-base mb-6 sm:mb-8 text-primary-foreground/80">
+                <p className="text-sm sm:text-base mb-4 sm:mb-6 lg:mb-8 text-primary-foreground/80">
                   Be part of the next generation of energy management for schools.
                 </p>
                 <a 
@@ -202,22 +187,40 @@ function App() {
               </div>
             </div>
           </section>
+        </div>
+
+        {/* Row 3: Pilot Success Story | Statistics */}
+        <div className="relative flex flex-col lg:flex-row">
+          {/* Pilot Program Success Story */}
+          <section id="pilot" className="flex-1 py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-32 xl:px-40">
+            <div className={`w-full max-w-2xl space-y-4 sm:space-y-6 lg:space-y-8 transition-all duration-1000 ${isVisible.pilot ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
+              <h2 className="text-3xl sm:text-4xl md:text-6xl font-semibold leading-tight text-foreground">
+                $360,000+ in
+                <span className="block text-primary">
+                  Overbilling Identified
+                </span>
+              </h2>
+              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+                Our pilot program with local school districts uncovered significant billing discrepancies and energy inefficiencies. Using our advanced anomaly detection algorithms, we identified <span className="text-primary font-semibold">over $360,000 in overbilling</span> that schools were able to recover.
+              </p>
+            </div>
+          </section>
 
           {/* Statistics Section */}
-          <section id="stats" className="relative py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-32 xl:px-40">
-            <div className={`w-full max-w-2xl space-y-6 sm:space-y-8 transition-all duration-1000 delay-200 ${isVisible.stats ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-                <div className="bg-card border border-border rounded-lg p-6 sm:p-8 lg:p-10 text-center flex-1">
+          <section id="stats" className="flex-1 py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-32 xl:px-40">
+            <div className={`w-full max-w-2xl space-y-4 sm:space-y-6 lg:space-y-8 transition-all duration-1000 delay-200 ${isVisible.stats ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
+              <div className="flex flex-col gap-3 sm:gap-4 lg:gap-6">
+                <div className="bg-card border border-border rounded-lg p-5 sm:p-6 lg:p-8 xl:p-10 text-center">
                   <div className="text-3xl sm:text-4xl font-semibold text-primary mb-2">$360K+</div>
                   <div className="text-muted-foreground text-sm">Recovered</div>
                 </div>
-                <div className="bg-card border border-border rounded-lg p-6 sm:p-8 lg:p-10 text-center flex-1">
+                <div className="bg-card border border-border rounded-lg p-5 sm:p-6 lg:p-8 xl:p-10 text-center">
                   <div className="text-3xl sm:text-4xl font-semibold text-primary mb-2">7</div>
                   <div className="text-muted-foreground text-sm">Schools</div>
                 </div>
-                <div className="bg-card border border-border rounded-lg p-6 sm:p-8 lg:p-10 text-center flex-1">
-                  <div className="text-3xl sm:text-4xl font-semibold text-primary mb-2">100%</div>
-                  <div className="text-muted-foreground text-sm">Success</div>
+                <div className="bg-card border border-border rounded-lg p-5 sm:p-6 lg:p-8 xl:p-10 text-center">
+                  <div className="text-3xl sm:text-4xl font-semibold text-primary mb-2">16</div>
+                  <div className="text-muted-foreground text-sm">Meters</div>
                 </div>
               </div>
             </div>
@@ -226,7 +229,7 @@ function App() {
       </div>
 
       {/* Footer */}
-      <footer className="py-8 sm:py-12 px-4 sm:px-6 border-t border-border bg-white relative z-20">
+      <footer className="py-6 sm:py-8 lg:py-12 px-4 sm:px-6 border-t border-border bg-white relative z-20">
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-xl sm:text-2xl font-semibold text-foreground mb-4 md:mb-0">
