@@ -31,8 +31,9 @@ function App() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border">
             <div className="container mx-auto px-4 sm:px-6 py-4">
               <div className="flex items-center justify-between">
-                <div className="text-xl sm:text-2xl font-semibold text-foreground">
-                  Edviro Energy
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <img src="/edviro_logo.png" alt="Edviro Logo" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
+                  <span className="text-xl sm:text-2xl font-semibold text-foreground">Edviro</span>
                 </div>
             <div className="hidden md:flex items-center space-x-8">
               <a href="#about" className="text-muted-foreground hover:text-foreground transition-colors font-medium">About</a>
@@ -136,7 +137,7 @@ function App() {
                 <span className="block text-primary">Team</span>
               </h2>
               <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
-                Edviro Energy is run by two passionate college students who grew fed up with seeing their hometown high schools lose thousands of valuable tax payer money to inefficiences, overbillings, and simple oversights that can be fixed with proper dashboarding and modern day API tools
+                Edviro is run by two passionate college students who grew fed up with seeing their hometown high schools lose thousands of valuable tax payer money to inefficiences, overbillings, and simple oversights that can be fixed with proper dashboarding and modern day API tools
               </p>
               
               <div className="space-y-3 sm:space-y-4 lg:space-y-6 pt-4 sm:pt-6 lg:pt-8">
@@ -232,11 +233,12 @@ function App() {
       <footer className="py-6 sm:py-8 lg:py-12 px-4 sm:px-6 border-t border-border bg-white relative z-20">
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="text-xl sm:text-2xl font-semibold text-foreground mb-4 md:mb-0">
-              Edviro Energy
+            <div className="flex items-center gap-2 sm:gap-3 mb-4 md:mb-0">
+              <img src="/edviro_logo.png" alt="Edviro Logo" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
+              <span className="text-xl sm:text-2xl font-semibold text-foreground">Edviro</span>
             </div>
             <div className="text-muted-foreground text-xs sm:text-sm text-center md:text-left">
-              © 2025 Edviro Energy. All rights reserved.
+              © 2025 Edviro. All rights reserved.
             </div>
           </div>
         </div>

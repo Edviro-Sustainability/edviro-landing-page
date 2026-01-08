@@ -12,11 +12,11 @@
   --color-border: hsl(220 13% 90%);
   --color-input: hsl(220 13% 94%);
   
-  --color-primary: #2563eb;
+  --color-primary: #16a34a;
   --color-primary-foreground: #FFFFFF;
-  --color-secondary: #F8F9FA;
-  --color-secondary-foreground: #1A1D1F;
-  --color-accent: #64748b;
+  --color-secondary: #f0fdf4;
+  --color-secondary-foreground: #14532d;
+  --color-accent: #22c55e;
   --color-accent-foreground: #FFFFFF;
   
   --radius-lg: 0.5rem;
