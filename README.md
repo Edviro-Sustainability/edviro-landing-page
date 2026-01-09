@@ -1,6 +1,6 @@
-# Edviro Energy Landing Page
+# Edviro Landing Page
 
-A modern landing page for Edviro Energy, showcasing energy dashboarding and anomaly detection solutions for school districts.
+A modern landing page for Edviro, showcasing energy dashboarding and anomaly detection solutions for school districts.
 
 ## Development
 
