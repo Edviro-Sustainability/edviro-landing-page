@@ -22,29 +22,47 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
 
-const ambientLight = new THREE.AmbientLight('#ffffff', 0.45);
-const keyLight = new THREE.DirectionalLight('#ffffff', 1.15);
-keyLight.position.set(4, 5, 5);
-scene.add(ambientLight, keyLight);
+const hemiLight = new THREE.HemisphereLight('#ffffff', '#0f172a', 0.6);
+const keyLight = new THREE.DirectionalLight('#ffffff', 1.35);
+keyLight.position.set(6, 8, 7);
+const fillLight = new THREE.DirectionalLight('#ffffff', 0.45);
+fillLight.position.set(-6, 2, 4);
+scene.add(hemiLight, keyLight, fillLight);
 
 const subjectGroup = new THREE.Group();
 scene.add(subjectGroup);
+
+let floor = null;
+const floorMaterial = new THREE.MeshStandardMaterial({
+  color: '#cccccc',
+});
+const floorGeometry = new THREE.PlaneGeometry(32, 20);
+floor = new THREE.Mesh(floorGeometry, floorMaterial);
+floor.rotation.x = -Math.PI / 2;
+floor.position.set(0, -3, 8);
+scene.add(floor);
 
 let schoolModel = null;
 const introState = {
   startCameraPos: new THREE.Vector3(0, 10, -4),
   endCameraPos: new THREE.Vector3(0, -2, 25),
-  lookAt: new THREE.Vector3(0, 5, -10),
+  lookAt: new THREE.Vector3(0, 5, -5),
 };
 const introDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 3.2;
 const loader = new OBJLoader();
+const schoolMaterial = new THREE.MeshStandardMaterial({
+  color: '#ffffff',
+});
 
 loader.load('/school.obj', (loadedModel) => {
   schoolModel = loadedModel;
-  
+
   schoolModel.scale.setScalar(0.2);
-  schoolModel.position.set(0, 0, 0);
+  schoolModel.position.set(0, 1.8, 0);
   subjectGroup.add(schoolModel);
 });
 
