@@ -5,7 +5,7 @@ import './style.css';
 const canvas = document.querySelector('#webgl');
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color('#dddddd');
+scene.background = new THREE.Color('#ececec');
 
 const camera = new THREE.PerspectiveCamera(
   40,
@@ -36,9 +36,52 @@ scene.add(hemiLight, keyLight, fillLight);
 const subjectGroup = new THREE.Group();
 scene.add(subjectGroup);
 
+const floorGridConfig = {
+  bgColor: '#ececec',
+  lineColor: '#d2d8d4',
+  cellsPerSide: 24,
+  lineWidth: 2,
+  textureSize: 1024,
+  repeatX: 3,
+  repeatY: 0.6
+};
+
+function createGridTexture(config) {
+  const canvasEl = document.createElement('canvas');
+  canvasEl.width = config.textureSize;
+  canvasEl.height = config.textureSize;
+  const ctx = canvasEl.getContext('2d');
+
+  ctx.fillStyle = config.bgColor;
+  ctx.fillRect(0, 0, config.textureSize, config.textureSize);
+
+  const step = config.textureSize / config.cellsPerSide;
+  ctx.strokeStyle = config.lineColor;
+  ctx.lineWidth = config.lineWidth;
+  ctx.beginPath();
+  for (let i = 0; i <= config.cellsPerSide; i += 1) {
+    const p = Math.round(i * step) + 0.5;
+    ctx.moveTo(p, 0);
+    ctx.lineTo(p, config.textureSize);
+    ctx.moveTo(0, p);
+    ctx.lineTo(config.textureSize, p);
+  }
+  ctx.stroke();
+
+  const texture = new THREE.CanvasTexture(canvasEl);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(config.repeatX, config.repeatY);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  return texture;
+}
+
 let floor = null;
 const floorMaterial = new THREE.MeshStandardMaterial({
-  color: '#cccccc',
+  map: createGridTexture(floorGridConfig),
+  roughness: 0.9,
+  metalness: 0.05
 });
 const floorGeometry = new THREE.PlaneGeometry(32, 20);
 floor = new THREE.Mesh(floorGeometry, floorMaterial);
@@ -56,13 +99,23 @@ const introDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matc
 const loader = new OBJLoader();
 const schoolMaterial = new THREE.MeshStandardMaterial({
   color: '#ffffff',
+  emissive: '#ffffff',
+  emissiveIntensity: 0.15,
+  roughness: 0.4,
+  metalness: 0.15
 });
 
 loader.load('/school.obj', (loadedModel) => {
   schoolModel = loadedModel;
+  schoolModel.traverse((child) => {
+    if (child.isMesh) {
+      child.material = schoolMaterial;
+    }
+  });
 
   schoolModel.scale.setScalar(0.2);
   schoolModel.position.set(0, 1.8, 0);
+  
   subjectGroup.add(schoolModel);
 });
 
