@@ -60,6 +60,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
+  transform-origin: center center;
+  will-change: transform;
 }
 
 .hero-title > .text-reveal-mask:nth-of-type(1) {
@@ -84,7 +86,7 @@ body {
 }
 
 .text-reveal-delay {
-  animation-delay: 300ms;
+  animation-delay: 700ms;
 }
 
 .panel h2 {

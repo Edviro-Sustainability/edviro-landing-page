@@ -9,6 +9,7 @@ import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 import './style.css';
 
 const canvas = document.querySelector('#webgl');
+const heroTitle = document.querySelector('.hero-title');
 
 const scene = new THREE.Scene();
 scene.background = null;
@@ -188,14 +189,14 @@ const lensMaterial = new THREE.ShaderMaterial({
   depthWrite: false
 });
 
-const lens = new THREE.Mesh(new THREE.SphereGeometry(0.25, 96, 96), lensMaterial);
+const lens = new THREE.Mesh(new THREE.SphereGeometry(0.25, 64, 64), lensMaterial);
 lens.scale.setScalar(0.001);
 lens.visible = false;
 scene.add(lens);
 
-const hemiLight = new THREE.HemisphereLight('#ffffff', 0.18);
+const hemiLight = new THREE.HemisphereLight('#ffffff', 2);
 const dirLight = new THREE.DirectionalLight('#ffffff', 1.9);
-dirLight.position.set(5, 10, 3);
+dirLight.position.set(0, 5, 3);
 dirLight.shadow.mapSize.set(1024,1024);
 dirLight.castShadow = true;
 dirLight.shadow.radius = 20;
@@ -203,7 +204,7 @@ dirLight.shadow.camera.left = -12;
 dirLight.shadow.camera.right = 12;
 dirLight.shadow.camera.top = 12;
 dirLight.shadow.camera.bottom = -12;
-scene.add(hemiLight, dirLight);
+scene.add(hemiLight, dirLight); 
 
 const subjectGroup = new THREE.Group();
 scene.add(subjectGroup);
@@ -310,8 +311,9 @@ const introState = {
   endCameraPos: new THREE.Vector3(0, -2, 25),
   lookAt: new THREE.Vector3(0, 5, -5)
 };
-const introDelay = 0.8;
-const introDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 3.2;
+const introDelay = 1.8;
+const introDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 2.55;
+const introEasePower = 3.4;
 const pulseConfig = {
   interval: 4.8,
   duration: 1.2,
@@ -458,6 +460,12 @@ const clock = new THREE.Clock();
 let scrollProgress = 0;
 let scrollProgressTarget = 0;
 const introCamera = new THREE.Vector3();
+let introEaseSmoothed = 0;
+const titleIntroState = {
+  offsetX: 0,
+  offsetY: 0,
+  startScale: 2.3
+};
 
 function clamp01(value) {
   return Math.min(1, Math.max(0, value));
@@ -466,6 +474,41 @@ function clamp01(value) {
 function mapRange(value, inMin, inMax, outMin, outMax) {
   const t = clamp01((value - inMin) / (inMax - inMin));
   return outMin + (outMax - outMin) * t;
+}
+
+function getIntroEase(elapsed) {
+  const introProgress =
+    introDuration === 0 ? 1 : clamp01((elapsed - introDelay) / introDuration);
+  return 1 - Math.pow(1 - introProgress, introEasePower);
+}
+
+function computeTitleIntroStartTransform() {
+  if (!heroTitle) {
+    return;
+  }
+
+  const previousTransform = heroTitle.style.transform;
+  heroTitle.style.transform = 'translate3d(0px, 0px, 0px) scale(1)';
+  const rect = heroTitle.getBoundingClientRect();
+  heroTitle.style.transform = previousTransform;
+
+  const centerX = rect.left + rect.width * 0.5;
+  const centerY = rect.top + rect.height * 0.5;
+  titleIntroState.offsetX = window.innerWidth * 0.5 - centerX;
+  titleIntroState.offsetY = window.innerHeight * 0.5 - centerY;
+  titleIntroState.startScale = window.innerWidth <= 768 ? 1.85 : 2.35;
+}
+
+function updateTitleIntroTransform(introEase) {
+  if (!heroTitle) {
+    return;
+  }
+
+  const translateX = titleIntroState.offsetX * (1 - introEase);
+  const translateY = titleIntroState.offsetY * (1 - introEase);
+  const scale = THREE.MathUtils.lerp(titleIntroState.startScale, 1, introEase);
+
+  heroTitle.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
 }
 
 function updateScrollTarget() {
@@ -488,6 +531,12 @@ function autoUpdateLensResolution() {
 
 autoUpdateLensResolution();
 updateScrollTarget();
+computeTitleIntroStartTransform();
+if (document.fonts?.ready) {
+  document.fonts.ready.then(() => {
+    computeTitleIntroStartTransform();
+  });
+}
 
 window.addEventListener('scroll', updateScrollTarget, { passive: true });
 
@@ -508,6 +557,7 @@ window.addEventListener('resize', () => {
 
   autoUpdateLensResolution();
   updateScrollTarget();
+  computeTitleIntroStartTransform();
 });
 
 function animate() {
@@ -515,6 +565,13 @@ function animate() {
 
   const delta = clock.getDelta();
   const elapsed = clock.elapsedTime;
+  const introEaseTarget = getIntroEase(elapsed);
+  const introBlend = 1.0 - Math.exp(-11.0 * delta);
+  introEaseSmoothed += (introEaseTarget - introEaseSmoothed) * introBlend;
+  if (introEaseTarget > 0.999 && introEaseSmoothed > 0.997) {
+    introEaseSmoothed = 1;
+  }
+
   wireMaterial.uniforms.uTime.value = elapsed;
   backgroundUniforms.uTime.value = elapsed;
   scrollProgress += (scrollProgressTarget - scrollProgress) * 0.08;
@@ -529,10 +586,7 @@ function animate() {
 
   if (schoolModel) {
     schoolModel.visible = elapsed >= introDelay;
-    const introProgress =
-      introDuration === 0 ? 1 : clamp01((elapsed - introDelay) / introDuration);
-    const introEase = 1 - Math.pow(1 - introProgress, 3);
-    introCamera.lerpVectors(introState.startCameraPos, introState.endCameraPos, introEase);
+    introCamera.lerpVectors(introState.startCameraPos, introState.endCameraPos, introEaseSmoothed);
 
     camera.position.x = introCamera.x + mapRange(scrollProgress, 0, 1, 0, 0.5);
     camera.position.y = introCamera.y;
@@ -542,6 +596,7 @@ function animate() {
     camera.position.z = mapRange(scrollProgress, 0, 1, 7.5, 5.8);
     camera.position.x = mapRange(scrollProgress, 0, 1, 0, 0.5);
   }
+  updateTitleIntroTransform(introEaseSmoothed);
 
   if (schoolMeshes.length > 0 && isPointerActive) {
     hoverRaycaster.setFromCamera(hoverPointer, camera);
@@ -567,7 +622,9 @@ function animate() {
     updateLensPosition();
   }
   wasHoveringSchool = isHoveringSchool;
-  renderWireMask();
+  if (lensScaleCurrent > 0.01 || lensScaleTarget > 0.01) {
+    renderWireMask();
+  }
   composer.render();
 }
 
