@@ -209,18 +209,18 @@ scene.add(hemiLight, dirLight);
 const subjectGroup = new THREE.Group();
 scene.add(subjectGroup);
 
-let floor = null;
-const floorMaterial = new THREE.MeshStandardMaterial({
-  color: '#ffffff',
-  roughness: 0.9,
-  metalness: 0.05
-});
-const floorGeometry = new THREE.PlaneGeometry(32, 20);
-floor = new THREE.Mesh(floorGeometry, floorMaterial);
-floor.rotation.x = -Math.PI / 2;
-floor.position.set(0, -3, 8);
-floor.receiveShadow = true;
-scene.add(floor);
+// let floor = null;
+// const floorMaterial = new THREE.MeshStandardMaterial({
+//   color: '#ffffff',
+//   roughness: 0.9,
+//   metalness: 0.05
+// });
+// const floorGeometry = new THREE.PlaneGeometry(32, 20);
+// floor = new THREE.Mesh(floorGeometry, floorMaterial);
+// floor.rotation.x = -Math.PI / 2;
+// floor.position.set(0, -3, 8);
+// floor.receiveShadow = true;
+// scene.add(floor);
 
 let schoolModel = null;
 const schoolMeshes = [];
@@ -308,8 +308,8 @@ const maskMaterial = new THREE.MeshBasicMaterial({
 
 const introState = {
   startCameraPos: new THREE.Vector3(0, 10, -4),
-  endCameraPos: new THREE.Vector3(0, -2, 25),
-  lookAt: new THREE.Vector3(0, 5, -5)
+  endCameraPos: new THREE.Vector3(0, 0, 22),
+  lookAt: new THREE.Vector3(0, 3, -3)
 };
 const introDelay = 1.8;
 const introDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 2.55;
@@ -351,8 +351,8 @@ loader.load('/school.obj', (loadedModel) => {
     }
   });
 
-  schoolModel.scale.setScalar(0.2);
-  schoolModel.position.set(0, 1.8, 0);
+  schoolModel.scale.setScalar(0.12);
+  schoolModel.position.set(0, -3, 0);
 
   subjectGroup.add(schoolModel);
   schoolModel.updateWorldMatrix(true, true);
