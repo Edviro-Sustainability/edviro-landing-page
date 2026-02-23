@@ -1,5 +1,11 @@
 import * as THREE from 'three';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 import './style.css';
 
 const canvas = document.querySelector('#webgl');
@@ -25,61 +31,53 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const composer = new EffectComposer(renderer);
+composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+composer.setSize(window.innerWidth, window.innerHeight);
+
+const renderPass = new RenderPass(scene, camera);
+composer.addPass(renderPass);
+
+const bloomPass = new UnrealBloomPass(
+  new THREE.Vector2(window.innerWidth, window.innerHeight),
+  0.1,
+  0.7,
+  0.82
+);
+composer.addPass(bloomPass);
+
+const pixelRatio = Math.min(window.devicePixelRatio, 2);
+const fxaaPass = new ShaderPass(FXAAShader);
+fxaaPass.material.uniforms.resolution.value.set(
+  1 / (window.innerWidth * pixelRatio),
+  1 / (window.innerHeight * pixelRatio)
+);
+composer.addPass(fxaaPass);
+
+const outputPass = new OutputPass();
+composer.addPass(outputPass);
 
 const hemiLight = new THREE.HemisphereLight('#ffffff', '#0f172a', 0.6);
-const keyLight = new THREE.DirectionalLight('#ffffff', 1.35);
-keyLight.position.set(6, 8, 7);
-const fillLight = new THREE.DirectionalLight('#ffffff', 0.45);
-fillLight.position.set(-6, 2, 4);
-scene.add(hemiLight, keyLight, fillLight);
+const dirLight = new THREE.DirectionalLight('#ffffff', 0.8);
+dirLight.position.set(5, 10, 3);
+dirLight.castShadow = true;
+dirLight.shadow.mapSize.set(2048, 2048);
+dirLight.shadow.radius = 20;
+dirLight.shadow.camera.left = -12;
+dirLight.shadow.camera.right = 12;
+dirLight.shadow.camera.top = 12;
+dirLight.shadow.camera.bottom = -12;
+scene.add(hemiLight, dirLight);
 
 const subjectGroup = new THREE.Group();
 scene.add(subjectGroup);
 
-const floorGridConfig = {
-  bgColor: '#ececec',
-  lineColor: '#d2d8d4',
-  cellsPerSide: 24,
-  lineWidth: 2,
-  textureSize: 1024,
-  repeatX: 3,
-  repeatY: 0.6
-};
-
-function createGridTexture(config) {
-  const canvasEl = document.createElement('canvas');
-  canvasEl.width = config.textureSize;
-  canvasEl.height = config.textureSize;
-  const ctx = canvasEl.getContext('2d');
-
-  ctx.fillStyle = config.bgColor;
-  ctx.fillRect(0, 0, config.textureSize, config.textureSize);
-
-  const step = config.textureSize / config.cellsPerSide;
-  ctx.strokeStyle = config.lineColor;
-  ctx.lineWidth = config.lineWidth;
-  ctx.beginPath();
-  for (let i = 0; i <= config.cellsPerSide; i += 1) {
-    const p = Math.round(i * step) + 0.5;
-    ctx.moveTo(p, 0);
-    ctx.lineTo(p, config.textureSize);
-    ctx.moveTo(0, p);
-    ctx.lineTo(config.textureSize, p);
-  }
-  ctx.stroke();
-
-  const texture = new THREE.CanvasTexture(canvasEl);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(config.repeatX, config.repeatY);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-  return texture;
-}
-
 let floor = null;
 const floorMaterial = new THREE.MeshStandardMaterial({
-  map: createGridTexture(floorGridConfig),
+  color: '#ffffff',
   roughness: 0.9,
   metalness: 0.05
 });
@@ -87,6 +85,7 @@ const floorGeometry = new THREE.PlaneGeometry(32, 20);
 floor = new THREE.Mesh(floorGeometry, floorMaterial);
 floor.rotation.x = -Math.PI / 2;
 floor.position.set(0, -3, 8);
+floor.receiveShadow = true;
 scene.add(floor);
 
 let schoolModel = null;
@@ -97,19 +96,32 @@ const introState = {
 };
 const introDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 3.2;
 const loader = new OBJLoader();
-const schoolMaterial = new THREE.MeshStandardMaterial({
-  color: '#ffffff',
-  emissive: '#ffffff',
-  emissiveIntensity: 0.15,
-  roughness: 0.4,
-  metalness: 0.15
-});
+
+const schoolMaterial = new THREE.MeshStandardMaterial({ emissive: '#ffffff', emissiveIntensity: 0.2, });
+
+const windowFrameMaterial = new THREE.MeshStandardMaterial({ emissive: '#d9d9d9', emissiveIntensity: 0.15, });
+
+const windowMaterial = new THREE.MeshPhysicalMaterial({ emissive: '#d7d7d7', emissiveIntensity: 0.06 });
+
+const windows = [
+  "Cube.024", "Cube.025", "Cube.026",
+  "Cube.013", "Cube.014", "Cube.015",
+  "Cube.046", "Plane"
+];
 
 loader.load('/school.obj', (loadedModel) => {
   schoolModel = loadedModel;
   schoolModel.traverse((child) => {
     if (child.isMesh) {
-      child.material = schoolMaterial;
+      if (windows.includes(child.name)) {
+        child.material = windowMaterial;
+      } else if (child.name === "Cube.038") {
+        child.material = windowFrameMaterial;
+      } else {
+        child.material = schoolMaterial;
+      }
+      child.castShadow = true;
+      child.receiveShadow = true;
     }
   });
 
@@ -142,10 +154,19 @@ updateScrollTarget();
 window.addEventListener('scroll', updateScrollTarget, { passive: true });
 
 window.addEventListener('resize', () => {
+  const pixelRatio = Math.min(window.devicePixelRatio, 2);
+
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(pixelRatio);
+  composer.setPixelRatio(pixelRatio);
+  composer.setSize(window.innerWidth, window.innerHeight);
+  bloomPass.setSize(window.innerWidth, window.innerHeight);
+  fxaaPass.material.uniforms.resolution.value.set(
+    1 / (window.innerWidth * pixelRatio),
+    1 / (window.innerHeight * pixelRatio)
+  );
   updateScrollTarget();
 });
 
@@ -172,7 +193,7 @@ function animate() {
     camera.position.x = mapRange(scrollProgress, 0, 1, 0, 0.5);
   }
 
-  renderer.render(scene, camera);
+  composer.render();
   requestAnimationFrame(animate);
 }
 
