@@ -60,11 +60,54 @@ composer.addPass(fxaaPass);
 const outputPass = new OutputPass();
 composer.addPass(outputPass);
 
+const maskRenderTarget = new THREE.WebGLRenderTarget(1, 1, {
+  depthBuffer: true
+});
+maskRenderTarget.texture.colorSpace = THREE.SRGBColorSpace;
+
+const lensVertexShader = /* glsl */ `
+void main() {
+  vec4 worldPos = modelMatrix * vec4(position, 1.0);
+  vec4 mvPosition = viewMatrix * worldPos;
+  gl_Position = projectionMatrix * mvPosition;
+}
+`;
+
+const lensFragmentShader = /* glsl */ `
+uniform vec2 winResolution;
+uniform sampler2D uTexture;
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / winResolution.xy;
+  vec4 color = texture2D(uTexture, uv);
+  gl_FragColor = color;
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
+}
+`;
+
+const lensUniforms = {
+  uTexture: { value: maskRenderTarget.texture },
+  winResolution: { value: new THREE.Vector2() }
+};
+
+const lensMaterial = new THREE.ShaderMaterial({
+  vertexShader: lensVertexShader,
+  fragmentShader: lensFragmentShader,
+  uniforms: lensUniforms,
+  transparent: true,
+  depthTest: false,
+  depthWrite: false
+});
+
+const lens = new THREE.Mesh(new THREE.SphereGeometry(0.25, 96, 96), lensMaterial);
+scene.add(lens);
+
 const hemiLight = new THREE.HemisphereLight('#ffffff', '#0f172a', 0.6);
 const dirLight = new THREE.DirectionalLight('#ffffff', 0.8);
 dirLight.position.set(5, 10, 3);
 dirLight.castShadow = true;
-dirLight.shadow.mapSize.set(512,512);
+dirLight.shadow.mapSize.set(512, 512);
 dirLight.shadow.radius = 20;
 dirLight.shadow.camera.left = -12;
 dirLight.shadow.camera.right = 12;
@@ -89,25 +132,39 @@ floor.receiveShadow = true;
 scene.add(floor);
 
 let schoolModel = null;
+const schoolMeshes = [];
+const schoolWireframes = [];
+const wireMaterial = new THREE.LineBasicMaterial({
+  color: 0x00ffff,
+  transparent: true,
+  opacity: 1
+});
+const maskMaterial = new THREE.MeshBasicMaterial({
+  color: 0x000000,
+  transparent: true,
+  opacity: 0,
+  depthWrite: false
+});
+
 const introState = {
   startCameraPos: new THREE.Vector3(0, 10, -4),
   endCameraPos: new THREE.Vector3(0, -2, 25),
-  lookAt: new THREE.Vector3(0, 5, -5),
+  lookAt: new THREE.Vector3(0, 5, -5)
 };
 const introDelay = 0.8;
 const introDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 3.2;
 const loader = new OBJLoader();
 
-const schoolMaterial = new THREE.MeshStandardMaterial({ emissive: '#ffffff', emissiveIntensity: 0.2, });
+const schoolMaterial = new THREE.MeshStandardMaterial({ emissive: '#ffffff', emissiveIntensity: 0.2 });
 
-const windowFrameMaterial = new THREE.MeshStandardMaterial({ emissive: '#d9d9d9', emissiveIntensity: 0.15, });
+const windowFrameMaterial = new THREE.MeshStandardMaterial({ emissive: '#d9d9d9', emissiveIntensity: 0.15 });
 
 const windowMaterial = new THREE.MeshPhysicalMaterial({ emissive: '#d7d7d7', emissiveIntensity: 0.06 });
 
 const windows = [
-  "Cube.024", "Cube.025", "Cube.026",
-  "Cube.013", "Cube.014", "Cube.015",
-  "Cube.046", "Plane", "Cylinder"
+  'Cube.024', 'Cube.025', 'Cube.026',
+  'Cube.013', 'Cube.014', 'Cube.015',
+  'Cube.046', 'Plane', 'Cylinder'
 ];
 
 loader.load('/school.obj', (loadedModel) => {
@@ -116,21 +173,106 @@ loader.load('/school.obj', (loadedModel) => {
     if (child.isMesh) {
       if (windows.includes(child.name)) {
         child.material = windowMaterial;
-      } else if (child.name === "Cube.038") {
+      } else if (child.name === 'Cube.038') {
         child.material = windowFrameMaterial;
       } else {
         child.material = schoolMaterial;
       }
       child.castShadow = true;
       child.receiveShadow = true;
+
+      const edges = new THREE.EdgesGeometry(child.geometry, 15);
+      const wire = new THREE.LineSegments(edges, wireMaterial);
+      wire.visible = false;
+      child.add(wire);
+
+      schoolMeshes.push(child);
+      schoolWireframes.push(wire);
     }
   });
 
   schoolModel.scale.setScalar(0.2);
   schoolModel.position.set(0, 1.8, 0);
-  
+
   subjectGroup.add(schoolModel);
 });
+
+const pointerTarget = new THREE.Vector2(0, 0);
+const pointerCurrent = new THREE.Vector2(0, 0);
+
+window.addEventListener('pointermove', (event) => {
+  pointerTarget.x = (event.clientX / window.innerWidth) * 2 - 1;
+  pointerTarget.y = -(event.clientY / window.innerHeight) * 2 + 1;
+});
+
+window.addEventListener('pointerleave', () => {
+  pointerTarget.set(0, 0);
+});
+
+const cameraDirection = new THREE.Vector3();
+const cameraRight = new THREE.Vector3();
+const cameraUp = new THREE.Vector3();
+const lensPosition = new THREE.Vector3();
+
+function updateLensPosition() {
+  pointerCurrent.lerp(pointerTarget, 0.1);
+
+  const distanceFromCamera = 2.2;
+  const vFov = THREE.MathUtils.degToRad(camera.fov);
+  const halfHeight = Math.tan(vFov * 0.5) * distanceFromCamera;
+  const halfWidth = halfHeight * camera.aspect;
+
+  camera.getWorldDirection(cameraDirection).normalize();
+  cameraUp.set(0, 1, 0).applyQuaternion(camera.quaternion).normalize();
+  cameraRight.copy(cameraDirection).cross(cameraUp).normalize();
+
+  lensPosition
+    .copy(camera.position)
+    .addScaledVector(cameraDirection, distanceFromCamera)
+    .addScaledVector(cameraRight, pointerCurrent.x * halfWidth)
+    .addScaledVector(cameraUp, pointerCurrent.y * halfHeight);
+
+  lens.position.copy(lensPosition);
+}
+
+const maskBackground = new THREE.Color(0x000000);
+const previousMaterials = new Map();
+
+function renderWireMask() {
+  if (!schoolModel || schoolMeshes.length === 0) {
+    return;
+  }
+
+  const previousBackground = scene.background;
+  scene.background = maskBackground;
+  lens.visible = false;
+
+  for (const mesh of schoolMeshes) {
+    previousMaterials.set(mesh, mesh.material);
+    mesh.material = maskMaterial;
+  }
+
+  for (const wire of schoolWireframes) {
+    wire.visible = true;
+  }
+
+  renderer.setRenderTarget(maskRenderTarget);
+  renderer.clear();
+  renderer.render(scene, camera);
+  renderer.setRenderTarget(null);
+
+  for (const mesh of schoolMeshes) {
+    mesh.material = previousMaterials.get(mesh);
+  }
+
+  for (const wire of schoolWireframes) {
+    wire.visible = false;
+  }
+
+  previousMaterials.clear();
+  lens.visible = true;
+  scene.background = previousBackground;
+}
 
 const clock = new THREE.Clock();
 let scrollProgress = 0;
@@ -150,6 +292,19 @@ function updateScrollTarget() {
   scrollProgressTarget = maxScroll <= 0 ? 0 : window.scrollY / maxScroll;
 }
 
+function autoUpdateLensResolution() {
+  const pixelRatio = Math.min(window.devicePixelRatio, 2);
+  lensUniforms.winResolution.value.set(
+    window.innerWidth * pixelRatio,
+    window.innerHeight * pixelRatio
+  );
+  maskRenderTarget.setSize(
+    Math.floor(window.innerWidth * pixelRatio),
+    Math.floor(window.innerHeight * pixelRatio)
+  );
+}
+
+autoUpdateLensResolution();
 updateScrollTarget();
 
 window.addEventListener('scroll', updateScrollTarget, { passive: true });
@@ -168,10 +323,13 @@ window.addEventListener('resize', () => {
     1 / (window.innerWidth * pixelRatio),
     1 / (window.innerHeight * pixelRatio)
   );
+
+  autoUpdateLensResolution();
   updateScrollTarget();
 });
 
 function animate() {
+  requestAnimationFrame(animate);
 
   const elapsed = clock.getElapsedTime();
   scrollProgress += (scrollProgressTarget - scrollProgress) * 0.08;
@@ -196,8 +354,9 @@ function animate() {
     camera.position.x = mapRange(scrollProgress, 0, 1, 0, 0.5);
   }
 
+  updateLensPosition();
+  renderWireMask();
   composer.render();
-  requestAnimationFrame(animate);
 }
 
 animate();
