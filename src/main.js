@@ -189,6 +189,8 @@ const lensMaterial = new THREE.ShaderMaterial({
 });
 
 const lens = new THREE.Mesh(new THREE.SphereGeometry(0.25, 96, 96), lensMaterial);
+lens.scale.setScalar(0.001);
+lens.visible = false;
 scene.add(lens);
 
 const hemiLight = new THREE.HemisphereLight('#ffffff', 0.18);
@@ -229,15 +231,23 @@ const wireMaterial = new THREE.ShaderMaterial({
     uColorHot: { value: new THREE.Color(0x3ffd84) },
     uSpeed: { value: 0.6 },
     uPulse: { value: 3.0 },
-    uOpacity: { value: 1.0 }
+    uOpacity: { value: 1.0 },
+    uPulseCenter: { value: 0.0 },
+    uPulseHalfWidth: { value: 1.4 },
+    uPulseSoftness: { value: 0.45 },
+    uPulseActive: { value: 0.0 },
+    uMaskPass: { value: 0.0 }
   },
   vertexShader: /* glsl */ `
     attribute float lineDistance;
     varying float vLineDistance;
+    varying float vWorldX;
 
     void main() {
       vLineDistance = lineDistance;
-      vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+      vec4 worldPos = modelMatrix * vec4(position, 1.0);
+      vWorldX = worldPos.x;
+      vec4 mvPosition = viewMatrix * worldPos;
       gl_Position = projectionMatrix * mvPosition;
     }
   `,
@@ -248,8 +258,14 @@ const wireMaterial = new THREE.ShaderMaterial({
     uniform float uSpeed;
     uniform float uPulse;
     uniform float uOpacity;
+    uniform float uPulseCenter;
+    uniform float uPulseHalfWidth;
+    uniform float uPulseSoftness;
+    uniform float uPulseActive;
+    uniform float uMaskPass;
 
     varying float vLineDistance;
+    varying float vWorldX;
 
     void main() {
       float flow = fract(vLineDistance * 0.32 - uTime * uSpeed);
@@ -257,7 +273,20 @@ const wireMaterial = new THREE.ShaderMaterial({
       float pulse = 0.55 + 0.45 * sin(uTime * uPulse + vLineDistance * 0.18);
       float glow = max(currentBand, 0.35 * pulse);
       vec3 color = mix(uColorBase, uColorHot, glow);
-      float alpha = (0.2 + 0.8 * glow) * uOpacity;
+
+      float leftFade = smoothstep(
+        uPulseCenter - uPulseHalfWidth - uPulseSoftness,
+        uPulseCenter - uPulseHalfWidth,
+        vWorldX
+      );
+      float rightFade = 1.0 - smoothstep(
+        uPulseCenter + uPulseHalfWidth,
+        uPulseCenter + uPulseHalfWidth + uPulseSoftness,
+        vWorldX
+      );
+      float revealBand = leftFade * rightFade;
+      float reveal = mix(revealBand * uPulseActive, 1.0, step(0.5, uMaskPass));
+      float alpha = (0.2 + 0.8 * glow) * uOpacity * reveal;
 
       gl_FragColor = vec4(color, alpha);
       #include <tonemapping_fragment>
@@ -283,6 +312,14 @@ const introState = {
 };
 const introDelay = 0.8;
 const introDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 3.2;
+const pulseConfig = {
+  interval: 4.8,
+  duration: 1.2,
+  padding: 0.35,
+  minX: -1.0,
+  maxX: 1.0,
+  ready: false
+};
 const loader = new OBJLoader();
 
 const schoolMaterial = new THREE.MeshStandardMaterial({
@@ -304,7 +341,7 @@ loader.load('/school.obj', (loadedModel) => {
       const edges = new THREE.EdgesGeometry(child.geometry, 15);
       const wire = new THREE.LineSegments(edges, wireMaterial);
       wire.computeLineDistances();
-      wire.visible = false;
+      wire.visible = true;
       child.add(wire);
 
       schoolMeshes.push(child);
@@ -316,18 +353,35 @@ loader.load('/school.obj', (loadedModel) => {
   schoolModel.position.set(0, 1.8, 0);
 
   subjectGroup.add(schoolModel);
+  schoolModel.updateWorldMatrix(true, true);
+  const modelBounds = new THREE.Box3().setFromObject(schoolModel);
+  pulseConfig.minX = modelBounds.min.x;
+  pulseConfig.maxX = modelBounds.max.x;
+  pulseConfig.ready = true;
 });
 
 const pointerTarget = new THREE.Vector2(0, 0);
 const pointerCurrent = new THREE.Vector2(0, 0);
+const hoverRaycaster = new THREE.Raycaster();
+const hoverPointer = new THREE.Vector2(0, 0);
+let isPointerActive = false;
+let isHoveringSchool = false;
+let wasHoveringSchool = false;
+let lensScaleCurrent = 0.0;
+let lensScaleTarget = 0.0;
 
 window.addEventListener('pointermove', (event) => {
   pointerTarget.x = (event.clientX / window.innerWidth) * 2 - 1;
   pointerTarget.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  hoverPointer.copy(pointerTarget);
+  isPointerActive = true;
 });
 
 window.addEventListener('pointerleave', () => {
   pointerTarget.set(0, 0);
+  hoverPointer.set(0, 0);
+  isPointerActive = false;
+  isHoveringSchool = false;
 });
 
 const cameraDirection = new THREE.Vector3();
@@ -365,6 +419,7 @@ function renderWireMask() {
   }
 
   const previousBackground = scene.background;
+  const previousLensVisible = lens.visible;
   scene.background = maskBackground;
   lens.visible = false;
   backgroundDome.visible = false;
@@ -378,21 +433,23 @@ function renderWireMask() {
     wire.visible = true;
   }
 
+  wireMaterial.uniforms.uMaskPass.value = 1.0;
   renderer.setRenderTarget(maskRenderTarget);
   renderer.clear();
   renderer.render(scene, camera);
   renderer.setRenderTarget(null);
+  wireMaterial.uniforms.uMaskPass.value = 0.0;
 
   for (const mesh of schoolMeshes) {
     mesh.material = previousMaterials.get(mesh);
   }
 
   for (const wire of schoolWireframes) {
-    wire.visible = false;
+    wire.visible = true;
   }
 
   previousMaterials.clear();
-  lens.visible = true;
+  lens.visible = previousLensVisible;
   backgroundDome.visible = true;
   scene.background = previousBackground;
 }
@@ -456,10 +513,19 @@ window.addEventListener('resize', () => {
 function animate() {
   requestAnimationFrame(animate);
 
-  const elapsed = clock.getElapsedTime();
+  const delta = clock.getDelta();
+  const elapsed = clock.elapsedTime;
   wireMaterial.uniforms.uTime.value = elapsed;
   backgroundUniforms.uTime.value = elapsed;
   scrollProgress += (scrollProgressTarget - scrollProgress) * 0.08;
+
+  const pulsePhase = elapsed % pulseConfig.interval;
+  const pulseActive = pulseConfig.ready && pulsePhase <= pulseConfig.duration ? 1.0 : 0.0;
+  const pulseT = pulseConfig.duration > 0 ? clamp01(pulsePhase / pulseConfig.duration) : 1.0;
+  const pulseStart = pulseConfig.minX - pulseConfig.padding;
+  const pulseEnd = pulseConfig.maxX + pulseConfig.padding;
+  wireMaterial.uniforms.uPulseCenter.value = THREE.MathUtils.lerp(pulseStart, pulseEnd, pulseT);
+  wireMaterial.uniforms.uPulseActive.value = pulseActive;
 
   if (schoolModel) {
     schoolModel.visible = elapsed >= introDelay;
@@ -477,7 +543,30 @@ function animate() {
     camera.position.x = mapRange(scrollProgress, 0, 1, 0, 0.5);
   }
 
-  updateLensPosition();
+  if (schoolMeshes.length > 0 && isPointerActive) {
+    hoverRaycaster.setFromCamera(hoverPointer, camera);
+    isHoveringSchool = hoverRaycaster.intersectObjects(schoolMeshes, false).length > 0;
+  } else {
+    isHoveringSchool = false;
+  }
+
+  if (isHoveringSchool && !wasHoveringSchool) {
+    pointerCurrent.copy(pointerTarget);
+    updateLensPosition();
+  }
+
+  lensScaleTarget = isHoveringSchool ? 1.0 : 0.0;
+  const growSpeed = 12.0;
+  const shrinkSpeed = 9.0;
+  const blend = 1.0 - Math.exp(-(lensScaleTarget > lensScaleCurrent ? growSpeed : shrinkSpeed) * delta);
+  lensScaleCurrent += (lensScaleTarget - lensScaleCurrent) * blend;
+  lens.scale.setScalar(Math.max(lensScaleCurrent, 0.001));
+  lens.visible = lensScaleCurrent > 0.01;
+
+  if (isHoveringSchool) {
+    updateLensPosition();
+  }
+  wasHoveringSchool = isHoveringSchool;
   renderWireMask();
   composer.render();
 }
