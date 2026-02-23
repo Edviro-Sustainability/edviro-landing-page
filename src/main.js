@@ -11,7 +11,7 @@ import './style.css';
 const canvas = document.querySelector('#webgl');
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color('#ececec');
+scene.background = null;
 
 const camera = new THREE.PerspectiveCamera(
   40,
@@ -33,6 +33,99 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const backgroundUniforms = {
+  uTime: { value: 0 },
+  uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
+};
+
+const backgroundMaterial = new THREE.ShaderMaterial({
+  uniforms: backgroundUniforms,
+  side: THREE.BackSide,
+  depthWrite: false,
+  vertexShader: /* glsl */ `
+    varying vec3 vWorldDir;
+
+    void main() {
+      vec4 worldPos = modelMatrix * vec4(position, 1.0);
+      vWorldDir = normalize(worldPos.xyz - cameraPosition);
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: /* glsl */ `
+    uniform float uTime;
+    uniform vec2 uResolution;
+    varying vec3 vWorldDir;
+
+    float hash21(vec2 p) {
+      p = fract(p * vec2(123.34, 345.45));
+      p += dot(p, p + 34.345);
+      return fract(p.x * p.y);
+    }
+
+    float noise2d(vec2 p) {
+      vec2 i = floor(p);
+      vec2 f = fract(p);
+      f = f * f * (3.0 - 2.0 * f);
+
+      float a = hash21(i);
+      float b = hash21(i + vec2(1.0, 0.0));
+      float c = hash21(i + vec2(0.0, 1.0));
+      float d = hash21(i + vec2(1.0, 1.0));
+
+      float x1 = mix(a, b, f.x);
+      float x2 = mix(c, d, f.x);
+      return mix(x1, x2, f.y);
+    }
+
+    float fbm(vec2 p) {
+      float v = 0.0;
+      float a = 0.55;
+      mat2 rot = mat2(0.8, -0.6, 0.6, 0.8);
+
+      v += a * noise2d(p);
+      p = rot * p * 2.02;
+      a *= 0.5;
+
+      v += a * noise2d(p);
+      return v;
+    }
+
+    void main() {
+      vec2 uv = normalize(vWorldDir).xy;
+      uv.x *= uResolution.x / uResolution.y;
+
+      float t = uTime * 0.01;
+      vec2 flow = vec2(t, -t * 0.72);
+
+      float n = fbm(uv * 0.1 + flow);
+      n += 0.3 * fbm((uv + vec2(1.7, -2.1)) * 4.5 - flow * 1.8);
+      n *= 0.78;
+
+      float bandCount = 18.0;
+      float contour = fract(n * bandCount);
+      float distToLine = abs(contour - 0.5);
+
+      float aa = max(fwidth(n * bandCount), 0.0015);
+      float lineWidth = 0.020;
+      float line = 1.0 - smoothstep(lineWidth - aa, lineWidth + aa, distToLine);
+
+      vec3 base = vec3(240.0/255.0);
+
+      vec3 ink = vec3(0.7,0.2,0.7);
+
+      vec3 color = base - ink * line * 0.32;
+
+      gl_FragColor = vec4(color, 1.0);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+    }
+  `
+});
+
+const backgroundDome = new THREE.Mesh(new THREE.SphereGeometry(55, 32, 24), backgroundMaterial);
+backgroundDome.frustumCulled = false;
+scene.add(backgroundDome);
 
 const composer = new EffectComposer(renderer);
 composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -289,6 +382,7 @@ function renderWireMask() {
   const previousBackground = scene.background;
   scene.background = maskBackground;
   lens.visible = false;
+  backgroundDome.visible = false;
 
   for (const mesh of schoolMeshes) {
     previousMaterials.set(mesh, mesh.material);
@@ -314,12 +408,14 @@ function renderWireMask() {
 
   previousMaterials.clear();
   lens.visible = true;
+  backgroundDome.visible = true;
   scene.background = previousBackground;
 }
 
 const clock = new THREE.Clock();
 let scrollProgress = 0;
 let scrollProgressTarget = 0;
+const introCamera = new THREE.Vector3();
 
 function clamp01(value) {
   return Math.min(1, Math.max(0, value));
@@ -341,6 +437,7 @@ function autoUpdateLensResolution() {
     window.innerWidth * pixelRatio,
     window.innerHeight * pixelRatio
   );
+  backgroundUniforms.uResolution.value.set(window.innerWidth * pixelRatio, window.innerHeight * pixelRatio);
   maskRenderTarget.setSize(
     Math.floor(window.innerWidth * pixelRatio),
     Math.floor(window.innerHeight * pixelRatio)
@@ -376,6 +473,7 @@ function animate() {
 
   const elapsed = clock.getElapsedTime();
   wireMaterial.uniforms.uTime.value = elapsed;
+  backgroundUniforms.uTime.value = elapsed;
   scrollProgress += (scrollProgressTarget - scrollProgress) * 0.08;
 
   if (schoolModel) {
@@ -383,11 +481,7 @@ function animate() {
     const introProgress =
       introDuration === 0 ? 1 : clamp01((elapsed - introDelay) / introDuration);
     const introEase = 1 - Math.pow(1 - introProgress, 3);
-    const introCamera = new THREE.Vector3().lerpVectors(
-      introState.startCameraPos,
-      introState.endCameraPos,
-      introEase
-    );
+    introCamera.lerpVectors(introState.startCameraPos, introState.endCameraPos, introEase);
 
     camera.position.x = introCamera.x + mapRange(scrollProgress, 0, 1, 0, 0.5);
     camera.position.y = introCamera.y;
@@ -398,6 +492,7 @@ function animate() {
     camera.position.x = mapRange(scrollProgress, 0, 1, 0, 0.5);
   }
 
+  backgroundDome.position.copy(camera.position);
   updateLensPosition();
   renderWireMask();
   composer.render();
