@@ -134,10 +134,52 @@ scene.add(floor);
 let schoolModel = null;
 const schoolMeshes = [];
 const schoolWireframes = [];
-const wireMaterial = new THREE.LineBasicMaterial({
-  color: 0x00ffff,
+const wireMaterial = new THREE.ShaderMaterial({
+  uniforms: {
+    uTime: { value: 0 },
+    uColorBase: { value: new THREE.Color(0x0c4e24) },
+    uColorHot: { value: new THREE.Color(0x3ffd84) },
+    uSpeed: { value: 0.6 },
+    uPulse: { value: 3.0 },
+    uOpacity: { value: 1.0 }
+  },
+  vertexShader: /* glsl */ `
+    attribute float lineDistance;
+    varying float vLineDistance;
+
+    void main() {
+      vLineDistance = lineDistance;
+      vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+      gl_Position = projectionMatrix * mvPosition;
+    }
+  `,
+  fragmentShader: /* glsl */ `
+    uniform float uTime;
+    uniform vec3 uColorBase;
+    uniform vec3 uColorHot;
+    uniform float uSpeed;
+    uniform float uPulse;
+    uniform float uOpacity;
+
+    varying float vLineDistance;
+
+    void main() {
+      float flow = fract(vLineDistance * 0.32 - uTime * uSpeed);
+      float currentBand = smoothstep(0.0, 0.12, flow) * (1.0 - smoothstep(0.12, 0.45, flow));
+      float pulse = 0.55 + 0.45 * sin(uTime * uPulse + vLineDistance * 0.18);
+      float glow = max(currentBand, 0.35 * pulse);
+      vec3 color = mix(uColorBase, uColorHot, glow);
+      float alpha = (0.2 + 0.8 * glow) * uOpacity;
+
+      gl_FragColor = vec4(color, alpha);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+    }
+  `,
   transparent: true,
-  opacity: 1
+  opacity: 1,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending
 });
 const maskMaterial = new THREE.MeshBasicMaterial({
   color: 0x000000,
@@ -183,6 +225,7 @@ loader.load('/school.obj', (loadedModel) => {
 
       const edges = new THREE.EdgesGeometry(child.geometry, 15);
       const wire = new THREE.LineSegments(edges, wireMaterial);
+      wire.computeLineDistances();
       wire.visible = false;
       child.add(wire);
 
@@ -332,6 +375,7 @@ function animate() {
   requestAnimationFrame(animate);
 
   const elapsed = clock.getElapsedTime();
+  wireMaterial.uniforms.uTime.value = elapsed;
   scrollProgress += (scrollProgressTarget - scrollProgress) * 0.08;
 
   if (schoolModel) {
