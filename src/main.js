@@ -64,7 +64,7 @@ const hemiLight = new THREE.HemisphereLight('#ffffff', '#0f172a', 0.6);
 const dirLight = new THREE.DirectionalLight('#ffffff', 0.8);
 dirLight.position.set(5, 10, 3);
 dirLight.castShadow = true;
-dirLight.shadow.mapSize.set(2048, 2048);
+dirLight.shadow.mapSize.set(512,512);
 dirLight.shadow.radius = 20;
 dirLight.shadow.camera.left = -12;
 dirLight.shadow.camera.right = 12;
@@ -94,6 +94,7 @@ const introState = {
   endCameraPos: new THREE.Vector3(0, -2, 25),
   lookAt: new THREE.Vector3(0, 5, -5),
 };
+const introDelay = 0.8;
 const introDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 3.2;
 const loader = new OBJLoader();
 
@@ -106,7 +107,7 @@ const windowMaterial = new THREE.MeshPhysicalMaterial({ emissive: '#d7d7d7', emi
 const windows = [
   "Cube.024", "Cube.025", "Cube.026",
   "Cube.013", "Cube.014", "Cube.015",
-  "Cube.046", "Plane"
+  "Cube.046", "Plane", "Cylinder"
 ];
 
 loader.load('/school.obj', (loadedModel) => {
@@ -176,7 +177,9 @@ function animate() {
   scrollProgress += (scrollProgressTarget - scrollProgress) * 0.08;
 
   if (schoolModel) {
-    const introProgress = introDuration === 0 ? 1 : clamp01(elapsed / introDuration);
+    schoolModel.visible = elapsed >= introDelay;
+    const introProgress =
+      introDuration === 0 ? 1 : clamp01((elapsed - introDelay) / introDuration);
     const introEase = 1 - Math.pow(1 - introProgress, 3);
     const introCamera = new THREE.Vector3().lerpVectors(
       introState.startCameraPos,
