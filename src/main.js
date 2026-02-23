@@ -44,18 +44,13 @@ const backgroundMaterial = new THREE.ShaderMaterial({
   side: THREE.BackSide,
   depthWrite: false,
   vertexShader: /* glsl */ `
-    varying vec3 vWorldDir;
-
     void main() {
-      vec4 worldPos = modelMatrix * vec4(position, 1.0);
-      vWorldDir = normalize(worldPos.xyz - cameraPosition);
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
   `,
   fragmentShader: /* glsl */ `
     uniform float uTime;
     uniform vec2 uResolution;
-    varying vec3 vWorldDir;
 
     float hash21(vec2 p) {
       p = fract(p * vec2(123.34, 345.45));
@@ -92,15 +87,15 @@ const backgroundMaterial = new THREE.ShaderMaterial({
     }
 
     void main() {
-      vec2 uv = normalize(vWorldDir).xy;
+      vec2 uv = (gl_FragCoord.xy / uResolution.xy) * 2.0 - 1.0;
       uv.x *= uResolution.x / uResolution.y;
 
-      float t = uTime * 0.01;
+      float t = uTime * 0.02;
       vec2 flow = vec2(t, -t * 0.72);
 
-      float n = fbm(uv * 0.1 + flow);
-      n += 0.3 * fbm((uv + vec2(1.7, -2.1)) * 4.5 - flow * 1.8);
-      n *= 0.78;
+      float n = fbm(uv * 0.32 + flow);
+      n += 0.3 * fbm((uv + vec2(1.7, -2.1)) * 2.9 - flow * 1.8);
+      n *= 0.5;
 
       float bandCount = 18.0;
       float contour = fract(n * bandCount);
@@ -112,9 +107,9 @@ const backgroundMaterial = new THREE.ShaderMaterial({
 
       vec3 base = vec3(240.0/255.0);
 
-      vec3 ink = vec3(0.7,0.2,0.7);
+      vec3 ink = vec3(0.6,0.2,0.6);
 
-      vec3 color = base - ink * line * 0.32;
+      vec3 color = base - ink * line * 0.4;
 
       gl_FragColor = vec4(color, 1.0);
       #include <tonemapping_fragment>
@@ -196,11 +191,11 @@ const lensMaterial = new THREE.ShaderMaterial({
 const lens = new THREE.Mesh(new THREE.SphereGeometry(0.25, 96, 96), lensMaterial);
 scene.add(lens);
 
-const hemiLight = new THREE.HemisphereLight('#ffffff', '#0f172a', 0.6);
-const dirLight = new THREE.DirectionalLight('#ffffff', 0.8);
+const hemiLight = new THREE.HemisphereLight('#ffffff', 0.18);
+const dirLight = new THREE.DirectionalLight('#ffffff', 1.9);
 dirLight.position.set(5, 10, 3);
+dirLight.shadow.mapSize.set(1024,1024);
 dirLight.castShadow = true;
-dirLight.shadow.mapSize.set(512, 512);
 dirLight.shadow.radius = 20;
 dirLight.shadow.camera.left = -12;
 dirLight.shadow.camera.right = 12;
@@ -290,29 +285,19 @@ const introDelay = 0.8;
 const introDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 3.2;
 const loader = new OBJLoader();
 
-const schoolMaterial = new THREE.MeshStandardMaterial({ emissive: '#ffffff', emissiveIntensity: 0.2 });
-
-const windowFrameMaterial = new THREE.MeshStandardMaterial({ emissive: '#d9d9d9', emissiveIntensity: 0.15 });
-
-const windowMaterial = new THREE.MeshPhysicalMaterial({ emissive: '#d7d7d7', emissiveIntensity: 0.06 });
-
-const windows = [
-  'Cube.024', 'Cube.025', 'Cube.026',
-  'Cube.013', 'Cube.014', 'Cube.015',
-  'Cube.046', 'Plane', 'Cylinder'
-];
+const schoolMaterial = new THREE.MeshStandardMaterial({
+  color: '#ffffff',
+  roughness: 0.32,
+  metalness: 0.0,
+  emissive: '#ffffff',
+  emissiveIntensity: 0.12
+});
 
 loader.load('/school.obj', (loadedModel) => {
   schoolModel = loadedModel;
   schoolModel.traverse((child) => {
     if (child.isMesh) {
-      if (windows.includes(child.name)) {
-        child.material = windowMaterial;
-      } else if (child.name === 'Cube.038') {
-        child.material = windowFrameMaterial;
-      } else {
-        child.material = schoolMaterial;
-      }
+      child.material = schoolMaterial;
       child.castShadow = true;
       child.receiveShadow = true;
 
@@ -492,7 +477,6 @@ function animate() {
     camera.position.x = mapRange(scrollProgress, 0, 1, 0, 0.5);
   }
 
-  backgroundDome.position.copy(camera.position);
   updateLensPosition();
   renderWireMask();
   composer.render();
