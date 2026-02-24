@@ -82,9 +82,14 @@ const maskRenderTarget = new THREE.WebGLRenderTarget(1, 1, {
 maskRenderTarget.texture.colorSpace = THREE.SRGBColorSpace;
 
 const lensVertexShader = /* glsl */ `
+varying vec3 vNormal;
+varying vec3 vViewDir;
+
 void main() {
   vec4 worldPos = modelMatrix * vec4(position, 1.0);
   vec4 mvPosition = viewMatrix * worldPos;
+  vNormal = normalize(normalMatrix * normal);
+  vViewDir = normalize(-mvPosition.xyz);
   gl_Position = projectionMatrix * mvPosition;
 }
 `;
@@ -92,11 +97,42 @@ void main() {
 const lensFragmentShader = /* glsl */ `
 uniform vec2 winResolution;
 uniform sampler2D uTexture;
+uniform float uIor;
+uniform float uChromatic;
+uniform float uEdgeStrength;
+
+varying vec3 vNormal;
+varying vec3 vViewDir;
 
 void main() {
   vec2 uv = gl_FragCoord.xy / winResolution.xy;
-  vec4 color = texture2D(uTexture, uv);
-  gl_FragColor = color;
+  vec3 normal = normalize(vNormal);
+  vec3 viewDir = normalize(vViewDir);
+
+  float fresnel = pow(1.0 - max(dot(normal, viewDir), 0.0), 2.0);
+  float edge = fresnel * uEdgeStrength;
+
+  vec2 dir = normal.xy;
+  float dirLen = length(dir);
+  if (dirLen > 0.0001) {
+    dir /= dirLen;
+  } else {
+    dir = vec2(0.0, 1.0);
+  }
+
+  float distort = (uIor - 1.0) * 0.08 * edge;
+  vec2 offsetR = dir * (distort * (1.0 + uChromatic));
+  vec2 offsetG = dir * (distort * 0.55);
+  vec2 offsetB = -dir * (distort * (0.85 + uChromatic * 0.5));
+
+  vec3 center = texture2D(uTexture, uv).rgb;
+  vec3 refracted = vec3(
+    texture2D(uTexture, uv + offsetR).r,
+    texture2D(uTexture, uv + offsetG).g,
+    texture2D(uTexture, uv + offsetB).b
+  );
+  vec3 color = mix(center, refracted, clamp(edge, 0.0, 1.0));
+  gl_FragColor = vec4(color, 1.0);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
 }
@@ -104,7 +140,10 @@ void main() {
 
 const lensUniforms = {
   uTexture: { value: maskRenderTarget.texture },
-  winResolution: { value: new THREE.Vector2() }
+  winResolution: { value: new THREE.Vector2() },
+  uIor: { value: 1.04 },
+  uChromatic: { value: 0.05 },
+  uEdgeStrength: { value: 2.0 }
 };
 
 const lensMaterial = new THREE.ShaderMaterial({
@@ -116,7 +155,7 @@ const lensMaterial = new THREE.ShaderMaterial({
   depthWrite: false
 });
 
-const lens = new THREE.Mesh(new THREE.SphereGeometry(0.25, 64, 64), lensMaterial);
+const lens = new THREE.Mesh(new THREE.SphereGeometry(0.2, 64, 64), lensMaterial);
 lens.scale.setScalar(0.001);
 lens.visible = false;
 scene.add(lens);
