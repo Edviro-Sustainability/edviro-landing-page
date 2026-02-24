@@ -4,6 +4,8 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
+import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 import './style.css';
@@ -12,7 +14,8 @@ const canvas = document.querySelector('#webgl');
 const heroTitle = document.querySelector('.hero-title');
 
 const scene = new THREE.Scene();
-scene.background = null;
+scene.background = new THREE.Color(0xf9f0f9);
+scene.fog = new THREE.FogExp2(0xf9f0f9, 0.014);
 
 const camera = new THREE.PerspectiveCamera(
   40,
@@ -35,94 +38,6 @@ renderer.toneMappingExposure = 1.05;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-const backgroundUniforms = {
-  uTime: { value: 0 },
-  uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
-};
-
-const backgroundMaterial = new THREE.ShaderMaterial({
-  uniforms: backgroundUniforms,
-  side: THREE.BackSide,
-  depthWrite: false,
-  vertexShader: /* glsl */ `
-    void main() {
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `,
-  fragmentShader: /* glsl */ `
-    uniform float uTime;
-    uniform vec2 uResolution;
-
-    float hash21(vec2 p) {
-      p = fract(p * vec2(123.34, 345.45));
-      p += dot(p, p + 34.345);
-      return fract(p.x * p.y);
-    }
-
-    float noise2d(vec2 p) {
-      vec2 i = floor(p);
-      vec2 f = fract(p);
-      f = f * f * (3.0 - 2.0 * f);
-
-      float a = hash21(i);
-      float b = hash21(i + vec2(1.0, 0.0));
-      float c = hash21(i + vec2(0.0, 1.0));
-      float d = hash21(i + vec2(1.0, 1.0));
-
-      float x1 = mix(a, b, f.x);
-      float x2 = mix(c, d, f.x);
-      return mix(x1, x2, f.y);
-    }
-
-    float fbm(vec2 p) {
-      float v = 0.0;
-      float a = 0.55;
-      mat2 rot = mat2(0.8, -0.6, 0.6, 0.8);
-
-      v += a * noise2d(p);
-      p = rot * p * 2.02;
-      a *= 0.5;
-
-      v += a * noise2d(p);
-      return v;
-    }
-
-    void main() {
-      vec2 uv = (gl_FragCoord.xy / uResolution.xy) * 2.0 - 1.0;
-      uv.x *= uResolution.x / uResolution.y;
-
-      float t = uTime * 0.02;
-      vec2 flow = vec2(t, -t * 0.72);
-
-      float n = fbm(uv * 0.32 + flow);
-      n += 0.3 * fbm((uv + vec2(1.7, -2.1)) * 2.9 - flow * 1.8);
-      n *= 0.5;
-
-      float bandCount = 18.0;
-      float contour = fract(n * bandCount);
-      float distToLine = abs(contour - 0.5);
-
-      float aa = max(fwidth(n * bandCount), 0.0015);
-      float lineWidth = 0.020;
-      float line = 1.0 - smoothstep(lineWidth - aa, lineWidth + aa, distToLine);
-
-      vec3 base = vec3(240.0/255.0);
-
-      vec3 ink = vec3(0.6,0.2,0.6);
-
-      vec3 color = base - ink * line * 0.4;
-
-      gl_FragColor = vec4(color, 1.0);
-      #include <tonemapping_fragment>
-      #include <colorspace_fragment>
-    }
-  `
-});
-
-const backgroundDome = new THREE.Mesh(new THREE.SphereGeometry(55, 32, 24), backgroundMaterial);
-backgroundDome.frustumCulled = false;
-scene.add(backgroundDome);
-
 const composer = new EffectComposer(renderer);
 composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 composer.setSize(window.innerWidth, window.innerHeight);
@@ -130,13 +45,32 @@ composer.setSize(window.innerWidth, window.innerHeight);
 const renderPass = new RenderPass(scene, camera);
 composer.addPass(renderPass);
 
-const bloomPass = new UnrealBloomPass(
+const outlinePass = new OutlinePass(
   new THREE.Vector2(window.innerWidth, window.innerHeight),
-  0.1,
-  0.7,
-  0.82
+  scene,
+  camera
 );
-composer.addPass(bloomPass);
+outlinePass.edgeStrength = 4.0;
+outlinePass.edgeGlow = 0.0;
+outlinePass.edgeThickness = 1.5;
+outlinePass.pulsePeriod = 0.0;
+outlinePass.visibleEdgeColor.set(0x000000);
+outlinePass.hiddenEdgeColor.set(0x000000);
+composer.addPass(outlinePass);
+
+// const bloomPass = new UnrealBloomPass(
+//   new THREE.Vector2(window.innerWidth, window.innerHeight),
+//   0.1,
+//   0.7,
+//   0.82
+// );
+// composer.addPass(bloomPass);
+
+const dofPass = new BokehPass(scene, camera, {
+  focus: 10.0,
+  aperture: 0.0001
+});
+composer.addPass(dofPass);
 
 const pixelRatio = Math.min(window.devicePixelRatio, 2);
 const fxaaPass = new ShaderPass(FXAAShader);
@@ -209,18 +143,18 @@ scene.add(hemiLight, dirLight);
 const subjectGroup = new THREE.Group();
 scene.add(subjectGroup);
 
-// let floor = null;
-// const floorMaterial = new THREE.MeshStandardMaterial({
-//   color: '#ffffff',
-//   roughness: 0.9,
-//   metalness: 0.05
-// });
-// const floorGeometry = new THREE.PlaneGeometry(32, 20);
-// floor = new THREE.Mesh(floorGeometry, floorMaterial);
-// floor.rotation.x = -Math.PI / 2;
-// floor.position.set(0, -3, 8);
-// floor.receiveShadow = true;
-// scene.add(floor);
+let floor = null;
+const floorMaterial = new THREE.MeshStandardMaterial({
+  color: '#ffffff',
+  roughness: 0.9,
+  metalness: 0.05
+});
+const floorGeometry = new THREE.PlaneGeometry(128,128);
+floor = new THREE.Mesh(floorGeometry, floorMaterial);
+floor.rotation.x = -Math.PI / 2;
+floor.position.set(0, -4, 0);
+floor.receiveShadow = true;
+scene.add(floor);
 
 let schoolModel = null;
 const schoolMeshes = [];
@@ -308,8 +242,8 @@ const maskMaterial = new THREE.MeshBasicMaterial({
 
 const introState = {
   startCameraPos: new THREE.Vector3(0, 10, -4),
-  endCameraPos: new THREE.Vector3(0, 0, 22),
-  lookAt: new THREE.Vector3(0, 3, -3)
+  endCameraPos: new THREE.Vector3(8,10,26),
+  lookAt: new THREE.Vector3(0, 0, 0)
 };
 const introDelay = 1.8;
 const introDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 2.55;
@@ -334,25 +268,33 @@ const schoolMaterial = new THREE.MeshStandardMaterial({
 
 loader.load('/school.obj', (loadedModel) => {
   schoolModel = loadedModel;
+  const modelMeshes = [];
   schoolModel.traverse((child) => {
     if (child.isMesh) {
-      child.material = schoolMaterial;
-      child.castShadow = true;
-      child.receiveShadow = true;
-
-      const edges = new THREE.EdgesGeometry(child.geometry, 15);
-      const wire = new THREE.LineSegments(edges, wireMaterial);
-      wire.computeLineDistances();
-      wire.visible = true;
-      child.add(wire);
-
-      schoolMeshes.push(child);
-      schoolWireframes.push(wire);
+      modelMeshes.push(child);
     }
   });
 
+  for (const mesh of modelMeshes) {
+    mesh.material = schoolMaterial;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+
+    if (mesh.name !== 'Base' && mesh.name !== 'Chair' && mesh.name !== 'Tree') {
+      const edges = new THREE.EdgesGeometry(mesh.geometry, 15);
+      const wire = new THREE.LineSegments(edges, wireMaterial);
+      wire.computeLineDistances();
+      wire.visible = true;
+      mesh.add(wire);
+      schoolWireframes.push(wire);
+    }
+
+    schoolMeshes.push(mesh);
+  }
+  outlinePass.selectedObjects = [...schoolMeshes];
+
   schoolModel.scale.setScalar(0.12);
-  schoolModel.position.set(0, -3, 0);
+  schoolModel.position.set(0, -4, 0);
 
   subjectGroup.add(schoolModel);
   schoolModel.updateWorldMatrix(true, true);
@@ -422,9 +364,14 @@ function renderWireMask() {
 
   const previousBackground = scene.background;
   const previousLensVisible = lens.visible;
+  const previousFloorVisible = floor ? floor.visible : false;
+  const previousShadowMapEnabled = renderer.shadowMap.enabled;
   scene.background = maskBackground;
   lens.visible = false;
-  backgroundDome.visible = false;
+  if (floor) {
+    floor.visible = false;
+  }
+  renderer.shadowMap.enabled = false;
 
   for (const mesh of schoolMeshes) {
     previousMaterials.set(mesh, mesh.material);
@@ -452,7 +399,10 @@ function renderWireMask() {
 
   previousMaterials.clear();
   lens.visible = previousLensVisible;
-  backgroundDome.visible = true;
+  if (floor) {
+    floor.visible = previousFloorVisible;
+  }
+  renderer.shadowMap.enabled = previousShadowMapEnabled;
   scene.background = previousBackground;
 }
 
@@ -522,7 +472,6 @@ function autoUpdateLensResolution() {
     window.innerWidth * pixelRatio,
     window.innerHeight * pixelRatio
   );
-  backgroundUniforms.uResolution.value.set(window.innerWidth * pixelRatio, window.innerHeight * pixelRatio);
   maskRenderTarget.setSize(
     Math.floor(window.innerWidth * pixelRatio),
     Math.floor(window.innerHeight * pixelRatio)
@@ -549,7 +498,9 @@ window.addEventListener('resize', () => {
   renderer.setPixelRatio(pixelRatio);
   composer.setPixelRatio(pixelRatio);
   composer.setSize(window.innerWidth, window.innerHeight);
+  outlinePass.setSize(window.innerWidth, window.innerHeight);
   bloomPass.setSize(window.innerWidth, window.innerHeight);
+  dofPass.setSize(window.innerWidth, window.innerHeight);
   fxaaPass.material.uniforms.resolution.value.set(
     1 / (window.innerWidth * pixelRatio),
     1 / (window.innerHeight * pixelRatio)
@@ -573,7 +524,6 @@ function animate() {
   }
 
   wireMaterial.uniforms.uTime.value = elapsed;
-  backgroundUniforms.uTime.value = elapsed;
   scrollProgress += (scrollProgressTarget - scrollProgress) * 0.08;
 
   const pulsePhase = elapsed % pulseConfig.interval;

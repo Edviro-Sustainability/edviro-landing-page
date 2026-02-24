@@ -1,5 +1,5 @@
 :root {
-  --bg-base: #020617;
+  --bg-base: #ffffff;
   --text-primary: #000000;
   --text-muted: #94a3b8;
   --glass: rgba(15, 23, 42, 0.55);
@@ -14,7 +14,7 @@ html,
 body {
   margin: 0;
   min-width: 320px;
-  background: radial-gradient(circle at top, #1e293b 0%, var(--bg-base) 55%);
+  background: var(--bg-base);
   color: var(--text-primary);
   font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
   overscroll-behavior: none;
