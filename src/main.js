@@ -50,13 +50,6 @@ const outlinePass = new OutlinePass(
   scene,
   camera
 );
-outlinePass.edgeStrength = 4.0;
-outlinePass.edgeGlow = 0.0;
-outlinePass.edgeThickness = 1.5;
-outlinePass.pulsePeriod = 0.0;
-outlinePass.visibleEdgeColor.set(0x000000);
-outlinePass.hiddenEdgeColor.set(0x000000);
-composer.addPass(outlinePass);
 
 // const bloomPass = new UnrealBloomPass(
 //   new THREE.Vector2(window.innerWidth, window.innerHeight),
@@ -168,16 +161,22 @@ const schoolMaskFillMaterial = new THREE.MeshBasicMaterial({
   depthWrite: false
 });
 const schoolMaskWireframeMaterial = new THREE.LineBasicMaterial({
-  color: 0xffffff
+  color: 0x999999,
+  linewidth: 3,
+  transparent: false,
+  opacity: 1.0,
+  toneMapped: false,
+  fog: false,
+  depthTest: false,
+  depthWrite: false
 });
 const wiringElectricMaterial = new THREE.ShaderMaterial({
   uniforms: {
     uTime: { value: 0 },
-    uColorBase: { value: new THREE.Color(0x0c4e24) },
-    uColorHot: { value: new THREE.Color(0x3ffd84) },
-    uSpeed: { value: 0.75 },
-    uPulse: { value: 3.0 },
-    uOpacity: { value: 1.0 }
+    uColorBase: { value: new THREE.Color(0x298d4e) },
+    uColorHot: { value: new THREE.Color(0x69ef81) },  
+    uSpeed: { value: 0.4 },
+    uPulse: { value: 4.2 },
   },
   vertexShader: /* glsl */ `
     varying vec3 vWorldPos;
@@ -195,32 +194,32 @@ const wiringElectricMaterial = new THREE.ShaderMaterial({
     uniform vec3 uColorHot;
     uniform float uSpeed;
     uniform float uPulse;
-    uniform float uOpacity;
 
     varying vec3 vWorldPos;
 
     void main() {
-      float flow = fract((vWorldPos.x + vWorldPos.z) * 0.28 - uTime * uSpeed);
-      float band = smoothstep(0.0, 0.14, flow) * (1.0 - smoothstep(0.14, 0.5, flow));
-      float pulse = 0.5 + 0.5 * sin(uTime * uPulse + vWorldPos.y * 1.8);
-      float glow = max(band, 0.35 * pulse);
+      float flow = fract((vWorldPos.x + vWorldPos.z) * 0.42 - uTime * uSpeed);
+      float bandA = smoothstep(0.0, 0.08, flow) * (1.0 - smoothstep(0.08, 0.26, flow));
+      float bandB = smoothstep(0.55, 0.72, flow) * (1.0 - smoothstep(0.72, 0.9, flow));
+      float pulse = 0.5 + 0.5 * sin(uTime * uPulse + vWorldPos.y * 2.2);
+      float glow = max(max(bandA, bandB), 0.45 * pulse);
       vec3 color = mix(uColorBase, uColorHot, glow);
-      float alpha = (0.25 + 0.75 * glow) * uOpacity;
 
-      gl_FragColor = vec4(color, alpha);
+      gl_FragColor = vec4(color, 1.0);
       #include <tonemapping_fragment>
       #include <colorspace_fragment>
     }
   `,
   transparent: true,
   depthWrite: false,
-  blending: THREE.AdditiveBlending
+  blending: THREE.NormalBlending
 });
 
 const introState = {
-  startCameraPos: new THREE.Vector3(0, 10, -20),
+  startCameraPos: new THREE.Vector3(0, 10, -30),
   endCameraPos: new THREE.Vector3(8,10,26),
-  lookAt: new THREE.Vector3(0, 0, 0)
+  startLookAt: new THREE.Vector3(0, 0, -30),
+  endLookAt: new THREE.Vector3(0, 0, 0)
 };
 const introDelay = 1.8;
 const introDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 2.55;
@@ -229,10 +228,18 @@ const loader = new OBJLoader();
 
 const schoolMaterial = new THREE.MeshStandardMaterial({
   color: '#ffffff',
-  roughness: 0.32,
-  metalness: 0.0,
   emissive: '#ffffff',
   emissiveIntensity: 0.12
+});
+const windowMaterial = new THREE.MeshStandardMaterial({
+  color: '#ccffd4',
+  emissive: '#ccffd4',
+  emissiveIntensity: 0.1
+});
+const treeMaterial = new THREE.MeshStandardMaterial({
+  color: '#69ef81',
+  emissive: '#69ef81',
+  emissiveIntensity: 0.1
 });
 
 loader.load('/school.obj', (loadedModel) => {
@@ -245,15 +252,25 @@ loader.load('/school.obj', (loadedModel) => {
   });
 
   for (const mesh of modelMeshes) {
-    mesh.material = schoolMaterial;
+    const materialMap = {
+        Tree: treeMaterial,
+        Windows: windowMaterial,
+        School: schoolMaterial
+    };
+    mesh.material = materialMap[mesh.name] || schoolMaterial;
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     if (mesh.name !== "Tree") {
       const edges = new THREE.EdgesGeometry(mesh.geometry, 15);
       const wire = new THREE.LineSegments(edges, schoolMaskWireframeMaterial);
+      const wireOffset = new THREE.LineSegments(edges, schoolMaskWireframeMaterial);
       wire.visible = false;
-      mesh.add(wire);
-      schoolMaskWireframes.push(wire);
+      wireOffset.visible = false;
+      wire.renderOrder = 1000;
+      wireOffset.renderOrder = 1000;
+      wireOffset.scale.setScalar(1.003);
+      mesh.add(wire, wireOffset);
+      schoolMaskWireframes.push(wire, wireOffset);
     }
 
     schoolMeshes.push(mesh);
@@ -337,7 +354,7 @@ function updateLensPosition() {
   lens.position.copy(lensPosition);
 }
 
-const maskBackground = new THREE.Color(0x000000);
+const maskBackground = new THREE.Color(0xffffff);
 const previousMaterials = new Map();
 
 function renderWireMask() {
@@ -392,6 +409,7 @@ const clock = new THREE.Clock();
 let scrollProgress = 0;
 let scrollProgressTarget = 0;
 const introCamera = new THREE.Vector3();
+const introLookAt = new THREE.Vector3();
 let introEaseSmoothed = 0;
 const titleIntroState = {
   offsetX: 0,
@@ -411,7 +429,8 @@ function mapRange(value, inMin, inMax, outMin, outMax) {
 function getIntroEase(elapsed) {
   const introProgress =
     introDuration === 0 ? 1 : clamp01((elapsed - introDelay) / introDuration);
-  return 1 - Math.pow(1 - introProgress, introEasePower);
+  const eased = 1 - Math.pow(1 - introProgress, introEasePower);
+  return eased * eased * (3 - 2 * eased);
 }
 
 function computeTitleIntroStartTransform() {
@@ -498,11 +517,8 @@ function animate() {
   const delta = clock.getDelta();
   const elapsed = clock.elapsedTime;
   const introEaseTarget = getIntroEase(elapsed);
-  const introBlend = 1.0 - Math.exp(-11.0 * delta);
+  const introBlend = 1.0 - Math.exp(-7.5 * delta);
   introEaseSmoothed += (introEaseTarget - introEaseSmoothed) * introBlend;
-  if (introEaseTarget > 0.999 && introEaseSmoothed > 0.997) {
-    introEaseSmoothed = 1;
-  }
 
   wiringElectricMaterial.uniforms.uTime.value = elapsed;
   scrollProgress += (scrollProgressTarget - scrollProgress) * 0.08;
@@ -510,14 +526,16 @@ function animate() {
   if (schoolModel) {
     schoolModel.visible = elapsed >= introDelay;
     introCamera.lerpVectors(introState.startCameraPos, introState.endCameraPos, introEaseSmoothed);
+    introLookAt.lerpVectors(introState.startLookAt, introState.endLookAt, introEaseSmoothed);
 
     camera.position.x = introCamera.x + mapRange(scrollProgress, 0, 1, 0, 0.5);
     camera.position.y = introCamera.y;
     camera.position.z = introCamera.z + mapRange(scrollProgress, 0, 1, 0, -1.2);
-    camera.lookAt(introState.lookAt);
+    camera.lookAt(introLookAt);
   } else {
     camera.position.z = mapRange(scrollProgress, 0, 1, 7.5, 5.8);
     camera.position.x = mapRange(scrollProgress, 0, 1, 0, 0.5);
+    camera.lookAt(introState.endLookAt);
   }
   updateTitleIntroTransform(introEaseSmoothed);
 
