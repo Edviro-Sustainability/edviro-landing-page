@@ -157,31 +157,34 @@ floor.receiveShadow = true;
 scene.add(floor);
 
 let schoolModel = null;
+let wiringModel = null;
 const schoolMeshes = [];
-const schoolWireframes = [];
-const wireMaterial = new THREE.ShaderMaterial({
+const outlineMeshes = [];
+const schoolMaskWireframes = [];
+const schoolMaskFillMaterial = new THREE.MeshBasicMaterial({
+  color: 0x000000,
+  transparent: true,
+  opacity: 0,
+  depthWrite: false
+});
+const schoolMaskWireframeMaterial = new THREE.LineBasicMaterial({
+  color: 0xffffff
+});
+const wiringElectricMaterial = new THREE.ShaderMaterial({
   uniforms: {
     uTime: { value: 0 },
     uColorBase: { value: new THREE.Color(0x0c4e24) },
     uColorHot: { value: new THREE.Color(0x3ffd84) },
-    uSpeed: { value: 0.6 },
+    uSpeed: { value: 0.75 },
     uPulse: { value: 3.0 },
-    uOpacity: { value: 1.0 },
-    uPulseCenter: { value: 0.0 },
-    uPulseHalfWidth: { value: 1.4 },
-    uPulseSoftness: { value: 0.45 },
-    uPulseActive: { value: 0.0 },
-    uMaskPass: { value: 0.0 }
+    uOpacity: { value: 1.0 }
   },
   vertexShader: /* glsl */ `
-    attribute float lineDistance;
-    varying float vLineDistance;
-    varying float vWorldX;
+    varying vec3 vWorldPos;
 
     void main() {
-      vLineDistance = lineDistance;
       vec4 worldPos = modelMatrix * vec4(position, 1.0);
-      vWorldX = worldPos.x;
+      vWorldPos = worldPos.xyz;
       vec4 mvPosition = viewMatrix * worldPos;
       gl_Position = projectionMatrix * mvPosition;
     }
@@ -193,35 +196,16 @@ const wireMaterial = new THREE.ShaderMaterial({
     uniform float uSpeed;
     uniform float uPulse;
     uniform float uOpacity;
-    uniform float uPulseCenter;
-    uniform float uPulseHalfWidth;
-    uniform float uPulseSoftness;
-    uniform float uPulseActive;
-    uniform float uMaskPass;
 
-    varying float vLineDistance;
-    varying float vWorldX;
+    varying vec3 vWorldPos;
 
     void main() {
-      float flow = fract(vLineDistance * 0.32 - uTime * uSpeed);
-      float currentBand = smoothstep(0.0, 0.12, flow) * (1.0 - smoothstep(0.12, 0.45, flow));
-      float pulse = 0.55 + 0.45 * sin(uTime * uPulse + vLineDistance * 0.18);
-      float glow = max(currentBand, 0.35 * pulse);
+      float flow = fract((vWorldPos.x + vWorldPos.z) * 0.28 - uTime * uSpeed);
+      float band = smoothstep(0.0, 0.14, flow) * (1.0 - smoothstep(0.14, 0.5, flow));
+      float pulse = 0.5 + 0.5 * sin(uTime * uPulse + vWorldPos.y * 1.8);
+      float glow = max(band, 0.35 * pulse);
       vec3 color = mix(uColorBase, uColorHot, glow);
-
-      float leftFade = smoothstep(
-        uPulseCenter - uPulseHalfWidth - uPulseSoftness,
-        uPulseCenter - uPulseHalfWidth,
-        vWorldX
-      );
-      float rightFade = 1.0 - smoothstep(
-        uPulseCenter + uPulseHalfWidth,
-        uPulseCenter + uPulseHalfWidth + uPulseSoftness,
-        vWorldX
-      );
-      float revealBand = leftFade * rightFade;
-      float reveal = mix(revealBand * uPulseActive, 1.0, step(0.5, uMaskPass));
-      float alpha = (0.2 + 0.8 * glow) * uOpacity * reveal;
+      float alpha = (0.25 + 0.75 * glow) * uOpacity;
 
       gl_FragColor = vec4(color, alpha);
       #include <tonemapping_fragment>
@@ -229,33 +213,18 @@ const wireMaterial = new THREE.ShaderMaterial({
     }
   `,
   transparent: true,
-  opacity: 1,
   depthWrite: false,
   blending: THREE.AdditiveBlending
 });
-const maskMaterial = new THREE.MeshBasicMaterial({
-  color: 0x000000,
-  transparent: true,
-  opacity: 0,
-  depthWrite: false
-});
 
 const introState = {
-  startCameraPos: new THREE.Vector3(0, 10, -4),
+  startCameraPos: new THREE.Vector3(0, 10, -20),
   endCameraPos: new THREE.Vector3(8,10,26),
   lookAt: new THREE.Vector3(0, 0, 0)
 };
 const introDelay = 1.8;
 const introDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 2.55;
 const introEasePower = 3.4;
-const pulseConfig = {
-  interval: 4.8,
-  duration: 1.2,
-  padding: 0.35,
-  minX: -1.0,
-  maxX: 1.0,
-  ready: false
-};
 const loader = new OBJLoader();
 
 const schoolMaterial = new THREE.MeshStandardMaterial({
@@ -279,29 +248,43 @@ loader.load('/school.obj', (loadedModel) => {
     mesh.material = schoolMaterial;
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-
-    if (mesh.name !== 'Base' && mesh.name !== 'Chair' && mesh.name !== 'Tree') {
+    if (mesh.name !== "Tree") {
       const edges = new THREE.EdgesGeometry(mesh.geometry, 15);
-      const wire = new THREE.LineSegments(edges, wireMaterial);
-      wire.computeLineDistances();
-      wire.visible = true;
+      const wire = new THREE.LineSegments(edges, schoolMaskWireframeMaterial);
+      wire.visible = false;
       mesh.add(wire);
-      schoolWireframes.push(wire);
+      schoolMaskWireframes.push(wire);
     }
 
     schoolMeshes.push(mesh);
+    if (mesh.name !== "Tree") {
+      outlineMeshes.push(mesh);
+    }
   }
-  outlinePass.selectedObjects = [...schoolMeshes];
+  outlinePass.selectedObjects = [...outlineMeshes];
 
   schoolModel.scale.setScalar(0.12);
   schoolModel.position.set(0, -4, 0);
 
   subjectGroup.add(schoolModel);
-  schoolModel.updateWorldMatrix(true, true);
-  const modelBounds = new THREE.Box3().setFromObject(schoolModel);
-  pulseConfig.minX = modelBounds.min.x;
-  pulseConfig.maxX = modelBounds.max.x;
-  pulseConfig.ready = true;
+});
+
+loader.load('/wiring.obj', (loadedModel) => {
+  wiringModel = loadedModel;
+  wiringModel.scale.setScalar(0.12);
+  wiringModel.position.set(0, -4, 0);
+  wiringModel.visible = false;
+
+  wiringModel.traverse((child) => {
+    if (!child.isMesh) {
+      return;
+    }
+    child.material = wiringElectricMaterial;
+    child.castShadow = false;
+    child.receiveShadow = false;
+  });
+
+  subjectGroup.add(wiringModel);
 });
 
 const pointerTarget = new THREE.Vector2(0, 0);
@@ -358,16 +341,18 @@ const maskBackground = new THREE.Color(0x000000);
 const previousMaterials = new Map();
 
 function renderWireMask() {
-  if (!schoolModel || schoolMeshes.length === 0) {
+  if (!wiringModel || schoolMeshes.length === 0) {
     return;
   }
 
   const previousBackground = scene.background;
   const previousLensVisible = lens.visible;
+  const previousWiringVisible = wiringModel.visible;
   const previousFloorVisible = floor ? floor.visible : false;
   const previousShadowMapEnabled = renderer.shadowMap.enabled;
   scene.background = maskBackground;
   lens.visible = false;
+  wiringModel.visible = true;
   if (floor) {
     floor.visible = false;
   }
@@ -375,29 +360,26 @@ function renderWireMask() {
 
   for (const mesh of schoolMeshes) {
     previousMaterials.set(mesh, mesh.material);
-    mesh.material = maskMaterial;
+    mesh.material = schoolMaskFillMaterial;
   }
-
-  for (const wire of schoolWireframes) {
+  for (const wire of schoolMaskWireframes) {
     wire.visible = true;
   }
 
-  wireMaterial.uniforms.uMaskPass.value = 1.0;
   renderer.setRenderTarget(maskRenderTarget);
   renderer.clear();
   renderer.render(scene, camera);
   renderer.setRenderTarget(null);
-  wireMaterial.uniforms.uMaskPass.value = 0.0;
 
+  for (const wire of schoolMaskWireframes) {
+    wire.visible = false;
+  }
   for (const mesh of schoolMeshes) {
     mesh.material = previousMaterials.get(mesh);
   }
-
-  for (const wire of schoolWireframes) {
-    wire.visible = true;
-  }
-
   previousMaterials.clear();
+
+  wiringModel.visible = previousWiringVisible;
   lens.visible = previousLensVisible;
   if (floor) {
     floor.visible = previousFloorVisible;
@@ -499,7 +481,6 @@ window.addEventListener('resize', () => {
   composer.setPixelRatio(pixelRatio);
   composer.setSize(window.innerWidth, window.innerHeight);
   outlinePass.setSize(window.innerWidth, window.innerHeight);
-  bloomPass.setSize(window.innerWidth, window.innerHeight);
   dofPass.setSize(window.innerWidth, window.innerHeight);
   fxaaPass.material.uniforms.resolution.value.set(
     1 / (window.innerWidth * pixelRatio),
@@ -523,16 +504,8 @@ function animate() {
     introEaseSmoothed = 1;
   }
 
-  wireMaterial.uniforms.uTime.value = elapsed;
+  wiringElectricMaterial.uniforms.uTime.value = elapsed;
   scrollProgress += (scrollProgressTarget - scrollProgress) * 0.08;
-
-  const pulsePhase = elapsed % pulseConfig.interval;
-  const pulseActive = pulseConfig.ready && pulsePhase <= pulseConfig.duration ? 1.0 : 0.0;
-  const pulseT = pulseConfig.duration > 0 ? clamp01(pulsePhase / pulseConfig.duration) : 1.0;
-  const pulseStart = pulseConfig.minX - pulseConfig.padding;
-  const pulseEnd = pulseConfig.maxX + pulseConfig.padding;
-  wireMaterial.uniforms.uPulseCenter.value = THREE.MathUtils.lerp(pulseStart, pulseEnd, pulseT);
-  wireMaterial.uniforms.uPulseActive.value = pulseActive;
 
   if (schoolModel) {
     schoolModel.visible = elapsed >= introDelay;
