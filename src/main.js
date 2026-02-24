@@ -51,17 +51,9 @@ const outlinePass = new OutlinePass(
   camera
 );
 
-// const bloomPass = new UnrealBloomPass(
-//   new THREE.Vector2(window.innerWidth, window.innerHeight),
-//   0.1,
-//   0.7,
-//   0.82
-// );
-// composer.addPass(bloomPass);
-
 const dofPass = new BokehPass(scene, camera, {
   focus: 10.0,
-  aperture: 0.0001
+  aperture: 0.00012
 });
 composer.addPass(dofPass);
 
@@ -176,11 +168,7 @@ const subjectGroup = new THREE.Group();
 scene.add(subjectGroup);
 
 let floor = null;
-const floorMaterial = new THREE.MeshStandardMaterial({
-  color: '#ffffff',
-  roughness: 0.9,
-  metalness: 0.05
-});
+const floorMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', });
 const floorGeometry = new THREE.PlaneGeometry(128,128);
 floor = new THREE.Mesh(floorGeometry, floorMaterial);
 floor.rotation.x = -Math.PI / 2;
@@ -265,21 +253,9 @@ const introDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matc
 const introEasePower = 3.4;
 const loader = new OBJLoader();
 
-const schoolMaterial = new THREE.MeshStandardMaterial({
-  color: '#ffffff',
-  emissive: '#ffffff',
-  emissiveIntensity: 0.12
-});
-const windowMaterial = new THREE.MeshStandardMaterial({
-  color: '#ccffd4',
-  emissive: '#ccffd4',
-  emissiveIntensity: 0.1
-});
-const treeMaterial = new THREE.MeshStandardMaterial({
-  color: '#69ef81',
-  emissive: '#69ef81',
-  emissiveIntensity: 0.1
-});
+const schoolMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', });
+const windowMaterial = new THREE.MeshStandardMaterial({ color: '#90c2b0', });
+const treeMaterial = new THREE.MeshStandardMaterial({ color: '#87eb99', });
 
 loader.load('/school.obj', (loadedModel) => {
   schoolModel = loadedModel;
