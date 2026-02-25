@@ -53,7 +53,7 @@ const outlinePass = new OutlinePass(
 
 const dofPass = new BokehPass(scene, camera, {
   focus: 10.0,
-  aperture: 0.00012
+  aperture: 0.00008
 });
 composer.addPass(dofPass);
 
@@ -151,6 +151,7 @@ const lensMaterial = new THREE.ShaderMaterial({
 const lens = new THREE.Mesh(new THREE.SphereGeometry(0.2, 64, 64), lensMaterial);
 lens.scale.setScalar(0.001);
 lens.visible = false;
+lens.renderOrder = 1100;
 scene.add(lens);
 
 const hemiLight = new THREE.HemisphereLight('#ffffff', 2);
@@ -182,6 +183,7 @@ let wiringModel = null;
 const schoolMeshes = [];
 const outlineMeshes = [];
 const schoolMaskWireframes = [];
+const schoolNoiseOverlays = [];
 const schoolMaskFillMaterial = new THREE.MeshBasicMaterial({
   color: 0x000000,
   transparent: true,
@@ -242,6 +244,115 @@ const wiringElectricMaterial = new THREE.ShaderMaterial({
   depthWrite: false,
   blending: THREE.NormalBlending
 });
+const schoolNoiseUniforms = {
+  uMaskTexture: { value: maskRenderTarget.texture },
+  uResolution: { value: lensUniforms.winResolution.value },
+  uTime: { value: 0 },
+  uNoiseScale: { value: 0.3 },
+  uNoiseSpeed: { value: 0.5 },
+  uNoiseThreshold: { value: 0.32 },
+  uNoiseSoftness: { value: 0.2 },
+  uOpacity: { value: 1.0 },
+  uLensScreenPos: { value: new THREE.Vector2(0.5, 0.5) },
+  uLensScreenRadius: { value: 0.0 },
+  uLensActive: { value: 0.0 }
+};
+const schoolNoiseRevealMaterial = new THREE.ShaderMaterial({
+  uniforms: schoolNoiseUniforms,
+  vertexShader: /* glsl */ `
+    varying vec3 vWorldPos;
+
+    void main() {
+      vec4 worldPos = modelMatrix * vec4(position, 1.0);
+      vWorldPos = worldPos.xyz;
+      gl_Position = projectionMatrix * viewMatrix * worldPos;
+    }
+  `,
+  fragmentShader: /* glsl */ `
+    uniform sampler2D uMaskTexture;
+    uniform vec2 uResolution;
+    uniform float uTime;
+    uniform float uNoiseScale;
+    uniform float uNoiseSpeed;
+    uniform float uNoiseThreshold;
+    uniform float uNoiseSoftness;
+    uniform float uOpacity;
+    uniform vec2 uLensScreenPos;
+    uniform float uLensScreenRadius;
+    uniform float uLensActive;
+
+    varying vec3 vWorldPos;
+
+    float hash(vec3 p) {
+      p = fract(p * 0.3183099 + vec3(0.1, 0.2, 0.3));
+      p *= 17.0;
+      return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+    }
+
+    float noise3d(vec3 p) {
+      vec3 i = floor(p);
+      vec3 f = fract(p);
+      vec3 u = f * f * (3.0 - 2.0 * f);
+
+      float n000 = hash(i + vec3(0.0, 0.0, 0.0));
+      float n100 = hash(i + vec3(1.0, 0.0, 0.0));
+      float n010 = hash(i + vec3(0.0, 1.0, 0.0));
+      float n110 = hash(i + vec3(1.0, 1.0, 0.0));
+      float n001 = hash(i + vec3(0.0, 0.0, 1.0));
+      float n101 = hash(i + vec3(1.0, 0.0, 1.0));
+      float n011 = hash(i + vec3(0.0, 1.0, 1.0));
+      float n111 = hash(i + vec3(1.0, 1.0, 1.0));
+
+      float nx00 = mix(n000, n100, u.x);
+      float nx10 = mix(n010, n110, u.x);
+      float nx01 = mix(n001, n101, u.x);
+      float nx11 = mix(n011, n111, u.x);
+      float nxy0 = mix(nx00, nx10, u.y);
+      float nxy1 = mix(nx01, nx11, u.y);
+      return mix(nxy0, nxy1, u.z);
+    }
+
+    float fbm(vec3 p) {
+      float value = 0.0;
+      float amplitude = 0.5;
+      for (int i = 0; i < 4; i++) {
+        value += noise3d(p) * amplitude;
+        p = p * 2.05 + vec3(7.1, 11.7, 3.6);
+        amplitude *= 0.5;
+      }
+      return value;
+    }
+
+    void main() {
+      vec2 uv = gl_FragCoord.xy / uResolution;
+      vec3 maskColor = texture2D(uMaskTexture, uv).rgb;
+
+      float contentMask = smoothstep(0.015, 0.08, length(maskColor - vec3(1.0)));
+      float n = fbm(vWorldPos * uNoiseScale + vec3(0.0, uTime * uNoiseSpeed, 0.0));
+      float reveal = 1.0 - smoothstep(
+        uNoiseThreshold - uNoiseSoftness,
+        uNoiseThreshold + uNoiseSoftness,
+        n
+      );
+
+      float lensDistance = distance(uv, uLensScreenPos);
+      float safeRadius = max(uLensScreenRadius, 0.0001);
+      float lensFade = smoothstep(safeRadius * 0.9, safeRadius * 1.1, lensDistance);
+      float lensSuppress = mix(1.0, lensFade, uLensActive);
+
+      float alpha = reveal * contentMask * uOpacity * lensSuppress;
+      gl_FragColor = vec4(maskColor, alpha);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+    }
+  `,
+  transparent: true,
+  depthTest: true,
+  depthWrite: false,
+  polygonOffset: true,
+  polygonOffsetFactor: -1,
+  polygonOffsetUnits: -1
+});
 
 const introState = {
   startCameraPos: new THREE.Vector3(0, 10, -30),
@@ -282,7 +393,7 @@ loader.load('/school.obj', (loadedModel) => {
     mesh.material = materialMap[mesh.name] || schoolMaterial;
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-    if (mesh.name !== "Tree") {
+    if (mesh.name !== "Tree" && mesh.name !== "Trunk") {
       const edges = new THREE.EdgesGeometry(mesh.geometry, 15);
       const wire = new THREE.LineSegments(edges, schoolMaskWireframeMaterial);
       const wireOffset = new THREE.LineSegments(edges, schoolMaskWireframeMaterial);
@@ -293,6 +404,13 @@ loader.load('/school.obj', (loadedModel) => {
       wireOffset.scale.setScalar(1.003);
       mesh.add(wire, wireOffset);
       schoolMaskWireframes.push(wire, wireOffset);
+
+      const noiseOverlay = new THREE.Mesh(mesh.geometry, schoolNoiseRevealMaterial);
+      noiseOverlay.renderOrder = 950;
+      noiseOverlay.castShadow = false;
+      noiseOverlay.receiveShadow = false;
+      mesh.add(noiseOverlay);
+      schoolNoiseOverlays.push(noiseOverlay);
     }
 
     schoolMeshes.push(mesh);
@@ -404,6 +522,9 @@ function renderWireMask() {
   for (const wire of schoolMaskWireframes) {
     wire.visible = true;
   }
+  for (const overlay of schoolNoiseOverlays) {
+    overlay.visible = false;
+  }
 
   renderer.setRenderTarget(maskRenderTarget);
   renderer.clear();
@@ -412,6 +533,9 @@ function renderWireMask() {
 
   for (const wire of schoolMaskWireframes) {
     wire.visible = false;
+  }
+  for (const overlay of schoolNoiseOverlays) {
+    overlay.visible = true;
   }
   for (const mesh of schoolMeshes) {
     mesh.material = previousMaterials.get(mesh);
@@ -543,6 +667,7 @@ function animate() {
   introEaseSmoothed += (introEaseTarget - introEaseSmoothed) * introBlend;
 
   wiringElectricMaterial.uniforms.uTime.value = elapsed;
+  schoolNoiseUniforms.uTime.value = elapsed;
   scrollProgress += (scrollProgressTarget - scrollProgress) * 0.08;
 
   if (schoolModel) {
@@ -584,8 +709,29 @@ function animate() {
   if (isHoveringSchool) {
     updateLensPosition();
   }
+
+  if (lens.visible) {
+    const lensCenterNdc = lens.position.clone().project(camera);
+    const lensRadiusWorld = 0.2 * lens.scale.x;
+    const lensEdgeWorld = lens.position.clone().addScaledVector(cameraRight, lensRadiusWorld);
+    const lensEdgeNdc = lensEdgeWorld.project(camera);
+
+    schoolNoiseUniforms.uLensScreenPos.value.set(
+      lensCenterNdc.x * 0.5 + 0.5,
+      lensCenterNdc.y * 0.5 + 0.5
+    );
+    schoolNoiseUniforms.uLensScreenRadius.value = Math.max(
+      Math.abs(lensEdgeNdc.x - lensCenterNdc.x) * 0.5,
+      0.001
+    );
+    schoolNoiseUniforms.uLensActive.value = 1.0;
+  } else {
+    schoolNoiseUniforms.uLensActive.value = 0.0;
+    schoolNoiseUniforms.uLensScreenRadius.value = 0.0;
+  }
+
   wasHoveringSchool = isHoveringSchool;
-  if (lensScaleCurrent > 0.01 || lensScaleTarget > 0.01) {
+  if (schoolNoiseOverlays.length > 0 || lensScaleCurrent > 0.01 || lensScaleTarget > 0.01) {
     renderWireMask();
   }
   composer.render();
