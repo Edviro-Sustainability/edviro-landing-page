@@ -134,10 +134,10 @@ const schoolMaskWireframeMaterial = new THREE.LineBasicMaterial({
 const wiringElectricMaterial = new THREE.ShaderMaterial({
   uniforms: {
     uTime: { value: 0 },
-    uColorBase: { value: new THREE.Color(0x298d4e) },
-    uColorHot: { value: new THREE.Color(0x69ef81) },  
+    uColorBase: { value: new THREE.Color(0x196c38) },
+    uColorHot: { value: new THREE.Color(0x47dd63) },
     uSpeed: { value: 0.2 },
-    uPulse: { value: 2.0 },
+    uPulse: { value: 1.5 },
   },
   vertexShader: /* glsl */ `
     varying vec3 vWorldPos;
@@ -309,10 +309,10 @@ const introEasePower = 3.4;
 const loader = new OBJLoader();
 
 const schoolMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', });
-const windowMaterial = new THREE.MeshStandardMaterial({ color: '#90c2b0', });
-const treeMaterial = new THREE.MeshStandardMaterial({ color: '#9cf7ad', });
+const windowMaterial = new THREE.MeshStandardMaterial({ color: '#8e9e98', });
+const treeMaterial = new THREE.MeshStandardMaterial({ color: '#16a34a', });
 const poleMaterial = new THREE.MeshStandardMaterial({ color: '#c7c7c7', });
-const trunkMaterial = new THREE.MeshStandardMaterial({ color: '#d3a76d', });
+const trunkMaterial = new THREE.MeshStandardMaterial({ color: '#c3b399', });
 
 loader.load('/school.obj', (loadedModel) => {
   schoolModel = loadedModel;
@@ -390,6 +390,14 @@ loader.load('/wiring.obj', (loadedModel) => {
 const pointerTarget = new THREE.Vector2(0, 0);
 const pointerCurrent = new THREE.Vector2(0, 0);
 let isPointerActive = false;
+const parallaxSettings = {
+  cameraX: 0.9,
+  cameraY: 0.9,
+  lookAtX: 0,
+  lookAtY: 0,
+  groupX: 0.08,
+  groupY: 0.05
+};
 
 window.addEventListener('pointermove', (event) => {
   pointerTarget.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -549,20 +557,38 @@ function animate() {
   );
   schoolNoiseUniforms.uPointerStrength.value = isPointerActive ? 1.0 : 0.0;
   scrollProgress += (scrollProgressTarget - scrollProgress) * 0.08;
+  const parallaxX = pointerCurrent.x;
+  const parallaxY = pointerCurrent.y;
+  const cameraParallaxX = parallaxX * parallaxSettings.cameraX;
+  const cameraParallaxY = parallaxY * parallaxSettings.cameraY;
+  const lookAtParallaxX = parallaxX * parallaxSettings.lookAtX;
+  const lookAtParallaxY = parallaxY * parallaxSettings.lookAtY;
+
+  subjectGroup.position.x = -parallaxX * parallaxSettings.groupX;
+  subjectGroup.position.y = -parallaxY * parallaxSettings.groupY;
 
   if (schoolModel) {
     schoolModel.visible = elapsed >= introDelay;
     introCamera.lerpVectors(introState.startCameraPos, introState.endCameraPos, introEaseSmoothed);
     introLookAt.lerpVectors(introState.startLookAt, introState.endLookAt, introEaseSmoothed);
 
-    camera.position.x = introCamera.x + mapRange(scrollProgress, 0, 1, 0, 0.5);
-    camera.position.y = introCamera.y;
+    camera.position.x = introCamera.x + mapRange(scrollProgress, 0, 1, 0, 0.5) + cameraParallaxX;
+    camera.position.y = introCamera.y + cameraParallaxY;
     camera.position.z = introCamera.z + mapRange(scrollProgress, 0, 1, 0, -1.2);
-    camera.lookAt(introLookAt);
+    camera.lookAt(
+      introLookAt.x + lookAtParallaxX,
+      introLookAt.y + lookAtParallaxY,
+      introLookAt.z
+    );
   } else {
     camera.position.z = mapRange(scrollProgress, 0, 1, 7.5, 5.8);
-    camera.position.x = mapRange(scrollProgress, 0, 1, 0, 0.5);
-    camera.lookAt(introState.endLookAt);
+    camera.position.x = mapRange(scrollProgress, 0, 1, 0, 0.5) + cameraParallaxX;
+    camera.position.y = 0.5 + cameraParallaxY;
+    camera.lookAt(
+      introState.endLookAt.x + lookAtParallaxX,
+      introState.endLookAt.y + lookAtParallaxY,
+      introState.endLookAt.z
+    );
   }
   updateTitleIntroTransform(introEaseSmoothed);
 
