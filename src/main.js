@@ -203,8 +203,8 @@ const wiringElectricMaterial = new THREE.ShaderMaterial({
     uTime: { value: 0 },
     uColorBase: { value: new THREE.Color(0x298d4e) },
     uColorHot: { value: new THREE.Color(0x69ef81) },  
-    uSpeed: { value: 0.4 },
-    uPulse: { value: 4.2 },
+    uSpeed: { value: 0.2 },
+    uPulse: { value: 2.0 },
   },
   vertexShader: /* glsl */ `
     varying vec3 vWorldPos;
@@ -256,7 +256,9 @@ const loader = new OBJLoader();
 
 const schoolMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', });
 const windowMaterial = new THREE.MeshStandardMaterial({ color: '#90c2b0', });
-const treeMaterial = new THREE.MeshStandardMaterial({ color: '#87eb99', });
+const treeMaterial = new THREE.MeshStandardMaterial({ color: '#9cf7ad', });
+const poleMaterial = new THREE.MeshStandardMaterial({ color: '#c7c7c7', });
+const trunkMaterial = new THREE.MeshStandardMaterial({ color: '#d3a76d', });
 
 loader.load('/school.obj', (loadedModel) => {
   schoolModel = loadedModel;
@@ -271,7 +273,11 @@ loader.load('/school.obj', (loadedModel) => {
     const materialMap = {
         Tree: treeMaterial,
         Windows: windowMaterial,
-        School: schoolMaterial
+        School: schoolMaterial,
+        Trunk: trunkMaterial,
+        Lights: poleMaterial,
+        NameTop: trunkMaterial,
+        CanopyTop: trunkMaterial,
     };
     mesh.material = materialMap[mesh.name] || schoolMaterial;
     mesh.castShadow = true;
