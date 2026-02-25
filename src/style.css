@@ -65,11 +65,11 @@ body {
 }
 
 .hero-title > .text-reveal-mask:nth-of-type(1) {
-  font-size: 2.4rem;
+  font-size: 4.8rem;
 }
 
 .hero-title > .text-reveal-mask:nth-of-type(2) {
-  font-size: 4rem;
+  font-size: 8rem;
   color: var(--color-primary);
 }
 

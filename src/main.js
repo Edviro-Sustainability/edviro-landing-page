@@ -10,6 +10,10 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 import './style.css';
 
+// OPTIMIZATION: We assign a specific layer to isolate the mask render 
+// without toggling visibility and material states manually.
+const MASK_LAYER = 1;
+
 const canvas = document.querySelector('#webgl');
 const heroTitle = document.querySelector('.hero-title');
 
@@ -72,92 +76,12 @@ const maskRenderTarget = new THREE.WebGLRenderTarget(1, 1, {
   depthBuffer: true
 });
 maskRenderTarget.texture.colorSpace = THREE.SRGBColorSpace;
-
-const lensVertexShader = /* glsl */ `
-varying vec3 vNormal;
-varying vec3 vViewDir;
-
-void main() {
-  vec4 worldPos = modelMatrix * vec4(position, 1.0);
-  vec4 mvPosition = viewMatrix * worldPos;
-  vNormal = normalize(normalMatrix * normal);
-  vViewDir = normalize(-mvPosition.xyz);
-  gl_Position = projectionMatrix * mvPosition;
-}
-`;
-
-const lensFragmentShader = /* glsl */ `
-uniform vec2 winResolution;
-uniform sampler2D uTexture;
-uniform float uIor;
-uniform float uChromatic;
-uniform float uEdgeStrength;
-
-varying vec3 vNormal;
-varying vec3 vViewDir;
-
-void main() {
-  vec2 uv = gl_FragCoord.xy / winResolution.xy;
-  vec3 normal = normalize(vNormal);
-  vec3 viewDir = normalize(vViewDir);
-
-  float fresnel = pow(1.0 - max(dot(normal, viewDir), 0.0), 2.0);
-  float edge = fresnel * uEdgeStrength;
-
-  vec2 dir = normal.xy;
-  float dirLen = length(dir);
-  if (dirLen > 0.0001) {
-    dir /= dirLen;
-  } else {
-    dir = vec2(0.0, 1.0);
-  }
-
-  float distort = (uIor - 1.0) * 0.08 * edge;
-  vec2 offsetR = dir * (distort * (1.0 + uChromatic));
-  vec2 offsetG = dir * (distort * 0.55);
-  vec2 offsetB = -dir * (distort * (0.85 + uChromatic * 0.5));
-
-  vec3 center = texture2D(uTexture, uv).rgb;
-  vec3 refracted = vec3(
-    texture2D(uTexture, uv + offsetR).r,
-    texture2D(uTexture, uv + offsetG).g,
-    texture2D(uTexture, uv + offsetB).b
-  );
-  vec3 color = mix(center, refracted, clamp(edge, 0.0, 1.0));
-  gl_FragColor = vec4(color, 1.0);
-  #include <tonemapping_fragment>
-  #include <colorspace_fragment>
-}
-`;
-
-const ENABLE_LENS_REFRACTION = false;
-const lensUniforms = {
-  uTexture: { value: maskRenderTarget.texture },
-  winResolution: { value: new THREE.Vector2() },
-  uIor: { value: ENABLE_LENS_REFRACTION ? 1.04 : 1.0 },
-  uChromatic: { value: ENABLE_LENS_REFRACTION ? 0.05 : 0.0 },
-  uEdgeStrength: { value: 2.0 }
-};
-
-const lensMaterial = new THREE.ShaderMaterial({
-  vertexShader: lensVertexShader,
-  fragmentShader: lensFragmentShader,
-  uniforms: lensUniforms,
-  transparent: true,
-  depthTest: false,
-  depthWrite: false
-});
-
-const lens = new THREE.Mesh(new THREE.SphereGeometry(0.2, 64, 64), lensMaterial);
-lens.scale.setScalar(0.001);
-lens.visible = false;
-lens.renderOrder = 1100;
-scene.add(lens);
+const renderResolution = new THREE.Vector2();
 
 const hemiLight = new THREE.HemisphereLight('#ffffff', 2);
 const dirLight = new THREE.DirectionalLight('#ffffff', 1.9);
 dirLight.position.set(0, 5, 3);
-dirLight.shadow.mapSize.set(1024,1024);
+dirLight.shadow.mapSize.set(1024, 1024);
 dirLight.castShadow = true;
 dirLight.shadow.radius = 20;
 dirLight.shadow.camera.left = -12;
@@ -171,7 +95,7 @@ scene.add(subjectGroup);
 
 let floor = null;
 const floorMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', });
-const floorGeometry = new THREE.PlaneGeometry(128,128);
+const floorGeometry = new THREE.PlaneGeometry(128, 128);
 floor = new THREE.Mesh(floorGeometry, floorMaterial);
 floor.rotation.x = -Math.PI / 2;
 floor.position.set(0, -4, 0);
@@ -184,12 +108,9 @@ const schoolMeshes = [];
 const outlineMeshes = [];
 const schoolMaskWireframes = [];
 const schoolNoiseOverlays = [];
-const schoolMaskFillMaterial = new THREE.MeshBasicMaterial({
-  color: 0x000000,
-  transparent: true,
-  opacity: 0,
-  depthWrite: false
-});
+
+// Removed: schoolMaskFillMaterial (No longer needed thanks to Layers optimization)
+
 const schoolMaskWireframeMaterial = new THREE.LineBasicMaterial({
   color: 0x999999,
   linewidth: 3,
@@ -200,6 +121,7 @@ const schoolMaskWireframeMaterial = new THREE.LineBasicMaterial({
   depthTest: false,
   depthWrite: false
 });
+
 const wiringElectricMaterial = new THREE.ShaderMaterial({
   uniforms: {
     uTime: { value: 0 },
@@ -244,19 +166,23 @@ const wiringElectricMaterial = new THREE.ShaderMaterial({
   depthWrite: false,
   blending: THREE.NormalBlending
 });
+
 const schoolNoiseUniforms = {
   uMaskTexture: { value: maskRenderTarget.texture },
-  uResolution: { value: lensUniforms.winResolution.value },
+  uResolution: { value: renderResolution },
   uTime: { value: 0 },
-  uNoiseScale: { value: 0.3 },
-  uNoiseSpeed: { value: 0.5 },
-  uNoiseThreshold: { value: 0.32 },
+  uNoiseScale: { value: 0.2 },
+  uNoiseSpeed: { value: 0.8 },
+  uNoiseThreshold: { value: 0.26 },
   uNoiseSoftness: { value: 0.2 },
   uOpacity: { value: 1.0 },
-  uLensScreenPos: { value: new THREE.Vector2(0.5, 0.5) },
-  uLensScreenRadius: { value: 0.0 },
-  uLensActive: { value: 0.0 }
+  uPointerScreenPos: { value: new THREE.Vector2(0.5, 0.5) },
+  uPointerRadius: { value: 0.02 },
+  uPointerFeather: { value: 0.12 },
+  uPointerPeakBoost: { value: 0.3 },
+  uPointerStrength: { value: 0.0 }
 };
+
 const schoolNoiseRevealMaterial = new THREE.ShaderMaterial({
   uniforms: schoolNoiseUniforms,
   vertexShader: /* glsl */ `
@@ -277,9 +203,11 @@ const schoolNoiseRevealMaterial = new THREE.ShaderMaterial({
     uniform float uNoiseThreshold;
     uniform float uNoiseSoftness;
     uniform float uOpacity;
-    uniform vec2 uLensScreenPos;
-    uniform float uLensScreenRadius;
-    uniform float uLensActive;
+    uniform vec2 uPointerScreenPos;
+    uniform float uPointerRadius;
+    uniform float uPointerFeather;
+    uniform float uPointerPeakBoost;
+    uniform float uPointerStrength;
 
     varying vec3 vWorldPos;
 
@@ -327,20 +255,29 @@ const schoolNoiseRevealMaterial = new THREE.ShaderMaterial({
       vec2 uv = gl_FragCoord.xy / uResolution;
       vec3 maskColor = texture2D(uMaskTexture, uv).rgb;
 
-      float contentMask = smoothstep(0.015, 0.08, length(maskColor - vec3(1.0)));
+      // OPTIMIZATION: Discard immediately if the pixel corresponds to empty space.
+      vec3 diff = maskColor - vec3(1.0); // Compare to pure white
+      float distSq = dot(diff, diff);    // Avoid length()'s squareroot math early
+      
+      if (distSq < 0.0001) {
+        discard; // Stops FBM and other processing for 90%+ of the screen!
+      }
+
+      float contentMask = smoothstep(0.015, 0.08, sqrt(distSq));
       float n = fbm(vWorldPos * uNoiseScale + vec3(0.0, uTime * uNoiseSpeed, 0.0));
+      float pointerDistance = distance(uv, uPointerScreenPos);
+      float pointerRegion = 1.0 - smoothstep(
+        uPointerRadius,
+        uPointerRadius + uPointerFeather,
+        pointerDistance
+      );
+      float peakedNoise = max(n - (pointerRegion * uPointerPeakBoost * uPointerStrength), 0.0);
       float reveal = 1.0 - smoothstep(
         uNoiseThreshold - uNoiseSoftness,
         uNoiseThreshold + uNoiseSoftness,
-        n
+        peakedNoise
       );
-
-      float lensDistance = distance(uv, uLensScreenPos);
-      float safeRadius = max(uLensScreenRadius, 0.0001);
-      float lensFade = smoothstep(safeRadius * 0.9, safeRadius * 1.1, lensDistance);
-      float lensSuppress = mix(1.0, lensFade, uLensActive);
-
-      float alpha = reveal * contentMask * uOpacity * lensSuppress;
+      float alpha = reveal * contentMask * uOpacity;
       gl_FragColor = vec4(maskColor, alpha);
       #include <tonemapping_fragment>
       #include <colorspace_fragment>
@@ -356,7 +293,7 @@ const schoolNoiseRevealMaterial = new THREE.ShaderMaterial({
 
 const introState = {
   startCameraPos: new THREE.Vector3(0, 10, -30),
-  endCameraPos: new THREE.Vector3(8,10,26),
+  endCameraPos: new THREE.Vector3(8, 10, 26),
   startLookAt: new THREE.Vector3(0, 0, -30),
   endLookAt: new THREE.Vector3(0, 0, 0)
 };
@@ -397,8 +334,11 @@ loader.load('/school.obj', (loadedModel) => {
       const edges = new THREE.EdgesGeometry(mesh.geometry, 15);
       const wire = new THREE.LineSegments(edges, schoolMaskWireframeMaterial);
       const wireOffset = new THREE.LineSegments(edges, schoolMaskWireframeMaterial);
-      wire.visible = false;
-      wireOffset.visible = false;
+      
+      // OPTIMIZATION: Assign wires strictly to the hidden Mask layer.
+      wire.layers.set(MASK_LAYER);
+      wireOffset.layers.set(MASK_LAYER);
+      
       wire.renderOrder = 1000;
       wireOffset.renderOrder = 1000;
       wireOffset.scale.setScalar(1.003);
@@ -430,7 +370,6 @@ loader.load('/wiring.obj', (loadedModel) => {
   wiringModel = loadedModel;
   wiringModel.scale.setScalar(0.12);
   wiringModel.position.set(0, -4, 0);
-  wiringModel.visible = false;
 
   wiringModel.traverse((child) => {
     if (!child.isMesh) {
@@ -439,6 +378,9 @@ loader.load('/wiring.obj', (loadedModel) => {
     child.material = wiringElectricMaterial;
     child.castShadow = false;
     child.receiveShadow = false;
+    
+    // OPTIMIZATION: Push wiring model exclusively to the hidden Mask layer.
+    child.layers.set(MASK_LAYER); 
   });
 
   subjectGroup.add(wiringModel);
@@ -446,107 +388,45 @@ loader.load('/wiring.obj', (loadedModel) => {
 
 const pointerTarget = new THREE.Vector2(0, 0);
 const pointerCurrent = new THREE.Vector2(0, 0);
-const hoverRaycaster = new THREE.Raycaster();
-const hoverPointer = new THREE.Vector2(0, 0);
 let isPointerActive = false;
-let isHoveringSchool = false;
-let wasHoveringSchool = false;
-let lensScaleCurrent = 0.0;
-let lensScaleTarget = 0.0;
 
 window.addEventListener('pointermove', (event) => {
   pointerTarget.x = (event.clientX / window.innerWidth) * 2 - 1;
   pointerTarget.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  hoverPointer.copy(pointerTarget);
   isPointerActive = true;
 });
 
 window.addEventListener('pointerleave', () => {
   pointerTarget.set(0, 0);
-  hoverPointer.set(0, 0);
   isPointerActive = false;
-  isHoveringSchool = false;
 });
 
-const cameraDirection = new THREE.Vector3();
-const cameraRight = new THREE.Vector3();
-const cameraUp = new THREE.Vector3();
-const lensPosition = new THREE.Vector3();
-
-function updateLensPosition() {
-  pointerCurrent.lerp(pointerTarget, 0.1);
-
-  const distanceFromCamera = 2.2;
-  const vFov = THREE.MathUtils.degToRad(camera.fov);
-  const halfHeight = Math.tan(vFov * 0.5) * distanceFromCamera;
-  const halfWidth = halfHeight * camera.aspect;
-
-  camera.getWorldDirection(cameraDirection).normalize();
-  cameraUp.set(0, 1, 0).applyQuaternion(camera.quaternion).normalize();
-  cameraRight.copy(cameraDirection).cross(cameraUp).normalize();
-
-  lensPosition
-    .copy(camera.position)
-    .addScaledVector(cameraDirection, distanceFromCamera)
-    .addScaledVector(cameraRight, pointerCurrent.x * halfWidth)
-    .addScaledVector(cameraUp, pointerCurrent.y * halfHeight);
-
-  lens.position.copy(lensPosition);
-}
-
 const maskBackground = new THREE.Color(0xffffff);
-const previousMaterials = new Map();
 
+// OPTIMIZATION: Completely refactored this pass to utilize `camera.layers`.
+// It requires zero material swapping, no loops over arrays, and avoids rendering the 
+// massive base meshes twice just to be hidden by a 0-opacity ghost material.
 function renderWireMask() {
   if (!wiringModel || schoolMeshes.length === 0) {
     return;
   }
 
   const previousBackground = scene.background;
-  const previousLensVisible = lens.visible;
-  const previousWiringVisible = wiringModel.visible;
-  const previousFloorVisible = floor ? floor.visible : false;
   const previousShadowMapEnabled = renderer.shadowMap.enabled;
-  scene.background = maskBackground;
-  lens.visible = false;
-  wiringModel.visible = true;
-  if (floor) {
-    floor.visible = false;
-  }
-  renderer.shadowMap.enabled = false;
 
-  for (const mesh of schoolMeshes) {
-    previousMaterials.set(mesh, mesh.material);
-    mesh.material = schoolMaskFillMaterial;
-  }
-  for (const wire of schoolMaskWireframes) {
-    wire.visible = true;
-  }
-  for (const overlay of schoolNoiseOverlays) {
-    overlay.visible = false;
-  }
+  scene.background = maskBackground;
+  renderer.shadowMap.enabled = false;
+  
+  // Isolate processing power to objects ONLY residing on the MASK_LAYER
+  camera.layers.set(MASK_LAYER);
 
   renderer.setRenderTarget(maskRenderTarget);
   renderer.clear();
   renderer.render(scene, camera);
   renderer.setRenderTarget(null);
 
-  for (const wire of schoolMaskWireframes) {
-    wire.visible = false;
-  }
-  for (const overlay of schoolNoiseOverlays) {
-    overlay.visible = true;
-  }
-  for (const mesh of schoolMeshes) {
-    mesh.material = previousMaterials.get(mesh);
-  }
-  previousMaterials.clear();
-
-  wiringModel.visible = previousWiringVisible;
-  lens.visible = previousLensVisible;
-  if (floor) {
-    floor.visible = previousFloorVisible;
-  }
+  // Re-enable primary layer and previous parameters
+  camera.layers.set(0); 
   renderer.shadowMap.enabled = previousShadowMapEnabled;
   scene.background = previousBackground;
 }
@@ -613,9 +493,9 @@ function updateScrollTarget() {
   scrollProgressTarget = maxScroll <= 0 ? 0 : window.scrollY / maxScroll;
 }
 
-function autoUpdateLensResolution() {
+function updateRenderResolution() {
   const pixelRatio = Math.min(window.devicePixelRatio, 2);
-  lensUniforms.winResolution.value.set(
+  renderResolution.set(
     window.innerWidth * pixelRatio,
     window.innerHeight * pixelRatio
   );
@@ -625,7 +505,7 @@ function autoUpdateLensResolution() {
   );
 }
 
-autoUpdateLensResolution();
+updateRenderResolution();
 updateScrollTarget();
 computeTitleIntroStartTransform();
 if (document.fonts?.ready) {
@@ -652,7 +532,7 @@ window.addEventListener('resize', () => {
     1 / (window.innerHeight * pixelRatio)
   );
 
-  autoUpdateLensResolution();
+  updateRenderResolution();
   updateScrollTarget();
   computeTitleIntroStartTransform();
 });
@@ -668,6 +548,12 @@ function animate() {
 
   wiringElectricMaterial.uniforms.uTime.value = elapsed;
   schoolNoiseUniforms.uTime.value = elapsed;
+  pointerCurrent.lerp(pointerTarget, isPointerActive ? 0.12 : 0.08);
+  schoolNoiseUniforms.uPointerScreenPos.value.set(
+    pointerCurrent.x * 0.5 + 0.5,
+    pointerCurrent.y * 0.5 + 0.5
+  );
+  schoolNoiseUniforms.uPointerStrength.value = isPointerActive ? 1.0 : 0.0;
   scrollProgress += (scrollProgressTarget - scrollProgress) * 0.08;
 
   if (schoolModel) {
@@ -686,52 +572,7 @@ function animate() {
   }
   updateTitleIntroTransform(introEaseSmoothed);
 
-  if (schoolMeshes.length > 0 && isPointerActive) {
-    hoverRaycaster.setFromCamera(hoverPointer, camera);
-    isHoveringSchool = hoverRaycaster.intersectObjects(schoolMeshes, false).length > 0;
-  } else {
-    isHoveringSchool = false;
-  }
-
-  if (isHoveringSchool && !wasHoveringSchool) {
-    pointerCurrent.copy(pointerTarget);
-    updateLensPosition();
-  }
-
-  lensScaleTarget = isHoveringSchool ? 1.0 : 0.0;
-  const growSpeed = 12.0;
-  const shrinkSpeed = 9.0;
-  const blend = 1.0 - Math.exp(-(lensScaleTarget > lensScaleCurrent ? growSpeed : shrinkSpeed) * delta);
-  lensScaleCurrent += (lensScaleTarget - lensScaleCurrent) * blend;
-  lens.scale.setScalar(Math.max(lensScaleCurrent, 0.001));
-  lens.visible = lensScaleCurrent > 0.01;
-
-  if (isHoveringSchool) {
-    updateLensPosition();
-  }
-
-  if (lens.visible) {
-    const lensCenterNdc = lens.position.clone().project(camera);
-    const lensRadiusWorld = 0.2 * lens.scale.x;
-    const lensEdgeWorld = lens.position.clone().addScaledVector(cameraRight, lensRadiusWorld);
-    const lensEdgeNdc = lensEdgeWorld.project(camera);
-
-    schoolNoiseUniforms.uLensScreenPos.value.set(
-      lensCenterNdc.x * 0.5 + 0.5,
-      lensCenterNdc.y * 0.5 + 0.5
-    );
-    schoolNoiseUniforms.uLensScreenRadius.value = Math.max(
-      Math.abs(lensEdgeNdc.x - lensCenterNdc.x) * 0.5,
-      0.001
-    );
-    schoolNoiseUniforms.uLensActive.value = 1.0;
-  } else {
-    schoolNoiseUniforms.uLensActive.value = 0.0;
-    schoolNoiseUniforms.uLensScreenRadius.value = 0.0;
-  }
-
-  wasHoveringSchool = isHoveringSchool;
-  if (schoolNoiseOverlays.length > 0 || lensScaleCurrent > 0.01 || lensScaleTarget > 0.01) {
+  if (schoolNoiseOverlays.length > 0) {
     renderWireMask();
   }
   composer.render();
