@@ -130,11 +130,12 @@ void main() {
 }
 `;
 
+const ENABLE_LENS_REFRACTION = false;
 const lensUniforms = {
   uTexture: { value: maskRenderTarget.texture },
   winResolution: { value: new THREE.Vector2() },
-  uIor: { value: 1.04 },
-  uChromatic: { value: 0.05 },
+  uIor: { value: ENABLE_LENS_REFRACTION ? 1.04 : 1.0 },
+  uChromatic: { value: ENABLE_LENS_REFRACTION ? 0.05 : 0.0 },
   uEdgeStrength: { value: 2.0 }
 };
 
