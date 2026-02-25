@@ -315,7 +315,7 @@ const windowMaterial = new THREE.MeshStandardMaterial({ color: '#8e9e98', });
 const treeMaterial = new THREE.MeshStandardMaterial({ color: '#49d46e', });
 const poleMaterial = new THREE.MeshStandardMaterial({ color: '#c7c7c7', });
 const trunkMaterial = new THREE.MeshStandardMaterial({ color: '#c3b399', });
-const rimMaterial = new THREE.MeshStandardMaterial({ color: '#939e9a', });
+const rimMaterial = new THREE.MeshStandardMaterial({ color: '#7a8481', });
 
 loader.load('/school.obj', (loadedModel) => {
   schoolModel = loadedModel;
