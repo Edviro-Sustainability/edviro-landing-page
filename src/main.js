@@ -92,13 +92,15 @@ maskComposer.addPass(wireBloomPass);
 const hemiLight = new THREE.HemisphereLight('#ffffff', 2);
 const dirLight = new THREE.DirectionalLight('#ffffff', 1.9);
 dirLight.position.set(0, 5, 3);
-dirLight.shadow.mapSize.set(1024, 1024);
+dirLight.shadow.mapSize.set(2048, 2048);
 dirLight.castShadow = true;
 dirLight.shadow.radius = 20;
-dirLight.shadow.camera.left = -12;
-dirLight.shadow.camera.right = 12;
-dirLight.shadow.camera.top = 12;
-dirLight.shadow.camera.bottom = -12;
+dirLight.shadow.camera.left = -20;
+dirLight.shadow.camera.right = 20;
+dirLight.shadow.camera.top = 20;
+dirLight.shadow.camera.bottom = -20;
+dirLight.shadow.camera.far = 40;
+dirLight.shadow.camera.updateProjectionMatrix();
 scene.add(hemiLight, dirLight); 
 
 const subjectGroup = new THREE.Group();
@@ -180,9 +182,9 @@ const schoolNoiseUniforms = {
   uMaskTexture: { value: maskComposer.readBuffer.texture },
   uResolution: { value: renderResolution },
   uTime: { value: 0 },
-  uNoiseScale: { value: 0.2 },
+  uNoiseScale: { value: 0.16 },
   uNoiseSpeed: { value: 0.8 },
-  uNoiseThreshold: { value: 0.26 },
+  uNoiseThreshold: { value: 0.2 },
   uNoiseSoftness: { value: 0.2 },
   uOpacity: { value: 1.0 },
   uPointerScreenPos: { value: new THREE.Vector2(0.5, 0.5) },
@@ -298,7 +300,7 @@ const schoolNoiseRevealMaterial = new THREE.ShaderMaterial({
 });
 
 const introState = {
-  startCameraPos: new THREE.Vector3(0, 10, -30),
+  startCameraPos: new THREE.Vector3(0, 10, -25),
   endCameraPos: new THREE.Vector3(8, 10, 26),
   startLookAt: new THREE.Vector3(0, 0, -30),
   endLookAt: new THREE.Vector3(0, 0, 0)
@@ -310,9 +312,10 @@ const loader = new OBJLoader();
 
 const schoolMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', });
 const windowMaterial = new THREE.MeshStandardMaterial({ color: '#8e9e98', });
-const treeMaterial = new THREE.MeshStandardMaterial({ color: '#16a34a', });
+const treeMaterial = new THREE.MeshStandardMaterial({ color: '#49d46e', });
 const poleMaterial = new THREE.MeshStandardMaterial({ color: '#c7c7c7', });
 const trunkMaterial = new THREE.MeshStandardMaterial({ color: '#c3b399', });
+const rimMaterial = new THREE.MeshStandardMaterial({ color: '#939e9a', });
 
 loader.load('/school.obj', (loadedModel) => {
   schoolModel = loadedModel;
@@ -324,19 +327,29 @@ loader.load('/school.obj', (loadedModel) => {
   });
 
   for (const mesh of modelMeshes) {
+    const isWireMesh = mesh.name.startsWith("Wire");
+    const isTreeMesh = mesh.name.startsWith("Tree");
+    const isTrunkMesh = mesh.name.startsWith("Trunk");
+
     const materialMap = {
-        Tree: treeMaterial,
-        Windows: windowMaterial,
-        School: schoolMaterial,
-        Trunk: trunkMaterial,
-        Lights: poleMaterial,
-        NameTop: trunkMaterial,
-        CanopyTop: trunkMaterial,
+      Windows: windowMaterial,
+      School: schoolMaterial,
+      Lights: poleMaterial,
+      Rim: rimMaterial,
+      TopRim: rimMaterial,
+      BottomRim: rimMaterial,
+      NameRim: rimMaterial,
     };
-    mesh.material = materialMap[mesh.name] || schoolMaterial;
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    if (mesh.name !== "Tree" && mesh.name !== "Trunk") {
+
+    mesh.material = isWireMesh ? wiringElectricMaterial : isTreeMesh ? treeMaterial : isTrunkMesh ? trunkMaterial : (materialMap[mesh.name] || schoolMaterial);
+    mesh.castShadow = !isWireMesh;
+    mesh.receiveShadow = !isWireMesh;
+
+    if (isWireMesh) {
+      mesh.layers.enable(MASK_LAYER);
+    }
+
+    if (!mesh.name.startsWith("Tree") && !mesh.name.startsWith("Pole") && !mesh.name.startsWith("Trunk")) {
       const edges = new THREE.EdgesGeometry(mesh.geometry, 15);
       const wire = new THREE.LineSegments(edges, schoolMaskWireframeMaterial);
       const wireOffset = new THREE.LineSegments(edges, schoolMaskWireframeMaterial);
@@ -413,7 +426,7 @@ window.addEventListener('pointerleave', () => {
 const maskBackground = new THREE.Color(0x000000);
 
 function renderWireMask() {
-  if (!wiringModel || schoolMeshes.length === 0) {
+  if (schoolMeshes.length === 0) {
     return;
   }
 
