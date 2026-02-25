@@ -15,9 +15,11 @@ const MASK_LAYER = 1;
 const canvas = document.querySelector('#webgl');
 const heroTitle = document.querySelector('.hero-title');
 
+const tint = 0xf9f0f9;
+const lighttint = 0xffffff;
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xf9f0f9);
-scene.fog = new THREE.FogExp2(0xf9f0f9, 0.014);
+scene.background = new THREE.Color(tint);
+scene.fog = new THREE.FogExp2(tint, 0.014);
 
 const camera = new THREE.PerspectiveCamera(
   40,
@@ -54,8 +56,8 @@ const outlinePass = new OutlinePass(
 );
 
 const dofPass = new BokehPass(scene, camera, {
-  focus: 10.0,
-  aperture: 0.00008
+  focus: 12.0,
+  aperture: 0.0001
 });
 composer.addPass(dofPass);
 
@@ -89,8 +91,8 @@ const wireBloomPass = new UnrealBloomPass(
 );
 maskComposer.addPass(wireBloomPass);
 
-const hemiLight = new THREE.HemisphereLight('#ffffff', 2);
-const dirLight = new THREE.DirectionalLight('#ffffff', 1.9);
+const hemiLight = new THREE.HemisphereLight(lighttint, 2);
+const dirLight = new THREE.DirectionalLight(lighttint, 1.9);
 dirLight.position.set(0, 5, 3);
 dirLight.shadow.mapSize.set(2048, 2048);
 dirLight.castShadow = true;
@@ -107,8 +109,8 @@ const subjectGroup = new THREE.Group();
 scene.add(subjectGroup);
 
 let floor = null;
-const floorMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', });
-const floorGeometry = new THREE.PlaneGeometry(128, 128);
+const floorMaterial = new THREE.MeshStandardMaterial({ color: tint });
+const floorGeometry = new THREE.PlaneGeometry(164, 164);
 floor = new THREE.Mesh(floorGeometry, floorMaterial);
 floor.rotation.x = -Math.PI / 2;
 floor.position.set(0, -4, 0);
@@ -136,8 +138,8 @@ const schoolMaskWireframeMaterial = new THREE.LineBasicMaterial({
 const wiringElectricMaterial = new THREE.ShaderMaterial({
   uniforms: {
     uTime: { value: 0 },
-    uColorBase: { value: new THREE.Color(0x115228) },
-    uColorHot: { value: new THREE.Color(0x47dd63) },
+    uColorBase: { value: new THREE.Color(0x167437) },
+    uColorHot: { value: new THREE.Color(0x54d36b) },
     uSpeed: { value: 0.2 },
     uPulse: { value: 1.5 },
   },
@@ -314,7 +316,7 @@ const schoolMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', });
 const windowMaterial = new THREE.MeshStandardMaterial({ color: '#8e9e98', });
 const treeMaterial = new THREE.MeshStandardMaterial({ color: '#49d46e', });
 const poleMaterial = new THREE.MeshStandardMaterial({ color: '#c7c7c7', });
-const trunkMaterial = new THREE.MeshStandardMaterial({ color: '#c3b399', });
+const woodMaterial = new THREE.MeshStandardMaterial({ color: '#a38764', });
 const rimMaterial = new THREE.MeshStandardMaterial({ color: '#7a8481', });
 
 loader.load('/school.obj', (loadedModel) => {
@@ -329,6 +331,7 @@ loader.load('/school.obj', (loadedModel) => {
   for (const mesh of modelMeshes) {
     const isWireMesh = mesh.name.startsWith("Wire");
     const isTreeMesh = mesh.name.startsWith("Tree");
+    const isPoleMesh = mesh.name.startsWith("Pole");
     const isTrunkMesh = mesh.name.startsWith("Trunk");
 
     const materialMap = {
@@ -341,7 +344,10 @@ loader.load('/school.obj', (loadedModel) => {
       NameRim: rimMaterial,
     };
 
-    mesh.material = isWireMesh ? wiringElectricMaterial : isTreeMesh ? treeMaterial : isTrunkMesh ? trunkMaterial : (materialMap[mesh.name] || schoolMaterial);
+    mesh.material = isWireMesh ? wiringElectricMaterial :
+    isTreeMesh ? treeMaterial :
+    isPoleMesh ? woodMaterial :
+    isTrunkMesh ? woodMaterial : (materialMap[mesh.name] || schoolMaterial);
     mesh.castShadow = !isWireMesh;
     mesh.receiveShadow = !isWireMesh;
 
