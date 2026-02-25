@@ -1,9 +1,19 @@
 :root {
-  --bg-base: #ffffff;
-  --text-primary: #000000;
-  --text-muted: #94a3b8;
-  --glass: rgba(15, 23, 42, 0.55);
+  --bg-base: #f7f7f8;
+  --text-primary: #111417;
+  --text-muted: #5b6570;
+  --glass: rgba(255, 255, 255, 0.78);
+  --border-soft: rgba(17, 20, 23, 0.22);
   --color-primary: #16a34a;
+}
+
+body[data-theme='dark'] {
+  --bg-base: #050607;
+  --text-primary: #f7f8fa;
+  --text-muted: #95a2b0;
+  --glass: rgba(17, 24, 39, 0.7);
+  --border-soft: rgba(148, 163, 184, 0.3);
+  --color-primary: #5bd584;
 }
 
 * {
@@ -18,6 +28,7 @@ body {
   color: var(--text-primary);
   font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
   overscroll-behavior: none;
+  transition: background-color 220ms ease, color 220ms ease;
 }
 
 #webgl {
@@ -31,6 +42,33 @@ body {
 #content {
   position: relative;
   z-index: 1;
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 3;
+  padding: 0.55rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background: var(--glass);
+  color: var(--text-primary);
+  font: 600 0.88rem/1 'Space Grotesk', 'Segoe UI', sans-serif;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-1px);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .panel {

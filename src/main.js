@@ -14,12 +14,58 @@ const MASK_LAYER = 1;
 
 const canvas = document.querySelector('#webgl');
 const heroTitle = document.querySelector('.hero-title');
+const themeToggleButton = document.querySelector('#theme-toggle');
+const STORAGE_THEME_KEY = 'edviro-theme';
+const DEFAULT_THEME_NAME = 'light';
+const STREET_LAMP_FALLBACK_POSITIONS = [
+  new THREE.Vector3(-67.31, 15.5, 71.74),
+  new THREE.Vector3(-44.8, 15.5, 71.74),
+  new THREE.Vector3(-20.78, 15.5, 71.74),
+  new THREE.Vector3(19.85, 15.5, 71.74),
+  new THREE.Vector3(43.87, 15.5, 71.74),
+  new THREE.Vector3(66.38, 15.5, 71.74)
+];
 
-const tint = 0xf9f0f9;
-const lighttint = 0xffffff;
+const themeConfig = {
+  light: {
+    sceneColor: 0xf9f0f9,
+    fogColor: 0xf9f0f9,
+    fogDensity: 0.014,
+    floorColor: 0xf9f0f9,
+    hemiColor: 0xffffff,
+    hemiGroundColor: 0xcfd8dc,
+    hemiIntensity: 2.0,
+    dirColor: 0xffffff,
+    dirIntensity: 1.9,
+    exposure: 1.05,
+    maskWireColor: 0x666666,
+    wireBloomStrength: 0.24,
+    streetLampIntensity: 0.0,
+    streetLampColor: 0xffd7ad,
+    streetLampDistance: 16
+  },
+  dark: {
+    sceneColor: 0x050608,
+    fogColor: 0x050608,
+    fogDensity: 0.018,
+    floorColor: 0x090b0f,
+    hemiColor: 0x7b899c,
+    hemiGroundColor: 0x020304,
+    hemiIntensity: 0.5,
+    dirColor: 0xffffff,
+    dirIntensity: 1.0,
+    exposure: 0.96,
+    maskWireColor: 0x555555,
+    wireBloomStrength: 0.31,
+    streetLampIntensity: 0.8,
+    streetLampColor: 0xffd8aa,
+    streetLampDistance: 16
+  }
+};
+
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(tint);
-scene.fog = new THREE.FogExp2(tint, 0.014);
+scene.background = new THREE.Color(themeConfig.light.sceneColor);
+scene.fog = new THREE.FogExp2(themeConfig.light.fogColor, themeConfig.light.fogDensity);
 
 const camera = new THREE.PerspectiveCamera(
   40,
@@ -85,14 +131,21 @@ maskComposer.addPass(maskRenderPass);
 
 const wireBloomPass = new UnrealBloomPass(
   new THREE.Vector2(window.innerWidth, window.innerHeight),
-  0.24,
+  themeConfig.light.wireBloomStrength,
   0.2,
   0.1
 );
 maskComposer.addPass(wireBloomPass);
 
-const hemiLight = new THREE.HemisphereLight(lighttint, 2);
-const dirLight = new THREE.DirectionalLight(lighttint, 1.9);
+const hemiLight = new THREE.HemisphereLight(
+  themeConfig.light.hemiColor,
+  themeConfig.light.hemiGroundColor,
+  themeConfig.light.hemiIntensity
+);
+const dirLight = new THREE.DirectionalLight(
+  themeConfig.light.dirColor,
+  themeConfig.light.dirIntensity
+);
 dirLight.position.set(0, 5, 3);
 dirLight.shadow.mapSize.set(2048, 2048);
 dirLight.castShadow = true;
@@ -109,7 +162,7 @@ const subjectGroup = new THREE.Group();
 scene.add(subjectGroup);
 
 let floor = null;
-const floorMaterial = new THREE.MeshStandardMaterial({ color: tint });
+const floorMaterial = new THREE.MeshStandardMaterial({ color: themeConfig.light.floorColor });
 const floorGeometry = new THREE.PlaneGeometry(164, 164);
 floor = new THREE.Mesh(floorGeometry, floorMaterial);
 floor.rotation.x = -Math.PI / 2;
@@ -123,9 +176,10 @@ const schoolMeshes = [];
 const outlineMeshes = [];
 const schoolMaskWireframes = [];
 const schoolNoiseOverlays = [];
+const streetLampPointLights = [];
 
 const schoolMaskWireframeMaterial = new THREE.LineBasicMaterial({
-  color: 0x666666,
+  color: themeConfig.light.maskWireColor,
   linewidth: 3,
   transparent: false,
   opacity: 1.0,
@@ -312,16 +366,223 @@ const introDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matc
 const introEasePower = 3.4;
 const loader = new OBJLoader();
 
-const schoolMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', });
-const windowMaterial = new THREE.MeshStandardMaterial({ color: '#8e9e98', });
-const treeMaterial = new THREE.MeshStandardMaterial({ color: '#49d46e', });
-const poleMaterial = new THREE.MeshStandardMaterial({ color: '#c7c7c7', });
-const woodMaterial = new THREE.MeshStandardMaterial({ color: '#a38764', });
-const rimMaterial = new THREE.MeshStandardMaterial({ color: '#7a8481', });
+const schoolMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
+const windowMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
+const treeMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
+const poleMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
+const woodMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
+const rimMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
+const materialThemeColors = {
+  school: { light: 0xffffff, dark: 0xd7dee4 },
+  windows: { light: 0x3e4542, dark: 0x3e4542 },
+  tree: { light: 0x49d46e, dark: 0x52c878 },
+  pole: { light: 0xc7c7c7, dark: 0xbbc4cd },
+  wood: { light: 0xa38764, dark: 0x987a5d },
+  rim: { light: 0x7a8481, dark: 0x8e989f }
+};
+
+function getInitialThemeName() {
+  try {
+    const storedTheme = window.localStorage.getItem(STORAGE_THEME_KEY);
+    if (storedTheme === 'light' || storedTheme === 'dark') {
+      return storedTheme;
+    }
+  } catch {
+    // Ignore blocked storage in private contexts.
+  }
+  return DEFAULT_THEME_NAME;
+}
+
+function toVertexKey(x, y, z) {
+  return `${Math.round(x * 1000)}|${Math.round(y * 1000)}|${Math.round(z * 1000)}`;
+}
+
+function extractDisconnectedComponentCenters(geometry) {
+  const positionAttribute = geometry?.getAttribute('position');
+  if (!positionAttribute || positionAttribute.count < 3) {
+    return [];
+  }
+
+  const indexAttribute = geometry.index;
+  const rawVertexCount = indexAttribute ? indexAttribute.count : positionAttribute.count;
+  const triangleCount = Math.floor(rawVertexCount / 3);
+  if (triangleCount <= 0) {
+    return [];
+  }
+
+  const faceVertexKeys = new Array(triangleCount);
+  const vertexToFaces = new Map();
+  const keyToPosition = new Map();
+
+  for (let faceIndex = 0; faceIndex < triangleCount; faceIndex++) {
+    const keys = [];
+    for (let corner = 0; corner < 3; corner++) {
+      const baseIndex = faceIndex * 3 + corner;
+      const vertexIndex = indexAttribute ? indexAttribute.getX(baseIndex) : baseIndex;
+      const x = positionAttribute.getX(vertexIndex);
+      const y = positionAttribute.getY(vertexIndex);
+      const z = positionAttribute.getZ(vertexIndex);
+      const key = toVertexKey(x, y, z);
+
+      if (!keyToPosition.has(key)) {
+        keyToPosition.set(key, new THREE.Vector3(x, y, z));
+      }
+      if (!vertexToFaces.has(key)) {
+        vertexToFaces.set(key, []);
+      }
+      vertexToFaces.get(key).push(faceIndex);
+      keys.push(key);
+    }
+    faceVertexKeys[faceIndex] = keys;
+  }
+
+  const visitedFaces = new Array(triangleCount).fill(false);
+  const centers = [];
+
+  for (let startFace = 0; startFace < triangleCount; startFace++) {
+    if (visitedFaces[startFace]) {
+      continue;
+    }
+
+    const stack = [startFace];
+    const componentKeys = new Set();
+    visitedFaces[startFace] = true;
+
+    while (stack.length > 0) {
+      const currentFace = stack.pop();
+      for (const key of faceVertexKeys[currentFace]) {
+        componentKeys.add(key);
+        for (const neighborFace of vertexToFaces.get(key)) {
+          if (!visitedFaces[neighborFace]) {
+            visitedFaces[neighborFace] = true;
+            stack.push(neighborFace);
+          }
+        }
+      }
+    }
+
+    if (componentKeys.size === 0) {
+      continue;
+    }
+
+    const center = new THREE.Vector3();
+    for (const key of componentKeys) {
+      center.add(keyToPosition.get(key));
+    }
+    center.multiplyScalar(1 / componentKeys.size);
+    centers.push(center);
+  }
+
+  return centers.sort((a, b) => a.x - b.x);
+}
+
+function createStreetLampLights(lightsMesh) {
+  if (!lightsMesh || streetLampPointLights.length > 0) {
+    return;
+  }
+
+  const extractedCenters = extractDisconnectedComponentCenters(lightsMesh.geometry);
+  const centers = (
+    extractedCenters.length >= 6
+      ? extractedCenters.slice(0, 6)
+      : STREET_LAMP_FALLBACK_POSITIONS
+  ).map((center) => center.clone());
+
+  for (const center of centers) {
+    const pointLight = new THREE.PointLight(
+      themeConfig.dark.streetLampColor,
+      0,
+      themeConfig.dark.streetLampDistance,
+      2
+    );
+    pointLight.position.copy(center);
+    pointLight.position.y -= 2.0;
+    pointLight.visible = false;
+    pointLight.castShadow = false;
+    lightsMesh.add(pointLight);
+    streetLampPointLights.push(pointLight);
+  }
+}
+
+function applyMaterialTheme(themeName) {
+  schoolMaterial.color.set(materialThemeColors.school[themeName]);
+  windowMaterial.color.set(materialThemeColors.windows[themeName]);
+  treeMaterial.color.set(materialThemeColors.tree[themeName]);
+  poleMaterial.color.set(materialThemeColors.pole[themeName]);
+  woodMaterial.color.set(materialThemeColors.wood[themeName]);
+  rimMaterial.color.set(materialThemeColors.rim[themeName]);
+}
+
+function updateThemeToggleButton(themeName) {
+  if (!themeToggleButton) {
+    return;
+  }
+
+  const nextThemeName = themeName === 'dark' ? 'light' : 'dark';
+  themeToggleButton.textContent = `Switch to ${nextThemeName}`;
+  themeToggleButton.setAttribute('aria-label', `Switch to ${nextThemeName} mode`);
+  themeToggleButton.setAttribute('aria-pressed', themeName === 'dark' ? 'true' : 'false');
+}
+
+let currentThemeName = getInitialThemeName();
+
+function applyTheme(nextThemeName, options = {}) {
+  const normalizedThemeName = nextThemeName === 'dark' ? 'dark' : 'light';
+  const shouldPersist = options.persist !== false;
+  const theme = themeConfig[normalizedThemeName];
+
+  currentThemeName = normalizedThemeName;
+  document.body.dataset.theme = normalizedThemeName;
+  scene.background = new THREE.Color(theme.sceneColor);
+  if (scene.fog) {
+    scene.fog.color.set(theme.fogColor);
+    scene.fog.density = theme.fogDensity;
+  }
+  floorMaterial.color.set(theme.floorColor);
+  hemiLight.color.set(theme.hemiColor);
+  hemiLight.groundColor.set(theme.hemiGroundColor);
+  hemiLight.intensity = theme.hemiIntensity;
+  dirLight.color.set(theme.dirColor);
+  dirLight.intensity = theme.dirIntensity;
+  renderer.toneMappingExposure = theme.exposure;
+  wireBloomPass.strength = theme.wireBloomStrength;
+  schoolMaskWireframeMaterial.color.set(theme.maskWireColor);
+  outlinePass.visibleEdgeColor.set(theme.maskWireColor);
+  outlinePass.hiddenEdgeColor.set(theme.maskWireColor);
+
+  applyMaterialTheme(normalizedThemeName);
+
+  for (const pointLight of streetLampPointLights) {
+    pointLight.color.set(theme.streetLampColor);
+    pointLight.intensity = theme.streetLampIntensity;
+    pointLight.distance = theme.streetLampDistance;
+    pointLight.visible = normalizedThemeName === 'dark';
+  }
+
+  updateThemeToggleButton(normalizedThemeName);
+
+  if (shouldPersist) {
+    try {
+      window.localStorage.setItem(STORAGE_THEME_KEY, normalizedThemeName);
+    } catch {
+      // Ignore blocked storage in private contexts.
+    }
+  }
+}
+
+if (themeToggleButton) {
+  themeToggleButton.addEventListener('click', () => {
+    const nextThemeName = currentThemeName === 'dark' ? 'light' : 'dark';
+    applyTheme(nextThemeName);
+  });
+}
+
+applyTheme(currentThemeName, { persist: false });
 
 loader.load('/school.obj', (loadedModel) => {
   schoolModel = loadedModel;
   const modelMeshes = [];
+  let lightsMesh = null;
   schoolModel.traverse((child) => {
     if (child.isMesh) {
       modelMeshes.push(child);
@@ -333,6 +594,9 @@ loader.load('/school.obj', (loadedModel) => {
     const isTreeMesh = mesh.name.startsWith("Tree");
     const isPoleMesh = mesh.name.startsWith("Pole");
     const isTrunkMesh = mesh.name.startsWith("Trunk");
+    if (mesh.name === 'Lights') {
+      lightsMesh = mesh;
+    }
 
     const materialMap = {
       Windows: windowMaterial,
@@ -379,12 +643,14 @@ loader.load('/school.obj', (loadedModel) => {
 
     schoolMeshes.push(mesh);
   }
+  createStreetLampLights(lightsMesh);
   outlinePass.selectedObjects = [...outlineMeshes];
 
   schoolModel.scale.setScalar(0.12);
   schoolModel.position.set(0, -4, 0);
 
   subjectGroup.add(schoolModel);
+  applyTheme(currentThemeName, { persist: false });
 });
 
 loader.load('/wiring.obj', (loadedModel) => {
