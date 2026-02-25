@@ -30,7 +30,7 @@ const themeConfig = {
   light: {
     sceneColor: 0xf9f0f9,
     fogColor: 0xf9f0f9,
-    fogDensity: 0.014,
+    fogDensity: 0.012,
     floorColor: 0xf9f0f9,
     hemiColor: 0xffffff,
     hemiGroundColor: 0xcfd8dc,
@@ -51,12 +51,12 @@ const themeConfig = {
     floorColor: 0x090b0f,
     hemiColor: 0x7b899c,
     hemiGroundColor: 0x020304,
-    hemiIntensity: 0.5,
+    hemiIntensity: 0.4,
     dirColor: 0xffffff,
-    dirIntensity: 1.0,
+    dirIntensity: 0.7,
     exposure: 0.96,
     maskWireColor: 0x555555,
-    wireBloomStrength: 0.31,
+    wireBloomStrength: 0.24,
     streetLampIntensity: 0.8,
     streetLampColor: 0xffd8aa,
     streetLampDistance: 16
@@ -238,15 +238,15 @@ const schoolNoiseUniforms = {
   uMaskTexture: { value: maskComposer.readBuffer.texture },
   uResolution: { value: renderResolution },
   uTime: { value: 0 },
-  uNoiseScale: { value: 0.16 },
+  uNoiseScale: { value: 0.18 },
   uNoiseSpeed: { value: 0.8 },
   uNoiseThreshold: { value: 0.2 },
   uNoiseSoftness: { value: 0.2 },
   uOpacity: { value: 1.0 },
   uPointerScreenPos: { value: new THREE.Vector2(0.5, 0.5) },
-  uPointerRadius: { value: 0.02 },
+  uPointerRadius: { value: 0.016 },
   uPointerFeather: { value: 0.12 },
-  uPointerPeakBoost: { value: 0.3 },
+  uPointerPeakBoost: { value: 0.2 },
   uPointerStrength: { value: 0.0 }
 };
 
@@ -367,18 +367,22 @@ const introEasePower = 3.4;
 const loader = new OBJLoader();
 
 const schoolMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
-const windowMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
+const windowMaterial = new THREE.MeshStandardMaterial({ color: '#000000'});
 const treeMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
 const poleMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
 const woodMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
 const rimMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
 const materialThemeColors = {
   school: { light: 0xffffff, dark: 0xd7dee4 },
-  windows: { light: 0x3e4542, dark: 0x3e4542 },
+  windows: { light: 0x3e4542, dark: 0xfffcc9 },
   tree: { light: 0x49d46e, dark: 0x52c878 },
   pole: { light: 0xc7c7c7, dark: 0xbbc4cd },
   wood: { light: 0xa38764, dark: 0x987a5d },
   rim: { light: 0x7a8481, dark: 0x8e989f }
+};
+const windowEmission = {
+  light: { color: 0x000000, intensity: 0.0 },
+  dark: { color: 0xffe2b7, intensity: 0.75 }
 };
 
 function getInitialThemeName() {
@@ -507,6 +511,8 @@ function createStreetLampLights(lightsMesh) {
 function applyMaterialTheme(themeName) {
   schoolMaterial.color.set(materialThemeColors.school[themeName]);
   windowMaterial.color.set(materialThemeColors.windows[themeName]);
+  windowMaterial.emissive.set(windowEmission[themeName].color);
+  windowMaterial.emissiveIntensity = windowEmission[themeName].intensity;
   treeMaterial.color.set(materialThemeColors.tree[themeName]);
   poleMaterial.color.set(materialThemeColors.pole[themeName]);
   woodMaterial.color.set(materialThemeColors.wood[themeName]);
@@ -564,8 +570,8 @@ function applyTheme(nextThemeName, options = {}) {
   if (shouldPersist) {
     try {
       window.localStorage.setItem(STORAGE_THEME_KEY, normalizedThemeName);
-    } catch {
-      // Ignore blocked storage in private contexts.
+    } catch (error) {
+      console.warn('Failed to persist theme:', error);
     }
   }
 }
