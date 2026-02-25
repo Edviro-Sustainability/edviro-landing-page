@@ -136,7 +136,7 @@ const schoolMaskWireframeMaterial = new THREE.LineBasicMaterial({
 const wiringElectricMaterial = new THREE.ShaderMaterial({
   uniforms: {
     uTime: { value: 0 },
-    uColorBase: { value: new THREE.Color(0x196c38) },
+    uColorBase: { value: new THREE.Color(0x115228) },
     uColorHot: { value: new THREE.Color(0x47dd63) },
     uSpeed: { value: 0.2 },
     uPulse: { value: 1.5 },
