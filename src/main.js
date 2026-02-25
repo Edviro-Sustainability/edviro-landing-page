@@ -10,8 +10,6 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 import './style.css';
 
-// OPTIMIZATION: We assign a specific layer to isolate the mask render 
-// without toggling visibility and material states manually.
 const MASK_LAYER = 1;
 
 const canvas = document.querySelector('#webgl');
@@ -72,11 +70,24 @@ composer.addPass(fxaaPass);
 const outputPass = new OutputPass();
 composer.addPass(outputPass);
 
-const maskRenderTarget = new THREE.WebGLRenderTarget(1, 1, {
-  depthBuffer: true
-});
-maskRenderTarget.texture.colorSpace = THREE.SRGBColorSpace;
 const renderResolution = new THREE.Vector2();
+const maskComposer = new EffectComposer(renderer);
+maskComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+maskComposer.setSize(window.innerWidth, window.innerHeight);
+maskComposer.renderToScreen = false;
+maskComposer.renderTarget1.texture.colorSpace = THREE.SRGBColorSpace;
+maskComposer.renderTarget2.texture.colorSpace = THREE.SRGBColorSpace;
+
+const maskRenderPass = new RenderPass(scene, camera);
+maskComposer.addPass(maskRenderPass);
+
+const wireBloomPass = new UnrealBloomPass(
+  new THREE.Vector2(window.innerWidth, window.innerHeight),
+  0.24,
+  0.2,
+  0.1
+);
+maskComposer.addPass(wireBloomPass);
 
 const hemiLight = new THREE.HemisphereLight('#ffffff', 2);
 const dirLight = new THREE.DirectionalLight('#ffffff', 1.9);
@@ -109,10 +120,8 @@ const outlineMeshes = [];
 const schoolMaskWireframes = [];
 const schoolNoiseOverlays = [];
 
-// Removed: schoolMaskFillMaterial (No longer needed thanks to Layers optimization)
-
 const schoolMaskWireframeMaterial = new THREE.LineBasicMaterial({
-  color: 0x999999,
+  color: 0x666666,
   linewidth: 3,
   transparent: false,
   opacity: 1.0,
@@ -168,7 +177,7 @@ const wiringElectricMaterial = new THREE.ShaderMaterial({
 });
 
 const schoolNoiseUniforms = {
-  uMaskTexture: { value: maskRenderTarget.texture },
+  uMaskTexture: { value: maskComposer.readBuffer.texture },
   uResolution: { value: renderResolution },
   uTime: { value: 0 },
   uNoiseScale: { value: 0.2 },
@@ -254,16 +263,13 @@ const schoolNoiseRevealMaterial = new THREE.ShaderMaterial({
     void main() {
       vec2 uv = gl_FragCoord.xy / uResolution;
       vec3 maskColor = texture2D(uMaskTexture, uv).rgb;
+      float maskSignal = max(max(maskColor.r, maskColor.g), maskColor.b);
 
-      // OPTIMIZATION: Discard immediately if the pixel corresponds to empty space.
-      vec3 diff = maskColor - vec3(1.0); // Compare to pure white
-      float distSq = dot(diff, diff);    // Avoid length()'s squareroot math early
-      
-      if (distSq < 0.0001) {
-        discard; // Stops FBM and other processing for 90%+ of the screen!
+      if (maskSignal < 0.00001) {
+        discard;
       }
 
-      float contentMask = smoothstep(0.015, 0.08, sqrt(distSq));
+      float contentMask = smoothstep(0.03, 0.2, maskSignal);
       float n = fbm(vWorldPos * uNoiseScale + vec3(0.0, uTime * uNoiseSpeed, 0.0));
       float pointerDistance = distance(uv, uPointerScreenPos);
       float pointerRegion = 1.0 - smoothstep(
@@ -335,7 +341,6 @@ loader.load('/school.obj', (loadedModel) => {
       const wire = new THREE.LineSegments(edges, schoolMaskWireframeMaterial);
       const wireOffset = new THREE.LineSegments(edges, schoolMaskWireframeMaterial);
       
-      // OPTIMIZATION: Assign wires strictly to the hidden Mask layer.
       wire.layers.set(MASK_LAYER);
       wireOffset.layers.set(MASK_LAYER);
       
@@ -354,9 +359,6 @@ loader.load('/school.obj', (loadedModel) => {
     }
 
     schoolMeshes.push(mesh);
-    if (mesh.name !== "Tree") {
-      outlineMeshes.push(mesh);
-    }
   }
   outlinePass.selectedObjects = [...outlineMeshes];
 
@@ -379,7 +381,6 @@ loader.load('/wiring.obj', (loadedModel) => {
     child.castShadow = false;
     child.receiveShadow = false;
     
-    // OPTIMIZATION: Push wiring model exclusively to the hidden Mask layer.
     child.layers.set(MASK_LAYER); 
   });
 
@@ -401,11 +402,8 @@ window.addEventListener('pointerleave', () => {
   isPointerActive = false;
 });
 
-const maskBackground = new THREE.Color(0xffffff);
+const maskBackground = new THREE.Color(0x000000);
 
-// OPTIMIZATION: Completely refactored this pass to utilize `camera.layers`.
-// It requires zero material swapping, no loops over arrays, and avoids rendering the 
-// massive base meshes twice just to be hidden by a 0-opacity ghost material.
 function renderWireMask() {
   if (!wiringModel || schoolMeshes.length === 0) {
     return;
@@ -417,15 +415,11 @@ function renderWireMask() {
   scene.background = maskBackground;
   renderer.shadowMap.enabled = false;
   
-  // Isolate processing power to objects ONLY residing on the MASK_LAYER
   camera.layers.set(MASK_LAYER);
 
-  renderer.setRenderTarget(maskRenderTarget);
-  renderer.clear();
-  renderer.render(scene, camera);
-  renderer.setRenderTarget(null);
+  maskComposer.render();
+  schoolNoiseUniforms.uMaskTexture.value = maskComposer.readBuffer.texture;
 
-  // Re-enable primary layer and previous parameters
   camera.layers.set(0); 
   renderer.shadowMap.enabled = previousShadowMapEnabled;
   scene.background = previousBackground;
@@ -495,14 +489,14 @@ function updateScrollTarget() {
 
 function updateRenderResolution() {
   const pixelRatio = Math.min(window.devicePixelRatio, 2);
+  const width = Math.floor(window.innerWidth * pixelRatio);
+  const height = Math.floor(window.innerHeight * pixelRatio);
   renderResolution.set(
-    window.innerWidth * pixelRatio,
-    window.innerHeight * pixelRatio
+    width,
+    height
   );
-  maskRenderTarget.setSize(
-    Math.floor(window.innerWidth * pixelRatio),
-    Math.floor(window.innerHeight * pixelRatio)
-  );
+  maskComposer.setPixelRatio(pixelRatio);
+  maskComposer.setSize(window.innerWidth, window.innerHeight);
 }
 
 updateRenderResolution();
