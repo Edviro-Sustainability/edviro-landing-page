@@ -5,16 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Edviro - Energy Dashboarding & Anomaly Detection for School Districts Personal</title>
   </head>
-  <body>
+  <body class="is-site-loading">
     <canvas id="webgl"></canvas>
+    <div id="site-loader" class="site-loader" role="status" aria-live="polite" aria-label="Loading site">
+      <span class="site-loader__spinner" aria-hidden="true"></span>
+    </div>
     <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">
       Switch to dark
     </button>
     <main id="content">
       <section class="panel">
-        <h1 class="hero-title" aria-label="Save Your School Thousands">
+        <h1 class="title" aria-label="Save Your School Thousands">
           <span class="text-reveal-mask">
             <span class="text-reveal-line">Save Your School</span>
+          </span>
+          <span class="text-reveal-mask">
+            <span class="text-reveal-line text-reveal-delay">Hundreds of</span>
           </span>
           <span class="text-reveal-mask">
             <span class="text-reveal-line text-reveal-delay">Thousands</span>

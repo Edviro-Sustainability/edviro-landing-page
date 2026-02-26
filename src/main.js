@@ -13,7 +13,8 @@ import './style.css';
 const MASK_LAYER = 1;
 
 const canvas = document.querySelector('#webgl');
-const heroTitle = document.querySelector('.hero-title');
+const title = document.querySelector('.title');
+const siteLoader = document.querySelector('#site-loader');
 const themeToggleButton = document.querySelector('#theme-toggle');
 const STORAGE_THEME_KEY = 'edviro-theme';
 const DEFAULT_THEME_NAME = 'light';
@@ -25,6 +26,32 @@ const STREET_LAMP_FALLBACK_POSITIONS = [
   new THREE.Vector3(43.87, 15.5, 71.74),
   new THREE.Vector3(66.38, 15.5, 71.74)
 ];
+
+document.body.classList.add('is-site-loading');
+
+const loadingState = {
+  windowLoaded: document.readyState === 'complete',
+  schoolLoaded: false,
+  wiringLoaded: false
+};
+
+function markLoadComplete(key) {
+  loadingState[key] = true;
+  if (loadingState.windowLoaded && loadingState.schoolLoaded && loadingState.wiringLoaded) {
+    document.body.classList.remove('is-site-loading');
+    siteLoader?.setAttribute('aria-hidden', 'true');
+  }
+}
+
+if (!loadingState.windowLoaded) {
+  window.addEventListener(
+    'load',
+    () => {
+      markLoadComplete('windowLoaded');
+    },
+    { once: true }
+  );
+}
 
 const themeConfig = {
   light: {
@@ -48,7 +75,7 @@ const themeConfig = {
     sceneColor: 0x050608,
     fogColor: 0x050608,
     fogDensity: 0.018,
-    floorColor: 0x090b0f,
+    floorColor: 0x3b413d,
     hemiColor: 0x7b899c,
     hemiGroundColor: 0x020304,
     hemiIntensity: 0.4,
@@ -169,6 +196,9 @@ floor.rotation.x = -Math.PI / 2;
 floor.position.set(0, -4, 0);
 floor.receiveShadow = true;
 scene.add(floor);
+const grid = new THREE.GridHelper(160, 40, 0x444444, 0x222222);
+grid.position.set(0, -3.99, 0);
+scene.add(grid);
 
 let schoolModel = null;
 let wiringModel = null;
@@ -361,7 +391,7 @@ const introState = {
   startLookAt: new THREE.Vector3(0, 0, -30),
   endLookAt: new THREE.Vector3(0, 0, 0)
 };
-const introDelay = 1.8;
+const introDelay = 2.4;
 const introDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 2.55;
 const introEasePower = 3.4;
 const loader = new OBJLoader();
@@ -373,16 +403,16 @@ const poleMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
 const woodMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
 const rimMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
 const materialThemeColors = {
-  school: { light: 0xffffff, dark: 0xd7dee4 },
+  school: { light: 0xffffff, dark: 0xcbcfcb },
   windows: { light: 0x3e4542, dark: 0xfffcc9 },
   tree: { light: 0x49d46e, dark: 0x52c878 },
   pole: { light: 0xc7c7c7, dark: 0xbbc4cd },
   wood: { light: 0xa38764, dark: 0x987a5d },
-  rim: { light: 0x7a8481, dark: 0x8e989f }
+  rim: { light: 0x898f89, dark: 0x8c8e8c }
 };
 const windowEmission = {
   light: { color: 0x000000, intensity: 0.0 },
-  dark: { color: 0xffe2b7, intensity: 0.75 }
+  dark: { color: 0xffe2b7, intensity: 0.7 }
 };
 
 function getInitialThemeName() {
@@ -612,6 +642,7 @@ loader.load('/school.obj', (loadedModel) => {
       TopRim: rimMaterial,
       BottomRim: rimMaterial,
       NameRim: rimMaterial,
+      Fence: rimMaterial
     };
 
     mesh.material = isWireMesh ? wiringElectricMaterial :
@@ -657,6 +688,10 @@ loader.load('/school.obj', (loadedModel) => {
 
   subjectGroup.add(schoolModel);
   applyTheme(currentThemeName, { persist: false });
+  markLoadComplete('schoolLoaded');
+}, undefined, (error) => {
+  console.error('Failed to load school model:', error);
+  markLoadComplete('schoolLoaded');
 });
 
 loader.load('/wiring.obj', (loadedModel) => {
@@ -676,6 +711,10 @@ loader.load('/wiring.obj', (loadedModel) => {
   });
 
   subjectGroup.add(wiringModel);
+  markLoadComplete('wiringLoaded');
+}, undefined, (error) => {
+  console.error('Failed to load wiring model:', error);
+  markLoadComplete('wiringLoaded');
 });
 
 const pointerTarget = new THREE.Vector2(0, 0);
@@ -753,32 +792,40 @@ function getIntroEase(elapsed) {
 }
 
 function computeTitleIntroStartTransform() {
-  if (!heroTitle) {
+  if (!title) {
     return;
   }
 
-  const previousTransform = heroTitle.style.transform;
-  heroTitle.style.transform = 'translate3d(0px, 0px, 0px) scale(1)';
-  const rect = heroTitle.getBoundingClientRect();
-  heroTitle.style.transform = previousTransform;
+  const previousTransform = title.style.transform;
+  title.style.transform = 'translate3d(0px, 0px, 0px) scale(1)';
+  const rect = title.getBoundingClientRect();
+  title.style.transform = previousTransform;
 
   const centerX = rect.left + rect.width * 0.5;
   const centerY = rect.top + rect.height * 0.5;
   titleIntroState.offsetX = window.innerWidth * 0.5 - centerX;
   titleIntroState.offsetY = window.innerHeight * 0.5 - centerY;
-  titleIntroState.startScale = window.innerWidth <= 768 ? 1.85 : 2.35;
+
+  const desiredStartScale = window.innerWidth <= 768 ? 1.85 : 2.35;
+  const viewportPaddingX = Math.max(24, window.innerWidth * 0.05);
+  const viewportPaddingY = Math.max(24, window.innerHeight * 0.08);
+  const availableWidth = Math.max(1, window.innerWidth - viewportPaddingX * 2);
+  const availableHeight = Math.max(1, window.innerHeight - viewportPaddingY * 2);
+  const maxScaleByWidth = rect.width > 0 ? availableWidth / rect.width : desiredStartScale;
+  const maxScaleByHeight = rect.height > 0 ? availableHeight / rect.height : desiredStartScale;
+  const maxFitScale = Math.max(1, Math.min(maxScaleByWidth, maxScaleByHeight));
+
+  titleIntroState.startScale = Math.min(desiredStartScale, maxFitScale);
 }
 
 function updateTitleIntroTransform(introEase) {
-  if (!heroTitle) {
-    return;
-  }
+  if (!title) { return; }
 
   const translateX = titleIntroState.offsetX * (1 - introEase);
   const translateY = titleIntroState.offsetY * (1 - introEase);
   const scale = THREE.MathUtils.lerp(titleIntroState.startScale, 1, introEase);
 
-  heroTitle.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
+  title.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
 }
 
 function updateScrollTarget() {
