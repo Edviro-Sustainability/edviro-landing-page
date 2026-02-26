@@ -201,7 +201,7 @@ const wiringElectricMaterial = new THREE.ShaderMaterial({
 const schoolNoiseUniforms = {
   uMaskTexture: { value: maskComposer.readBuffer.texture }, uResolution: { value: renderResolution },
   uTime: { value: 0 }, uNoiseScale: { value: 0.18 }, uNoiseSpeed: { value: 0.8 },
-  uNoiseThreshold: { value: 0.2 }, uNoiseSoftness: { value: 0.2 }, uOpacity: { value: 0.84 },
+  uNoiseThreshold: { value: 0.2 }, uNoiseSoftness: { value: 0.2 }, uOpacity: { value: 0.9 },
   uPointerScreenPos: { value: new THREE.Vector2(0.5, 0.5) }, uPointerRadius: { value: 0.016 },
   uPointerFeather: { value: 0.12 }, uPointerPeakBoost: { value: 0.3 }, uPointerStrength: { value: 0.0 }
 };
@@ -515,7 +515,8 @@ const scrollState = { progress: 0, cameraOffsetX: 0, cameraOffsetY: 0, cameraOff
 const introAnimState = { progress: 0 };
 const introCamera = introState.startCameraPos.clone();
 const introLookAt = introState.startLookAt.clone();
-const titleIntroState = { offsetX: 0, offsetY: 0, startScale: 2.3 };
+const titleIntroState = { offsetX: 0, offsetY: 0, startScale: 2.3, endYOffset: 0 };
+const titleIntroAnimState = { progress: 0 };
 const introLeadTextLines = gsap.utils.toArray('.text-reveal-line--lead');
 const introBrandLine = document.querySelector('.text-reveal-line--brand');
 const introUnlockState = { cameraIntroDone: false, textRevealDone: false, scrollUnlocked: false };
@@ -591,7 +592,7 @@ function playIntroBrandReveal() {
     .add(() => {
       title.classList.add('is-brand-phase');
       computeTitleIntroStartTransform();
-      updateTitleIntroTransform(introAnimState.progress);
+      updateTitleIntroTransform(titleIntroAnimState.progress);
       
       gsap.set(introBrandLine, {
         yPercent: 115,
@@ -658,6 +659,7 @@ function computeTitleIntroStartTransform() {
 
   const desiredStartScale = window.innerWidth <= 768 ? 2.15 : 2.8;
   titleIntroState.startScale = desiredStartScale;
+  titleIntroState.endYOffset = window.innerWidth <= 768 ? -18 : -30;
 }
 
 function updateRenderResolution() {
@@ -672,7 +674,7 @@ computeTitleIntroStartTransform();
 if (document.fonts?.ready) {
   document.fonts.ready.then(() => {
     computeTitleIntroStartTransform();
-    updateTitleIntroTransform(introAnimState.progress);
+    updateTitleIntroTransform(titleIntroAnimState.progress);
     ScrollTrigger.refresh();
   });
 }
@@ -687,19 +689,37 @@ const introTl = gsap.timeline({
 
 introTl.to(introAnimState, { progress: 1, duration: introDuration, ease: "power3.inOut" }, 0)
   .to(introCamera, { x: introState.endCameraPos.x, y: introState.endCameraPos.y, z: introState.endCameraPos.z, duration: introDuration, ease: "power3.inOut" }, 0)
-  .to(introLookAt, { x: introState.endLookAt.x, y: introState.endLookAt.y, z: introState.endLookAt.z, duration: introDuration, ease: "power3.inOut" }, 0);
+  .to(introLookAt, { x: introState.endLookAt.x, y: introState.endLookAt.y, z: introState.endLookAt.z, duration: introDuration, ease: "power3.inOut" }, 0)
+  .to(titleIntroAnimState, {
+    progress: 1,
+    duration: introDuration,
+    ease: "power3.inOut",
+    onUpdate: () => updateTitleIntroTransform(titleIntroAnimState.progress)
+  }, 0);
 
-const setTitleTransform = title ? gsap.quickSetter(title, "transform") : null;
+const setTitleX = title ? gsap.quickSetter(title, 'x', 'px') : null;
+const setTitleY = title ? gsap.quickSetter(title, 'y', 'px') : null;
+const setTitleScale = title ? gsap.quickSetter(title, 'scale') : null;
 
-function updateTitleIntroTransform(progress) {
-  if (!setTitleTransform) return;
-  const x = titleIntroState.offsetX * (1 - progress);
-  const y = titleIntroState.offsetY * (1 - progress);
-  const scale = gsap.utils.interpolate(titleIntroState.startScale, 1, progress);
-  setTitleTransform(`translate3d(${x}px, ${y}px, 0) scale(${scale})`);
+if (title) {
+  gsap.set(title, {
+    transformOrigin: '50% 50%',
+    force3D: true
+  });
 }
 
-updateTitleIntroTransform(introAnimState.progress);
+function updateTitleIntroTransform(progress) {
+  if (!setTitleX || !setTitleY || !setTitleScale) return;
+  const p = gsap.utils.clamp(0, 1, progress);
+  const x = gsap.utils.interpolate(titleIntroState.offsetX, 0, p);
+  const y = gsap.utils.interpolate(titleIntroState.offsetY, titleIntroState.endYOffset, p);
+  const scale = gsap.utils.interpolate(titleIntroState.startScale, 1, p);
+  setTitleX(x);
+  setTitleY(y);
+  setTitleScale(scale);
+}
+
+updateTitleIntroTransform(titleIntroAnimState.progress);
 
 lenis = new Lenis({
   duration: prefersReducedMotion ? 0.8 : 1.15, smoothWheel: !prefersReducedMotion, smoothTouch: false
@@ -750,7 +770,7 @@ window.addEventListener('resize', () => {
 
   updateRenderResolution();
   computeTitleIntroStartTransform();
-  updateTitleIntroTransform(introAnimState.progress);
+  updateTitleIntroTransform(titleIntroAnimState.progress);
   ScrollTrigger.refresh();
 });
 
@@ -803,8 +823,6 @@ gsap.ticker.add((time) => {
       introState.endLookAt.z
     );
   }
-
-  updateTitleIntroTransform(introAnimState.progress);
 
   if (schoolNoiseOverlays.length > 0) renderWireMask();
   
