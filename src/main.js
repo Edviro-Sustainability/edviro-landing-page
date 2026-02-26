@@ -1,4 +1,7 @@
 import * as THREE from 'three';
+import Lenis from 'lenis';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
@@ -9,6 +12,12 @@ import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 import './style.css';
+import wiringVertexShader from './wiringvertex.glsl?raw';
+import wiringFragmentShader from './wiringfragment.glsl?raw';
+import maskVertexShader from './maskvertex.glsl?raw';
+import maskFragmentShader from './maskfragment.glsl?raw';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const MASK_LAYER = 1;
 
@@ -28,6 +37,20 @@ const STREET_LAMP_FALLBACK_POSITIONS = [
 ];
 
 document.body.classList.add('is-site-loading');
+document.body.classList.add('is-scroll-locked');
+
+function resetScrollPosition() {
+  window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+}
+
+try {
+  if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+} catch {}
+
+resetScrollPosition();
+window.addEventListener('load', resetScrollPosition, { once: true });
 
 const loadingState = {
   windowLoaded: document.readyState === 'complete',
@@ -44,49 +67,21 @@ function markLoadComplete(key) {
 }
 
 if (!loadingState.windowLoaded) {
-  window.addEventListener(
-    'load',
-    () => {
-      markLoadComplete('windowLoaded');
-    },
-    { once: true }
-  );
+  window.addEventListener('load', () => markLoadComplete('windowLoaded'), { once: true });
 }
 
 const themeConfig = {
   light: {
-    sceneColor: 0xf9f0f9,
-    fogColor: 0xf9f0f9,
-    fogDensity: 0.012,
-    floorColor: 0xf9f0f9,
-    hemiColor: 0xffffff,
-    hemiGroundColor: 0xcfd8dc,
-    hemiIntensity: 2.0,
-    dirColor: 0xffffff,
-    dirIntensity: 1.9,
-    exposure: 1.05,
-    maskWireColor: 0x666666,
-    wireBloomStrength: 0.24,
-    streetLampIntensity: 0.0,
-    streetLampColor: 0xffd7ad,
-    streetLampDistance: 16
+    sceneColor: 0xf9f0f9, fogColor: 0xf9f0f9, fogDensity: 0.012, floorColor: 0xf9f0f9,
+    hemiColor: 0xffffff, hemiGroundColor: 0xcfd8dc, hemiIntensity: 2.0, dirColor: 0xffffff,
+    dirIntensity: 1.9, exposure: 1.05, maskWireColor: 0x666666, wireBloomStrength: 0.24,
+    streetLampIntensity: 0.0, streetLampColor: 0xffd7ad, streetLampDistance: 16
   },
   dark: {
-    sceneColor: 0x050608,
-    fogColor: 0x050608,
-    fogDensity: 0.018,
-    floorColor: 0x3b413d,
-    hemiColor: 0x7b899c,
-    hemiGroundColor: 0x020304,
-    hemiIntensity: 0.4,
-    dirColor: 0xffffff,
-    dirIntensity: 0.7,
-    exposure: 0.96,
-    maskWireColor: 0x555555,
-    wireBloomStrength: 0.24,
-    streetLampIntensity: 0.8,
-    streetLampColor: 0xffd8aa,
-    streetLampDistance: 16
+    sceneColor: 0x050608, fogColor: 0x050608, fogDensity: 0.018, floorColor: 0x3b413d,
+    hemiColor: 0x7b899c, hemiGroundColor: 0x020304, hemiIntensity: 0.4, dirColor: 0xffffff,
+    dirIntensity: 0.7, exposure: 0.96, maskWireColor: 0x555555, wireBloomStrength: 0.24,
+    streetLampIntensity: 0.8, streetLampColor: 0xffd8aa, streetLampDistance: 16
   }
 };
 
@@ -94,19 +89,11 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(themeConfig.light.sceneColor);
 scene.fog = new THREE.FogExp2(themeConfig.light.fogColor, themeConfig.light.fogDensity);
 
-const camera = new THREE.PerspectiveCamera(
-  40,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  100
-);
+const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
 camera.position.set(0, 0.5, 7.5);
 scene.add(camera);
 
-const renderer = new THREE.WebGLRenderer({
-  canvas,
-  antialias: true
-});
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -122,16 +109,9 @@ composer.setSize(window.innerWidth, window.innerHeight);
 const renderPass = new RenderPass(scene, camera);
 composer.addPass(renderPass);
 
-const outlinePass = new OutlinePass(
-  new THREE.Vector2(window.innerWidth, window.innerHeight),
-  scene,
-  camera
-);
+const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
 
-const dofPass = new BokehPass(scene, camera, {
-  focus: 12.0,
-  aperture: 0.0001
-});
+const dofPass = new BokehPass(scene, camera, { focus: 12.0, aperture: 0.0001 });
 composer.addPass(dofPass);
 
 const pixelRatio = Math.min(window.devicePixelRatio, 2);
@@ -159,20 +139,12 @@ maskComposer.addPass(maskRenderPass);
 const wireBloomPass = new UnrealBloomPass(
   new THREE.Vector2(window.innerWidth, window.innerHeight),
   themeConfig.light.wireBloomStrength,
-  0.2,
-  0.1
+  0.2, 0.1
 );
 maskComposer.addPass(wireBloomPass);
 
-const hemiLight = new THREE.HemisphereLight(
-  themeConfig.light.hemiColor,
-  themeConfig.light.hemiGroundColor,
-  themeConfig.light.hemiIntensity
-);
-const dirLight = new THREE.DirectionalLight(
-  themeConfig.light.dirColor,
-  themeConfig.light.dirIntensity
-);
+const hemiLight = new THREE.HemisphereLight(themeConfig.light.hemiColor, themeConfig.light.hemiGroundColor, themeConfig.light.hemiIntensity);
+const dirLight = new THREE.DirectionalLight(themeConfig.light.dirColor, themeConfig.light.dirIntensity);
 dirLight.position.set(0, 5, 3);
 dirLight.shadow.mapSize.set(2048, 2048);
 dirLight.castShadow = true;
@@ -209,14 +181,8 @@ const schoolNoiseOverlays = [];
 const streetLampPointLights = [];
 
 const schoolMaskWireframeMaterial = new THREE.LineBasicMaterial({
-  color: themeConfig.light.maskWireColor,
-  linewidth: 3,
-  transparent: false,
-  opacity: 1.0,
-  toneMapped: false,
-  fog: false,
-  depthTest: false,
-  depthWrite: false
+  color: themeConfig.light.maskWireColor, linewidth: 3, transparent: false, opacity: 1.0,
+  toneMapped: false, fog: false, depthTest: false, depthWrite: false
 });
 
 const wiringElectricMaterial = new THREE.ShaderMaterial({
@@ -227,203 +193,54 @@ const wiringElectricMaterial = new THREE.ShaderMaterial({
     uSpeed: { value: 0.2 },
     uPulse: { value: 1.5 },
   },
-  vertexShader: /* glsl */ `
-    varying vec3 vWorldPos;
-
-    void main() {
-      vec4 worldPos = modelMatrix * vec4(position, 1.0);
-      vWorldPos = worldPos.xyz;
-      vec4 mvPosition = viewMatrix * worldPos;
-      gl_Position = projectionMatrix * mvPosition;
-    }
-  `,
-  fragmentShader: /* glsl */ `
-    uniform float uTime;
-    uniform vec3 uColorBase;
-    uniform vec3 uColorHot;
-    uniform float uSpeed;
-    uniform float uPulse;
-
-    varying vec3 vWorldPos;
-
-    void main() {
-      float flow = fract((vWorldPos.x + vWorldPos.z) * 0.42 - uTime * uSpeed);
-      float bandA = smoothstep(0.0, 0.08, flow) * (1.0 - smoothstep(0.08, 0.26, flow));
-      float bandB = smoothstep(0.55, 0.72, flow) * (1.0 - smoothstep(0.72, 0.9, flow));
-      float pulse = 0.5 + 0.5 * sin(uTime * uPulse + vWorldPos.y * 2.2);
-      float glow = max(max(bandA, bandB), 0.45 * pulse);
-      vec3 color = mix(uColorBase, uColorHot, glow);
-
-      gl_FragColor = vec4(color, 1.0);
-      #include <tonemapping_fragment>
-      #include <colorspace_fragment>
-    }
-  `,
-  transparent: true,
-  depthWrite: false,
-  blending: THREE.NormalBlending
+  vertexShader: wiringVertexShader,
+  fragmentShader: wiringFragmentShader,
+  transparent: true, depthWrite: false, blending: THREE.NormalBlending
 });
 
 const schoolNoiseUniforms = {
-  uMaskTexture: { value: maskComposer.readBuffer.texture },
-  uResolution: { value: renderResolution },
-  uTime: { value: 0 },
-  uNoiseScale: { value: 0.18 },
-  uNoiseSpeed: { value: 0.8 },
-  uNoiseThreshold: { value: 0.2 },
-  uNoiseSoftness: { value: 0.2 },
-  uOpacity: { value: 1.0 },
-  uPointerScreenPos: { value: new THREE.Vector2(0.5, 0.5) },
-  uPointerRadius: { value: 0.016 },
-  uPointerFeather: { value: 0.12 },
-  uPointerPeakBoost: { value: 0.2 },
-  uPointerStrength: { value: 0.0 }
+  uMaskTexture: { value: maskComposer.readBuffer.texture }, uResolution: { value: renderResolution },
+  uTime: { value: 0 }, uNoiseScale: { value: 0.18 }, uNoiseSpeed: { value: 0.8 },
+  uNoiseThreshold: { value: 0.2 }, uNoiseSoftness: { value: 0.2 }, uOpacity: { value: 0.84 },
+  uPointerScreenPos: { value: new THREE.Vector2(0.5, 0.5) }, uPointerRadius: { value: 0.016 },
+  uPointerFeather: { value: 0.12 }, uPointerPeakBoost: { value: 0.3 }, uPointerStrength: { value: 0.0 }
 };
 
 const schoolNoiseRevealMaterial = new THREE.ShaderMaterial({
   uniforms: schoolNoiseUniforms,
-  vertexShader: /* glsl */ `
-    varying vec3 vWorldPos;
-
-    void main() {
-      vec4 worldPos = modelMatrix * vec4(position, 1.0);
-      vWorldPos = worldPos.xyz;
-      gl_Position = projectionMatrix * viewMatrix * worldPos;
-    }
-  `,
-  fragmentShader: /* glsl */ `
-    uniform sampler2D uMaskTexture;
-    uniform vec2 uResolution;
-    uniform float uTime;
-    uniform float uNoiseScale;
-    uniform float uNoiseSpeed;
-    uniform float uNoiseThreshold;
-    uniform float uNoiseSoftness;
-    uniform float uOpacity;
-    uniform vec2 uPointerScreenPos;
-    uniform float uPointerRadius;
-    uniform float uPointerFeather;
-    uniform float uPointerPeakBoost;
-    uniform float uPointerStrength;
-
-    varying vec3 vWorldPos;
-
-    float hash(vec3 p) {
-      p = fract(p * 0.3183099 + vec3(0.1, 0.2, 0.3));
-      p *= 17.0;
-      return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
-    }
-
-    float noise3d(vec3 p) {
-      vec3 i = floor(p);
-      vec3 f = fract(p);
-      vec3 u = f * f * (3.0 - 2.0 * f);
-
-      float n000 = hash(i + vec3(0.0, 0.0, 0.0));
-      float n100 = hash(i + vec3(1.0, 0.0, 0.0));
-      float n010 = hash(i + vec3(0.0, 1.0, 0.0));
-      float n110 = hash(i + vec3(1.0, 1.0, 0.0));
-      float n001 = hash(i + vec3(0.0, 0.0, 1.0));
-      float n101 = hash(i + vec3(1.0, 0.0, 1.0));
-      float n011 = hash(i + vec3(0.0, 1.0, 1.0));
-      float n111 = hash(i + vec3(1.0, 1.0, 1.0));
-
-      float nx00 = mix(n000, n100, u.x);
-      float nx10 = mix(n010, n110, u.x);
-      float nx01 = mix(n001, n101, u.x);
-      float nx11 = mix(n011, n111, u.x);
-      float nxy0 = mix(nx00, nx10, u.y);
-      float nxy1 = mix(nx01, nx11, u.y);
-      return mix(nxy0, nxy1, u.z);
-    }
-
-    float fbm(vec3 p) {
-      float value = 0.0;
-      float amplitude = 0.5;
-      for (int i = 0; i < 4; i++) {
-        value += noise3d(p) * amplitude;
-        p = p * 2.05 + vec3(7.1, 11.7, 3.6);
-        amplitude *= 0.5;
-      }
-      return value;
-    }
-
-    void main() {
-      vec2 uv = gl_FragCoord.xy / uResolution;
-      vec3 maskColor = texture2D(uMaskTexture, uv).rgb;
-      float maskSignal = max(max(maskColor.r, maskColor.g), maskColor.b);
-
-      if (maskSignal < 0.00001) {
-        discard;
-      }
-
-      float contentMask = smoothstep(0.03, 0.2, maskSignal);
-      float n = fbm(vWorldPos * uNoiseScale + vec3(0.0, uTime * uNoiseSpeed, 0.0));
-      float pointerDistance = distance(uv, uPointerScreenPos);
-      float pointerRegion = 1.0 - smoothstep(
-        uPointerRadius,
-        uPointerRadius + uPointerFeather,
-        pointerDistance
-      );
-      float peakedNoise = max(n - (pointerRegion * uPointerPeakBoost * uPointerStrength), 0.0);
-      float reveal = 1.0 - smoothstep(
-        uNoiseThreshold - uNoiseSoftness,
-        uNoiseThreshold + uNoiseSoftness,
-        peakedNoise
-      );
-      float alpha = reveal * contentMask * uOpacity;
-      gl_FragColor = vec4(maskColor, alpha);
-      #include <tonemapping_fragment>
-      #include <colorspace_fragment>
-    }
-  `,
-  transparent: true,
-  depthTest: true,
-  depthWrite: false,
-  polygonOffset: true,
-  polygonOffsetFactor: -1,
-  polygonOffsetUnits: -1
+  vertexShader: maskVertexShader,
+  fragmentShader: maskFragmentShader,
+  transparent: true, depthTest: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1
 });
 
 const introState = {
-  startCameraPos: new THREE.Vector3(0, 10, -25),
-  endCameraPos: new THREE.Vector3(8, 10, 26),
-  startLookAt: new THREE.Vector3(0, 0, -30),
-  endLookAt: new THREE.Vector3(0, 0, 0)
+  startCameraPos: new THREE.Vector3(0, 10, -25), endCameraPos: new THREE.Vector3(8, 4, 26),
+  startLookAt: new THREE.Vector3(0, 0, -30), endLookAt: new THREE.Vector3(0, 0, 0)
 };
-const introDelay = 2.4;
-const introDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 2.55;
-const introEasePower = 3.4;
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const introDuration = prefersReducedMotion ? 1.35 : 2.55;
 const loader = new OBJLoader();
 
-const schoolMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
-const windowMaterial = new THREE.MeshStandardMaterial({ color: '#000000'});
-const treeMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
-const poleMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
-const woodMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
-const rimMaterial = new THREE.MeshStandardMaterial({ color: '#000000', });
+const schoolMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });
+const windowMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });
+const treeMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });
+const poleMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });
+const woodMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });
+const rimMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });
 const materialThemeColors = {
-  school: { light: 0xffffff, dark: 0xcbcfcb },
-  windows: { light: 0x3e4542, dark: 0xfffcc9 },
-  tree: { light: 0x49d46e, dark: 0x52c878 },
-  pole: { light: 0xc7c7c7, dark: 0xbbc4cd },
-  wood: { light: 0xa38764, dark: 0x987a5d },
-  rim: { light: 0x898f89, dark: 0x8c8e8c }
+  school: { light: 0xffffff, dark: 0xcbcfcb }, windows: { light: 0x71c1cf, dark: 0xfffcc9 },
+  tree: { light: 0x44af60, dark: 0x52c878 }, pole: { light: 0xc7c7c7, dark: 0xbbc4cd },
+  wood: { light: 0xa38764, dark: 0x987a5d }, rim: { light: 0x898f89, dark: 0x8c8e8c }
 };
 const windowEmission = {
-  light: { color: 0x000000, intensity: 0.0 },
-  dark: { color: 0xffe2b7, intensity: 0.7 }
+  light: { color: 0x000000, intensity: 0.0 }, dark: { color: 0xffe2b7, intensity: 0.7 }
 };
 
 function getInitialThemeName() {
   try {
     const storedTheme = window.localStorage.getItem(STORAGE_THEME_KEY);
-    if (storedTheme === 'light' || storedTheme === 'dark') {
-      return storedTheme;
-    }
-  } catch {
-    // Ignore blocked storage in private contexts.
-  }
+    if (storedTheme === 'light' || storedTheme === 'dark') return storedTheme;
+  } catch {}
   return DEFAULT_THEME_NAME;
 }
 
@@ -433,16 +250,12 @@ function toVertexKey(x, y, z) {
 
 function extractDisconnectedComponentCenters(geometry) {
   const positionAttribute = geometry?.getAttribute('position');
-  if (!positionAttribute || positionAttribute.count < 3) {
-    return [];
-  }
+  if (!positionAttribute || positionAttribute.count < 3) return [];
 
   const indexAttribute = geometry.index;
   const rawVertexCount = indexAttribute ? indexAttribute.count : positionAttribute.count;
   const triangleCount = Math.floor(rawVertexCount / 3);
-  if (triangleCount <= 0) {
-    return [];
-  }
+  if (triangleCount <= 0) return [];
 
   const faceVertexKeys = new Array(triangleCount);
   const vertexToFaces = new Map();
@@ -453,17 +266,11 @@ function extractDisconnectedComponentCenters(geometry) {
     for (let corner = 0; corner < 3; corner++) {
       const baseIndex = faceIndex * 3 + corner;
       const vertexIndex = indexAttribute ? indexAttribute.getX(baseIndex) : baseIndex;
-      const x = positionAttribute.getX(vertexIndex);
-      const y = positionAttribute.getY(vertexIndex);
-      const z = positionAttribute.getZ(vertexIndex);
+      const x = positionAttribute.getX(vertexIndex); const y = positionAttribute.getY(vertexIndex); const z = positionAttribute.getZ(vertexIndex);
       const key = toVertexKey(x, y, z);
 
-      if (!keyToPosition.has(key)) {
-        keyToPosition.set(key, new THREE.Vector3(x, y, z));
-      }
-      if (!vertexToFaces.has(key)) {
-        vertexToFaces.set(key, []);
-      }
+      if (!keyToPosition.has(key)) keyToPosition.set(key, new THREE.Vector3(x, y, z));
+      if (!vertexToFaces.has(key)) vertexToFaces.set(key, []);
       vertexToFaces.get(key).push(faceIndex);
       keys.push(key);
     }
@@ -474,9 +281,7 @@ function extractDisconnectedComponentCenters(geometry) {
   const centers = [];
 
   for (let startFace = 0; startFace < triangleCount; startFace++) {
-    if (visitedFaces[startFace]) {
-      continue;
-    }
+    if (visitedFaces[startFace]) continue;
 
     const stack = [startFace];
     const componentKeys = new Set();
@@ -495,14 +300,10 @@ function extractDisconnectedComponentCenters(geometry) {
       }
     }
 
-    if (componentKeys.size === 0) {
-      continue;
-    }
+    if (componentKeys.size === 0) continue;
 
     const center = new THREE.Vector3();
-    for (const key of componentKeys) {
-      center.add(keyToPosition.get(key));
-    }
+    for (const key of componentKeys) center.add(keyToPosition.get(key));
     center.multiplyScalar(1 / componentKeys.size);
     centers.push(center);
   }
@@ -511,24 +312,13 @@ function extractDisconnectedComponentCenters(geometry) {
 }
 
 function createStreetLampLights(lightsMesh) {
-  if (!lightsMesh || streetLampPointLights.length > 0) {
-    return;
-  }
+  if (!lightsMesh || streetLampPointLights.length > 0) return;
 
   const extractedCenters = extractDisconnectedComponentCenters(lightsMesh.geometry);
-  const centers = (
-    extractedCenters.length >= 6
-      ? extractedCenters.slice(0, 6)
-      : STREET_LAMP_FALLBACK_POSITIONS
-  ).map((center) => center.clone());
+  const centers = (extractedCenters.length >= 6 ? extractedCenters.slice(0, 6) : STREET_LAMP_FALLBACK_POSITIONS).map((center) => center.clone());
 
   for (const center of centers) {
-    const pointLight = new THREE.PointLight(
-      themeConfig.dark.streetLampColor,
-      0,
-      themeConfig.dark.streetLampDistance,
-      2
-    );
+    const pointLight = new THREE.PointLight(themeConfig.dark.streetLampColor, 0, themeConfig.dark.streetLampDistance, 2);
     pointLight.position.copy(center);
     pointLight.position.y -= 2.0;
     pointLight.visible = false;
@@ -550,10 +340,7 @@ function applyMaterialTheme(themeName) {
 }
 
 function updateThemeToggleButton(themeName) {
-  if (!themeToggleButton) {
-    return;
-  }
-
+  if (!themeToggleButton) return;
   const nextThemeName = themeName === 'dark' ? 'light' : 'dark';
   themeToggleButton.textContent = `Switch to ${nextThemeName}`;
   themeToggleButton.setAttribute('aria-label', `Switch to ${nextThemeName} mode`);
@@ -598,21 +385,15 @@ function applyTheme(nextThemeName, options = {}) {
   updateThemeToggleButton(normalizedThemeName);
 
   if (shouldPersist) {
-    try {
-      window.localStorage.setItem(STORAGE_THEME_KEY, normalizedThemeName);
-    } catch (error) {
-      console.warn('Failed to persist theme:', error);
-    }
+    try { window.localStorage.setItem(STORAGE_THEME_KEY, normalizedThemeName); } catch (e) { console.warn(e); }
   }
 }
 
 if (themeToggleButton) {
   themeToggleButton.addEventListener('click', () => {
-    const nextThemeName = currentThemeName === 'dark' ? 'light' : 'dark';
-    applyTheme(nextThemeName);
+    applyTheme(currentThemeName === 'dark' ? 'light' : 'dark');
   });
 }
-
 applyTheme(currentThemeName, { persist: false });
 
 loader.load('/school.obj', (loadedModel) => {
@@ -620,9 +401,7 @@ loader.load('/school.obj', (loadedModel) => {
   const modelMeshes = [];
   let lightsMesh = null;
   schoolModel.traverse((child) => {
-    if (child.isMesh) {
-      modelMeshes.push(child);
-    }
+    if (child.isMesh) modelMeshes.push(child);
   });
 
   for (const mesh of modelMeshes) {
@@ -630,54 +409,37 @@ loader.load('/school.obj', (loadedModel) => {
     const isTreeMesh = mesh.name.startsWith("Tree");
     const isPoleMesh = mesh.name.startsWith("Pole");
     const isTrunkMesh = mesh.name.startsWith("Trunk");
-    if (mesh.name === 'Lights') {
-      lightsMesh = mesh;
-    }
+    if (mesh.name === 'Lights') lightsMesh = mesh;
 
     const materialMap = {
-      Windows: windowMaterial,
-      School: schoolMaterial,
-      Lights: poleMaterial,
-      Rim: rimMaterial,
-      TopRim: rimMaterial,
-      BottomRim: rimMaterial,
-      NameRim: rimMaterial,
-      Fence: rimMaterial
+      Windows: windowMaterial, School: schoolMaterial, Lights: poleMaterial,
+      Rim: rimMaterial, TopRim: rimMaterial, BottomRim: rimMaterial, NameRim: rimMaterial, Fence: rimMaterial
     };
 
     mesh.material = isWireMesh ? wiringElectricMaterial :
-    isTreeMesh ? treeMaterial :
-    isPoleMesh ? woodMaterial :
-    isTrunkMesh ? woodMaterial : (materialMap[mesh.name] || schoolMaterial);
+      isTreeMesh ? treeMaterial :
+      isPoleMesh || isTrunkMesh ? woodMaterial : (materialMap[mesh.name] || schoolMaterial);
+    
     mesh.castShadow = !isWireMesh;
     mesh.receiveShadow = !isWireMesh;
-
-    if (isWireMesh) {
-      mesh.layers.enable(MASK_LAYER);
-    }
+    if (isWireMesh) mesh.layers.enable(MASK_LAYER);
 
     if (!mesh.name.startsWith("Tree") && !mesh.name.startsWith("Pole") && !mesh.name.startsWith("Trunk")) {
       const edges = new THREE.EdgesGeometry(mesh.geometry, 15);
       const wire = new THREE.LineSegments(edges, schoolMaskWireframeMaterial);
       const wireOffset = new THREE.LineSegments(edges, schoolMaskWireframeMaterial);
       
-      wire.layers.set(MASK_LAYER);
-      wireOffset.layers.set(MASK_LAYER);
-      
-      wire.renderOrder = 1000;
-      wireOffset.renderOrder = 1000;
+      wire.layers.set(MASK_LAYER); wireOffset.layers.set(MASK_LAYER);
+      wire.renderOrder = 1000; wireOffset.renderOrder = 1000;
       wireOffset.scale.setScalar(1.003);
       mesh.add(wire, wireOffset);
       schoolMaskWireframes.push(wire, wireOffset);
 
       const noiseOverlay = new THREE.Mesh(mesh.geometry, schoolNoiseRevealMaterial);
-      noiseOverlay.renderOrder = 950;
-      noiseOverlay.castShadow = false;
-      noiseOverlay.receiveShadow = false;
+      noiseOverlay.renderOrder = 950; noiseOverlay.castShadow = false; noiseOverlay.receiveShadow = false;
       mesh.add(noiseOverlay);
       schoolNoiseOverlays.push(noiseOverlay);
     }
-
     schoolMeshes.push(mesh);
   }
   createStreetLampLights(lightsMesh);
@@ -700,102 +462,190 @@ loader.load('/wiring.obj', (loadedModel) => {
   wiringModel.position.set(0, -4, 0);
 
   wiringModel.traverse((child) => {
-    if (!child.isMesh) {
-      return;
-    }
+    if (!child.isMesh) return;
     child.material = wiringElectricMaterial;
-    child.castShadow = false;
-    child.receiveShadow = false;
-    
+    child.castShadow = false; child.receiveShadow = false;
     child.layers.set(MASK_LAYER); 
   });
-
   subjectGroup.add(wiringModel);
   markLoadComplete('wiringLoaded');
 }, undefined, (error) => {
-  console.error('Failed to load wiring model:', error);
+  console.error('Failed to load wiring:', error);
   markLoadComplete('wiringLoaded');
 });
 
-const pointerTarget = new THREE.Vector2(0, 0);
-const pointerCurrent = new THREE.Vector2(0, 0);
-let isPointerActive = false;
-const parallaxSettings = {
-  cameraX: 0.9,
-  cameraY: 0.9,
-  lookAtX: 0,
-  lookAtY: 0,
-  groupX: 0.08,
-  groupY: 0.05
-};
+const pointerCurrent = { x: 0, y: 0 };
+const pointerXTo = gsap.quickTo(pointerCurrent, 'x', { duration: 0.6, ease: 'power3.out' });
+const pointerYTo = gsap.quickTo(pointerCurrent, 'y', { duration: 0.6, ease: 'power3.out' });
+const pointerStrengthTo = gsap.quickTo(schoolNoiseUniforms.uPointerStrength, 'value', { duration: 0.6, ease: 'power2.out' });
 
 window.addEventListener('pointermove', (event) => {
-  pointerTarget.x = (event.clientX / window.innerWidth) * 2 - 1;
-  pointerTarget.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  isPointerActive = true;
+  pointerXTo((event.clientX / window.innerWidth) * 2 - 1);
+  pointerYTo(-(event.clientY / window.innerHeight) * 2 + 1);
+  pointerStrengthTo(1.0);
 });
 
 window.addEventListener('pointerleave', () => {
-  pointerTarget.set(0, 0);
-  isPointerActive = false;
+  pointerXTo(0);
+  pointerYTo(0);
+  pointerStrengthTo(0.0);
 });
 
+const parallaxSettings = { cameraX: 0.9, cameraY: 0.9, lookAtX: 0, lookAtY: 0, groupX: 0.08, groupY: 0.05 };
 const maskBackground = new THREE.Color(0x000000);
 
 function renderWireMask() {
-  if (schoolMeshes.length === 0) {
-    return;
-  }
-
+  if (schoolMeshes.length === 0) return;
   const previousBackground = scene.background;
   const previousShadowMapEnabled = renderer.shadowMap.enabled;
-
+  
   scene.background = maskBackground;
   renderer.shadowMap.enabled = false;
-  
   camera.layers.set(MASK_LAYER);
-
+  
   maskComposer.render();
   schoolNoiseUniforms.uMaskTexture.value = maskComposer.readBuffer.texture;
-
+  
   camera.layers.set(0); 
   renderer.shadowMap.enabled = previousShadowMapEnabled;
   scene.background = previousBackground;
 }
 
-const clock = new THREE.Clock();
-let scrollProgress = 0;
-let scrollProgressTarget = 0;
-const introCamera = new THREE.Vector3();
-const introLookAt = new THREE.Vector3();
-let introEaseSmoothed = 0;
-const titleIntroState = {
-  offsetX: 0,
-  offsetY: 0,
-  startScale: 2.3
-};
+const scrollState = { progress: 0, cameraOffsetX: 0, cameraOffsetY: 0, cameraOffsetZ: 0, lookAtOffsetX: 0, lookAtOffsetY: 0, lookAtOffsetZ: 0 };
+const introAnimState = { progress: 0 };
+const introCamera = introState.startCameraPos.clone();
+const introLookAt = introState.startLookAt.clone();
+const titleIntroState = { offsetX: 0, offsetY: 0, startScale: 2.3 };
+const introLeadTextLines = gsap.utils.toArray('.text-reveal-line--lead');
+const introBrandLine = document.querySelector('.text-reveal-line--brand');
+const introUnlockState = { cameraIntroDone: false, textRevealDone: false, scrollUnlocked: false };
+let introCameraStarted = false;
+let introBrandRevealStarted = false;
 
-function clamp01(value) {
-  return Math.min(1, Math.max(0, value));
+let lenis = null;
+
+function maybeUnlockScroll() {
+  if (!lenis) return;
+  if (introUnlockState.scrollUnlocked) return;
+  if (!introUnlockState.cameraIntroDone || !introUnlockState.textRevealDone) return;
+
+  introUnlockState.scrollUnlocked = true;
+  document.body.classList.remove('is-scroll-locked');
+  resetScrollPosition();
+  lenis.start();
+  lenis.scrollTo(0, { immediate: true, force: true });
+  ScrollTrigger.refresh();
 }
 
-function mapRange(value, inMin, inMax, outMin, outMax) {
-  const t = clamp01((value - inMin) / (inMax - inMin));
-  return outMin + (outMax - outMin) * t;
+function markTextRevealComplete() {
+  introUnlockState.textRevealDone = true;
+  maybeUnlockScroll();
 }
 
-function getIntroEase(elapsed) {
-  const introProgress =
-    introDuration === 0 ? 1 : clamp01((elapsed - introDelay) / introDuration);
-  const eased = 1 - Math.pow(1 - introProgress, introEasePower);
-  return eased * eased * (3 - 2 * eased);
+function startIntroCameraAnimation() {
+  if (introCameraStarted) return;
+  introCameraStarted = true;
+  introTl.play(0);
 }
 
-function computeTitleIntroStartTransform() {
-  if (!title) {
+function playIntroBrandReveal() {
+  if (introBrandRevealStarted) return;
+  introBrandRevealStarted = true;
+
+  if (!title || !introBrandLine) {
+    markTextRevealComplete();
+    startIntroCameraAnimation();
     return;
   }
 
+  const leadExitDuration = prefersReducedMotion ? 0.36 : 0.75;
+  const brandRevealDuration = prefersReducedMotion ? 0.55 : 0.95;
+
+  introLeadTextLines.forEach(line => {
+    line.style.animation = 'none';
+    line.style.opacity = '1';
+    line.style.transform = 'translateY(0)';
+  });
+
+  const titleRect = title.getBoundingClientRect();
+  title.style.height = `${titleRect.height}px`;
+  title.style.display = 'flex';
+  title.style.flexDirection = 'column';
+  title.style.justifyContent = 'center';
+
+  gsap.timeline({
+    defaults: { overwrite: 'auto' },
+    onComplete: () => {
+      markTextRevealComplete();
+      startIntroCameraAnimation();
+    }
+  })
+
+    .to(introLeadTextLines, {
+      opacity: 0,
+      filter: 'blur(4px)',
+      duration: leadExitDuration,
+      ease: 'power2.out'
+    })
+
+    .add(() => {
+      title.classList.add('is-brand-phase');
+      computeTitleIntroStartTransform();
+      updateTitleIntroTransform(introAnimState.progress);
+      
+      gsap.set(introBrandLine, {
+        yPercent: 115,
+        opacity: 0,
+        filter: 'blur(2px)'
+      });
+    })
+
+    .to(
+      introBrandLine,
+      {
+        yPercent: 0,
+        opacity: 1,
+        filter: 'blur(0px)',
+        duration: brandRevealDuration,
+        ease: 'power3.out'
+      }
+    );
+}
+
+function bindIntroTextRevealUnlock() {
+  if (introLeadTextLines.length === 0) {
+    playIntroBrandReveal();
+    return;
+  }
+
+  const pendingLines = new Set(introLeadTextLines);
+  let fallbackTriggered = false;
+  const fallbackDelay = prefersReducedMotion ? 1.2 : 3.0;
+  const fallbackCall = gsap.delayedCall(fallbackDelay, () => {
+    fallbackTriggered = true;
+    playIntroBrandReveal();
+  });
+  const markLineDone = (line) => {
+    if (fallbackTriggered) return;
+    if (!pendingLines.has(line)) return;
+    pendingLines.delete(line);
+    if (pendingLines.size === 0) {
+      fallbackCall.kill();
+      playIntroBrandReveal();
+    }
+  };
+
+  introLeadTextLines.forEach((line) => {
+    line.addEventListener('animationend', () => markLineDone(line), { once: true });
+    line.addEventListener('animationcancel', () => markLineDone(line), { once: true });
+  });
+}
+
+const mapScrollToZ = gsap.utils.pipe(gsap.utils.clamp(0, 1), gsap.utils.mapRange(0, 1, 7.5, 5.8));
+const mapScrollToX = gsap.utils.pipe(gsap.utils.clamp(0, 1), gsap.utils.mapRange(0, 1, 0, 0.5));
+
+function computeTitleIntroStartTransform() {
+  if (!title) return;
   const previousTransform = title.style.transform;
   title.style.transform = 'translate3d(0px, 0px, 0px) scale(1)';
   const rect = title.getBoundingClientRect();
@@ -806,59 +656,88 @@ function computeTitleIntroStartTransform() {
   titleIntroState.offsetX = window.innerWidth * 0.5 - centerX;
   titleIntroState.offsetY = window.innerHeight * 0.5 - centerY;
 
-  const desiredStartScale = window.innerWidth <= 768 ? 1.85 : 2.35;
-  const viewportPaddingX = Math.max(24, window.innerWidth * 0.05);
-  const viewportPaddingY = Math.max(24, window.innerHeight * 0.08);
-  const availableWidth = Math.max(1, window.innerWidth - viewportPaddingX * 2);
-  const availableHeight = Math.max(1, window.innerHeight - viewportPaddingY * 2);
-  const maxScaleByWidth = rect.width > 0 ? availableWidth / rect.width : desiredStartScale;
-  const maxScaleByHeight = rect.height > 0 ? availableHeight / rect.height : desiredStartScale;
-  const maxFitScale = Math.max(1, Math.min(maxScaleByWidth, maxScaleByHeight));
-
-  titleIntroState.startScale = Math.min(desiredStartScale, maxFitScale);
-}
-
-function updateTitleIntroTransform(introEase) {
-  if (!title) { return; }
-
-  const translateX = titleIntroState.offsetX * (1 - introEase);
-  const translateY = titleIntroState.offsetY * (1 - introEase);
-  const scale = THREE.MathUtils.lerp(titleIntroState.startScale, 1, introEase);
-
-  title.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
-}
-
-function updateScrollTarget() {
-  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-  scrollProgressTarget = maxScroll <= 0 ? 0 : window.scrollY / maxScroll;
+  const desiredStartScale = window.innerWidth <= 768 ? 2.15 : 2.8;
+  titleIntroState.startScale = desiredStartScale;
 }
 
 function updateRenderResolution() {
   const pixelRatio = Math.min(window.devicePixelRatio, 2);
-  const width = Math.floor(window.innerWidth * pixelRatio);
-  const height = Math.floor(window.innerHeight * pixelRatio);
-  renderResolution.set(
-    width,
-    height
-  );
+  renderResolution.set(Math.floor(window.innerWidth * pixelRatio), Math.floor(window.innerHeight * pixelRatio));
   maskComposer.setPixelRatio(pixelRatio);
   maskComposer.setSize(window.innerWidth, window.innerHeight);
 }
 
 updateRenderResolution();
-updateScrollTarget();
 computeTitleIntroStartTransform();
 if (document.fonts?.ready) {
   document.fonts.ready.then(() => {
     computeTitleIntroStartTransform();
+    updateTitleIntroTransform(introAnimState.progress);
+    ScrollTrigger.refresh();
   });
 }
 
-window.addEventListener('scroll', updateScrollTarget, { passive: true });
+const introTl = gsap.timeline({
+  paused: true,
+  onComplete: () => {
+    introUnlockState.cameraIntroDone = true;
+    maybeUnlockScroll();
+  }
+});
+
+introTl.to(introAnimState, { progress: 1, duration: introDuration, ease: "power3.inOut" }, 0)
+  .to(introCamera, { x: introState.endCameraPos.x, y: introState.endCameraPos.y, z: introState.endCameraPos.z, duration: introDuration, ease: "power3.inOut" }, 0)
+  .to(introLookAt, { x: introState.endLookAt.x, y: introState.endLookAt.y, z: introState.endLookAt.z, duration: introDuration, ease: "power3.inOut" }, 0);
+
+const setTitleTransform = title ? gsap.quickSetter(title, "transform") : null;
+
+function updateTitleIntroTransform(progress) {
+  if (!setTitleTransform) return;
+  const x = titleIntroState.offsetX * (1 - progress);
+  const y = titleIntroState.offsetY * (1 - progress);
+  const scale = gsap.utils.interpolate(titleIntroState.startScale, 1, progress);
+  setTitleTransform(`translate3d(${x}px, ${y}px, 0) scale(${scale})`);
+}
+
+updateTitleIntroTransform(introAnimState.progress);
+
+lenis = new Lenis({
+  duration: prefersReducedMotion ? 0.8 : 1.15, smoothWheel: !prefersReducedMotion, smoothTouch: false
+});
+
+lenis.on('scroll', ScrollTrigger.update);
+lenis.stop();
+lenis.scrollTo(0, { immediate: true, force: true });
+bindIntroTextRevealUnlock();
+maybeUnlockScroll();
+
+const panels = gsap.utils.toArray('.panel');
+const postSecondPanelDuration = Math.max(panels.length - 2, 0);
+
+const cameraScrollTimeline = gsap.timeline({
+  defaults: { ease: 'none' },
+  scrollTrigger: {
+    trigger: '#content', start: 'top top', end: 'bottom bottom', scrub: true, invalidateOnRefresh: true,
+    onUpdate: (self) => { scrollState.progress = self.progress; }
+  }
+});
+
+cameraScrollTimeline.to(scrollState, {
+  cameraOffsetX: -21, cameraOffsetY: -6.0, cameraOffsetZ: -24.0,
+  lookAtOffsetX: -32.0, lookAtOffsetY: -30, lookAtOffsetZ: -16,
+  duration: 1
+});
+
+if (postSecondPanelDuration > 0) {
+  cameraScrollTimeline.to(scrollState, {
+    cameraOffsetX: -13.5, cameraOffsetY: -1.8, cameraOffsetZ: -7.5,
+    lookAtOffsetX: -6.5, lookAtOffsetY: -0.5, lookAtOffsetZ: 1.5,
+    duration: postSecondPanelDuration
+  });
+}
 
 window.addEventListener('resize', () => {
   const pixelRatio = Math.min(window.devicePixelRatio, 2);
-
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -867,34 +746,26 @@ window.addEventListener('resize', () => {
   composer.setSize(window.innerWidth, window.innerHeight);
   outlinePass.setSize(window.innerWidth, window.innerHeight);
   dofPass.setSize(window.innerWidth, window.innerHeight);
-  fxaaPass.material.uniforms.resolution.value.set(
-    1 / (window.innerWidth * pixelRatio),
-    1 / (window.innerHeight * pixelRatio)
-  );
+  fxaaPass.material.uniforms.resolution.value.set(1 / (window.innerWidth * pixelRatio), 1 / (window.innerHeight * pixelRatio));
 
   updateRenderResolution();
-  updateScrollTarget();
   computeTitleIntroStartTransform();
+  updateTitleIntroTransform(introAnimState.progress);
+  ScrollTrigger.refresh();
 });
 
-function animate() {
-  requestAnimationFrame(animate);
+gsap.ticker.lagSmoothing(0);
+gsap.ticker.add((time) => {
+  lenis.raf(time * 1000); 
 
-  const delta = clock.getDelta();
-  const elapsed = clock.elapsedTime;
-  const introEaseTarget = getIntroEase(elapsed);
-  const introBlend = 1.0 - Math.exp(-7.5 * delta);
-  introEaseSmoothed += (introEaseTarget - introEaseSmoothed) * introBlend;
+  wiringElectricMaterial.uniforms.uTime.value = time;
+  schoolNoiseUniforms.uTime.value = time;
 
-  wiringElectricMaterial.uniforms.uTime.value = elapsed;
-  schoolNoiseUniforms.uTime.value = elapsed;
-  pointerCurrent.lerp(pointerTarget, isPointerActive ? 0.12 : 0.08);
   schoolNoiseUniforms.uPointerScreenPos.value.set(
     pointerCurrent.x * 0.5 + 0.5,
     pointerCurrent.y * 0.5 + 0.5
   );
-  schoolNoiseUniforms.uPointerStrength.value = isPointerActive ? 1.0 : 0.0;
-  scrollProgress += (scrollProgressTarget - scrollProgress) * 0.08;
+
   const parallaxX = pointerCurrent.x;
   const parallaxY = pointerCurrent.y;
   const cameraParallaxX = parallaxX * parallaxSettings.cameraX;
@@ -906,34 +777,36 @@ function animate() {
   subjectGroup.position.y = -parallaxY * parallaxSettings.groupY;
 
   if (schoolModel) {
-    schoolModel.visible = elapsed >= introDelay;
-    introCamera.lerpVectors(introState.startCameraPos, introState.endCameraPos, introEaseSmoothed);
-    introLookAt.lerpVectors(introState.startLookAt, introState.endLookAt, introEaseSmoothed);
-
-    camera.position.x = introCamera.x + mapRange(scrollProgress, 0, 1, 0, 0.5) + cameraParallaxX;
-    camera.position.y = introCamera.y + cameraParallaxY;
-    camera.position.z = introCamera.z + mapRange(scrollProgress, 0, 1, 0, -1.2);
+    schoolModel.visible = introCameraStarted;
+    const scrollInfluence = introAnimState.progress;
+    
+    camera.position.set(
+      introCamera.x + (scrollState.cameraOffsetX * scrollInfluence) + cameraParallaxX,
+      introCamera.y + (scrollState.cameraOffsetY * scrollInfluence) + cameraParallaxY,
+      introCamera.z + (scrollState.cameraOffsetZ * scrollInfluence)
+    );
+    
     camera.lookAt(
-      introLookAt.x + lookAtParallaxX,
-      introLookAt.y + lookAtParallaxY,
-      introLookAt.z
+      introLookAt.x + (scrollState.lookAtOffsetX * scrollInfluence) + lookAtParallaxX,
+      introLookAt.y + (scrollState.lookAtOffsetY * scrollInfluence) + lookAtParallaxY,
+      introLookAt.z + (scrollState.lookAtOffsetZ * scrollInfluence)
     );
   } else {
-    camera.position.z = mapRange(scrollProgress, 0, 1, 7.5, 5.8);
-    camera.position.x = mapRange(scrollProgress, 0, 1, 0, 0.5) + cameraParallaxX;
-    camera.position.y = 0.5 + cameraParallaxY;
+    camera.position.set(
+      mapScrollToX(scrollState.progress) + cameraParallaxX,
+      0.5 + cameraParallaxY,
+      mapScrollToZ(scrollState.progress)
+    );
     camera.lookAt(
       introState.endLookAt.x + lookAtParallaxX,
       introState.endLookAt.y + lookAtParallaxY,
       introState.endLookAt.z
     );
   }
-  updateTitleIntroTransform(introEaseSmoothed);
 
-  if (schoolNoiseOverlays.length > 0) {
-    renderWireMask();
-  }
+  updateTitleIntroTransform(introAnimState.progress);
+
+  if (schoolNoiseOverlays.length > 0) renderWireMask();
+  
   composer.render();
-}
-
-animate();
+});
