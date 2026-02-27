@@ -7,7 +7,6 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
@@ -74,13 +73,13 @@ const themeConfig = {
   light: {
     sceneColor: 0xf2fff9, fogColor: 0xf2fff9, fogDensity: 0.012, floorColor: 0xf9f0f9,
     hemiColor: 0xffffff, hemiGroundColor: 0xcfd8dc, hemiIntensity: 2.0, dirColor: 0xffffff,
-    dirIntensity: 1.9, exposure: 1.05, maskWireColor: 0x666666, wireBloomStrength: 0.24,
+    dirIntensity: 1.9, exposure: 1.05, wireBloomStrength: 0.24,
     streetLampIntensity: 0.0, streetLampColor: 0xffd7ad, streetLampDistance: 16
   },
   dark: {
     sceneColor: 0x050608, fogColor: 0x050608, fogDensity: 0.018, floorColor: 0x3b413d,
     hemiColor: 0x7b899c, hemiGroundColor: 0x020304, hemiIntensity: 0.4, dirColor: 0xffffff,
-    dirIntensity: 0.7, exposure: 0.96, maskWireColor: 0x555555, wireBloomStrength: 0.24,
+    dirIntensity: 0.7, exposure: 0.96, wireBloomStrength: 0.24,
     streetLampIntensity: 0.8, streetLampColor: 0xffd8aa, streetLampDistance: 16
   }
 };
@@ -109,11 +108,6 @@ composer.setSize(window.innerWidth, window.innerHeight);
 const renderPass = new RenderPass(scene, camera);
 composer.addPass(renderPass);
 
-const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
-outlinePass.edgeStrength = 5;
-outlinePass.edgeThickness = 1.5;
-outlinePass.pulsePeriod = 0;
-
 const dofPass = new BokehPass(scene, camera, { focus: 12.0, aperture: 0.0001 });
 composer.addPass(dofPass);
 
@@ -124,8 +118,6 @@ fxaaPass.material.uniforms.resolution.value.set(
   1 / (window.innerHeight * pixelRatio)
 );
 composer.addPass(fxaaPass);
-
-composer.addPass(outlinePass);
 
 const outputPass = new OutputPass();
 composer.addPass(outputPass);
@@ -180,15 +172,8 @@ scene.add(grid);
 let schoolModel = null;
 let wiringModel = null;
 const schoolMeshes = [];
-const outlineMeshes = [];
-const schoolMaskWireframes = [];
 const schoolNoiseOverlays = [];
 const streetLampPointLights = [];
-
-const schoolMaskWireframeMaterial = new THREE.LineBasicMaterial({
-  color: themeConfig.light.maskWireColor, linewidth: 3, transparent: false, opacity: 1.0,
-  toneMapped: false, fog: false, depthTest: false, depthWrite: false
-});
 
 const wiringElectricMaterial = new THREE.ShaderMaterial({
   uniforms: {
@@ -358,7 +343,6 @@ function applyTheme(nextThemeName, options = {}) {
   const normalizedThemeName = nextThemeName === 'dark' ? 'dark' : 'light';
   const shouldPersist = options.persist !== false;
   const theme = themeConfig[normalizedThemeName];
-  const outlineColor = normalizedThemeName === 'dark' ? 0xffffff : 0x000000;
 
   currentThemeName = normalizedThemeName;
   document.body.dataset.theme = normalizedThemeName;
@@ -375,9 +359,6 @@ function applyTheme(nextThemeName, options = {}) {
   dirLight.intensity = theme.dirIntensity;
   renderer.toneMappingExposure = theme.exposure;
   wireBloomPass.strength = theme.wireBloomStrength;
-  schoolMaskWireframeMaterial.color.set(theme.maskWireColor);
-  outlinePass.visibleEdgeColor.set(outlineColor);
-  outlinePass.hiddenEdgeColor.set(outlineColor);
 
   applyMaterialTheme(normalizedThemeName);
 
@@ -406,7 +387,6 @@ loader.load('/school.obj', (loadedModel) => {
   schoolModel = loadedModel;
   const modelMeshes = [];
   let lightsMesh = null;
-  outlineMeshes.length = 0;
   schoolModel.traverse((child) => {
     if (child.isMesh) modelMeshes.push(child);
   });
@@ -432,26 +412,14 @@ loader.load('/school.obj', (loadedModel) => {
     if (isWireMesh) mesh.layers.enable(MASK_LAYER);
 
     if (!mesh.name.startsWith("Tree") && !mesh.name.startsWith("Pole") && !mesh.name.startsWith("Trunk")) {
-      const edges = new THREE.EdgesGeometry(mesh.geometry, 15);
-      const wire = new THREE.LineSegments(edges, schoolMaskWireframeMaterial);
-      const wireOffset = new THREE.LineSegments(edges, schoolMaskWireframeMaterial);
-      
-      wire.layers.set(MASK_LAYER); wireOffset.layers.set(MASK_LAYER);
-      wire.renderOrder = 1000; wireOffset.renderOrder = 1000;
-      wireOffset.scale.setScalar(1.003);
-      mesh.add(wire, wireOffset);
-      schoolMaskWireframes.push(wire, wireOffset);
-
       const noiseOverlay = new THREE.Mesh(mesh.geometry, schoolNoiseRevealMaterial);
       noiseOverlay.renderOrder = 950; noiseOverlay.castShadow = false; noiseOverlay.receiveShadow = false;
       mesh.add(noiseOverlay);
       schoolNoiseOverlays.push(noiseOverlay);
     }
-    outlineMeshes.push(mesh);
     schoolMeshes.push(mesh);
   }
   createStreetLampLights(lightsMesh);
-  outlinePass.selectedObjects = [...outlineMeshes];
 
   schoolModel.scale.setScalar(0.12);
   schoolModel.position.set(0, -4, 0);
@@ -796,7 +764,6 @@ window.addEventListener('resize', () => {
   renderer.setPixelRatio(pixelRatio);
   composer.setPixelRatio(pixelRatio);
   composer.setSize(window.innerWidth, window.innerHeight);
-  outlinePass.setSize(window.innerWidth, window.innerHeight);
   dofPass.setSize(window.innerWidth, window.innerHeight);
   fxaaPass.material.uniforms.resolution.value.set(1 / (window.innerWidth * pixelRatio), 1 / (window.innerHeight * pixelRatio));
 
