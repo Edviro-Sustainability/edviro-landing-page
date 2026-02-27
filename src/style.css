@@ -187,7 +187,7 @@ body.is-site-loading .text-reveal-line {
   display: block;
   transform: translateY(115%);
   opacity: 0;
-  animation: reveal-up 900ms cubic-bezier(0.3, 0.3, 0.5, 1) forwards;
+  animation: reveal-up 800ms cubic-bezier(0.3, 0.3, 0.5, 1) forwards;
 }
 
 .text-reveal-delay {
@@ -199,11 +199,19 @@ body.is-site-loading .text-reveal-line {
   display: none;
 }
 
+.text-reveal-mask--subtitle {
+  display: none;
+}
+
 .title.is-brand-phase .text-reveal-mask--lead {
   display: none;
 }
 
 .title.is-brand-phase .text-reveal-mask--brand {
+  display: block;
+}
+
+.title.is-brand-phase .text-reveal-mask--subtitle {
   display: block;
 }
 
@@ -214,6 +222,17 @@ body.is-site-loading .text-reveal-line {
   animation: none;
   transform: translateY(0);
   opacity: 1;
+}
+
+.text-reveal-line--subtitle {
+  color: var(--text-primary);
+  font-size: clamp(1rem, 2.2vw, 1.7rem);
+  line-height: 1.1;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  animation: none;
+  transform: translateY(0);
+  opacity: 0;
 }
 
 .panel h2 {

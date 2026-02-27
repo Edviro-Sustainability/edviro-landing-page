@@ -519,6 +519,7 @@ const titleIntroState = { offsetX: 0, offsetY: 0, startScale: 2.3, endYOffset: 0
 const titleIntroAnimState = { progress: 0 };
 const introLeadTextLines = gsap.utils.toArray('.text-reveal-line--lead');
 const introBrandLine = document.querySelector('.text-reveal-line--brand');
+const introSubtitleLine = document.querySelector('.text-reveal-line--subtitle');
 const introUnlockState = { cameraIntroDone: false, textRevealDone: false, scrollUnlocked: false };
 let introCameraStarted = false;
 let introBrandRevealStarted = false;
@@ -559,8 +560,10 @@ function playIntroBrandReveal() {
     return;
   }
 
-  const leadExitDuration = prefersReducedMotion ? 0.36 : 0.75;
-  const brandRevealDuration = prefersReducedMotion ? 0.55 : 0.95;
+  const leadHoldDuration = prefersReducedMotion ? 0.15 : 0.45;
+  const leadExitDuration = prefersReducedMotion ? 0.26 : 0.5;
+  const brandRevealDuration = prefersReducedMotion ? 0.26 : 0.8;
+  const brandToCameraDelay = prefersReducedMotion ? 0.04 : 0.2;
 
   introLeadTextLines.forEach(line => {
     line.style.animation = 'none';
@@ -578,9 +581,9 @@ function playIntroBrandReveal() {
     defaults: { overwrite: 'auto' },
     onComplete: () => {
       markTextRevealComplete();
-      startIntroCameraAnimation();
     }
   })
+    .to({}, { duration: leadHoldDuration })
 
     .to(introLeadTextLines, {
       opacity: 0,
@@ -599,6 +602,14 @@ function playIntroBrandReveal() {
         opacity: 0,
         filter: 'blur(2px)'
       });
+
+      if (introSubtitleLine) {
+        gsap.set(introSubtitleLine, {
+          yPercent: 55,
+          opacity: 0,
+          filter: 'blur(2px)'
+        });
+      }
     })
 
     .to(
@@ -608,7 +619,10 @@ function playIntroBrandReveal() {
         opacity: 1,
         filter: 'blur(0px)',
         duration: brandRevealDuration,
-        ease: 'power3.out'
+        ease: 'power3.out',
+        onStart: () => {
+          gsap.delayedCall(brandToCameraDelay, startIntroCameraAnimation);
+        }
       }
     );
 }
@@ -696,6 +710,16 @@ introTl.to(introAnimState, { progress: 1, duration: introDuration, ease: "power3
     ease: "power3.inOut",
     onUpdate: () => updateTitleIntroTransform(titleIntroAnimState.progress)
   }, 0);
+
+if (introSubtitleLine) {
+  introTl.to(introSubtitleLine, {
+    yPercent: 0,
+    opacity: 1,
+    filter: 'blur(0px)',
+    duration: prefersReducedMotion ? 0.4 : 0.7,
+    ease: 'power2.out'
+  }, introDuration * 0.4);
+}
 
 const setTitleX = title ? gsap.quickSetter(title, 'x', 'px') : null;
 const setTitleY = title ? gsap.quickSetter(title, 'y', 'px') : null;
