@@ -72,7 +72,7 @@ if (!loadingState.windowLoaded) {
 
 const themeConfig = {
   light: {
-    sceneColor: 0xf9f0f9, fogColor: 0xf9f0f9, fogDensity: 0.012, floorColor: 0xf9f0f9,
+    sceneColor: 0xf2fff9, fogColor: 0xf2fff9, fogDensity: 0.012, floorColor: 0xf9f0f9,
     hemiColor: 0xffffff, hemiGroundColor: 0xcfd8dc, hemiIntensity: 2.0, dirColor: 0xffffff,
     dirIntensity: 1.9, exposure: 1.05, maskWireColor: 0x666666, wireBloomStrength: 0.24,
     streetLampIntensity: 0.0, streetLampColor: 0xffd7ad, streetLampDistance: 16
@@ -110,6 +110,9 @@ const renderPass = new RenderPass(scene, camera);
 composer.addPass(renderPass);
 
 const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
+outlinePass.edgeStrength = 5;
+outlinePass.edgeThickness = 1.5;
+outlinePass.pulsePeriod = 0;
 
 const dofPass = new BokehPass(scene, camera, { focus: 12.0, aperture: 0.0001 });
 composer.addPass(dofPass);
@@ -121,6 +124,8 @@ fxaaPass.material.uniforms.resolution.value.set(
   1 / (window.innerHeight * pixelRatio)
 );
 composer.addPass(fxaaPass);
+
+composer.addPass(outlinePass);
 
 const outputPass = new OutputPass();
 composer.addPass(outputPass);
@@ -201,7 +206,7 @@ const wiringElectricMaterial = new THREE.ShaderMaterial({
 const schoolNoiseUniforms = {
   uMaskTexture: { value: maskComposer.readBuffer.texture }, uResolution: { value: renderResolution },
   uTime: { value: 0 }, uNoiseScale: { value: 0.18 }, uNoiseSpeed: { value: 0.8 },
-  uNoiseThreshold: { value: 0.2 }, uNoiseSoftness: { value: 0.2 }, uOpacity: { value: 0.9 },
+  uNoiseThreshold: { value: 0.25 }, uNoiseSoftness: { value: 0.2 }, uOpacity: { value: 0.9 },
   uPointerScreenPos: { value: new THREE.Vector2(0.5, 0.5) }, uPointerRadius: { value: 0.016 },
   uPointerFeather: { value: 0.12 }, uPointerPeakBoost: { value: 0.3 }, uPointerStrength: { value: 0.0 }
 };
@@ -353,6 +358,7 @@ function applyTheme(nextThemeName, options = {}) {
   const normalizedThemeName = nextThemeName === 'dark' ? 'dark' : 'light';
   const shouldPersist = options.persist !== false;
   const theme = themeConfig[normalizedThemeName];
+  const outlineColor = normalizedThemeName === 'dark' ? 0xffffff : 0x000000;
 
   currentThemeName = normalizedThemeName;
   document.body.dataset.theme = normalizedThemeName;
@@ -370,8 +376,8 @@ function applyTheme(nextThemeName, options = {}) {
   renderer.toneMappingExposure = theme.exposure;
   wireBloomPass.strength = theme.wireBloomStrength;
   schoolMaskWireframeMaterial.color.set(theme.maskWireColor);
-  outlinePass.visibleEdgeColor.set(theme.maskWireColor);
-  outlinePass.hiddenEdgeColor.set(theme.maskWireColor);
+  outlinePass.visibleEdgeColor.set(outlineColor);
+  outlinePass.hiddenEdgeColor.set(outlineColor);
 
   applyMaterialTheme(normalizedThemeName);
 
@@ -400,6 +406,7 @@ loader.load('/school.obj', (loadedModel) => {
   schoolModel = loadedModel;
   const modelMeshes = [];
   let lightsMesh = null;
+  outlineMeshes.length = 0;
   schoolModel.traverse((child) => {
     if (child.isMesh) modelMeshes.push(child);
   });
@@ -440,6 +447,7 @@ loader.load('/school.obj', (loadedModel) => {
       mesh.add(noiseOverlay);
       schoolNoiseOverlays.push(noiseOverlay);
     }
+    outlineMeshes.push(mesh);
     schoolMeshes.push(mesh);
   }
   createStreetLampLights(lightsMesh);
