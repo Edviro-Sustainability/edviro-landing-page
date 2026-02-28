@@ -28,6 +28,28 @@ const canvas = document.querySelector('#webgl');
 const title = document.querySelector('.title');
 const siteLoader = document.querySelector('#site-loader');
 const themeToggleButton = document.querySelector('#theme-toggle');
+let sceneCardsOverlay = document.querySelector('.scene-cards-overlay');
+if (!sceneCardsOverlay) {
+  sceneCardsOverlay = document.createElement('div');
+  sceneCardsOverlay.className = 'scene-cards-overlay';
+  sceneCardsOverlay.setAttribute('aria-hidden', 'true');
+  sceneCardsOverlay.innerHTML = `
+    <article class="scene-card scene-card--one">
+      <p class="scene-card__label">After-hours Load</p>
+      <p class="scene-card__value">+18%</p>
+    </article>
+    <article class="scene-card scene-card--two">
+      <p class="scene-card__label">HVAC Runtime</p>
+      <p class="scene-card__value">2.9 hrs</p>
+    </article>
+    <article class="scene-card scene-card--three">
+      <p class="scene-card__label">Peak Demand</p>
+      <p class="scene-card__value">142 kW</p>
+    </article>
+  `;
+  document.body.appendChild(sceneCardsOverlay);
+}
+const sceneCards = Array.from(sceneCardsOverlay.querySelectorAll('.scene-card'));
 const STORAGE_THEME_KEY = 'edviro-theme';
 const DEFAULT_THEME_NAME = 'light';
 const STREET_LAMP_FALLBACK_POSITIONS = [
@@ -48,12 +70,21 @@ function resetScrollPosition() {
   document.body.scrollTop = 0;
 }
 
+function forceResetScrollPosition() {
+  resetScrollPosition();
+  requestAnimationFrame(() => resetScrollPosition());
+}
+
 try {
   if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
 } catch {}
 
-resetScrollPosition();
-window.addEventListener('load', resetScrollPosition, { once: true });
+forceResetScrollPosition();
+window.addEventListener('load', forceResetScrollPosition, { once: true });
+window.addEventListener('beforeunload', resetScrollPosition);
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) forceResetScrollPosition();
+});
 
 const loadingState = {
   windowLoaded: document.readyState === 'complete',
@@ -559,6 +590,7 @@ function renderWireMask() {
 }
 
 const scrollState = { progress: 0, cameraOffsetX: 0, cameraOffsetY: 0, cameraOffsetZ: 0, lookAtOffsetX: 0, lookAtOffsetY: 0, lookAtOffsetZ: 0 };
+const parallaxScrollState = { multiplier: 1 };
 const introAnimState = { progress: 0 };
 const introCamera = introState.startCameraPos.clone();
 const introLookAt = introState.startLookAt.clone();
@@ -814,10 +846,138 @@ const cameraScrollTimeline = gsap.timeline({
 });
 
 cameraScrollTimeline.to(scrollState, {
-  cameraOffsetX: -21, cameraOffsetY: -6.0, cameraOffsetZ: -24.0,
-  lookAtOffsetX: -32.0, lookAtOffsetY: -30, lookAtOffsetZ: -16,
+  cameraOffsetX: -40.0, cameraOffsetY: -2, cameraOffsetZ: -42.0,
+  lookAtOffsetX: -52.0, lookAtOffsetY: 0, lookAtOffsetZ: -52,
   duration: 1
 });
+
+cameraScrollTimeline.to(parallaxScrollState, {
+  multiplier: 0,
+  duration: 0.4
+}, 0);
+
+if (sceneCards.length === 3) {
+  const getCardPassStyle = () => {
+    const compact = window.innerWidth <= 768;
+    return compact ? {
+      startX: [-116, -92, -68],
+      startY: [80, 120, 160],
+      midX: [-10, 18, 48],
+      midY: [50, 92, 136],
+      endX: [124, 164, 208],
+      endY: [12, 56, 104],
+      startScale: [0.66, 0.62, 0.58],
+      midScale: [1.02, 0.96, 0.92],
+      endScale: [1.52, 1.46, 1.38]
+    } : {
+      startX: [-380, -380, -380],
+      startY: [-100, -100, -100],
+      midX: [-150, -165, -180],
+      midY: [-50, -50, -50],
+      endX: [300, 250, 200],
+      endY: [50, 50, 50],
+      startScale: [0.7, 0.64, 0.58],
+      midScale: [1.5, 1.44, 1.38],
+      endScale: [3.2, 3.08, 2.96]
+    };
+  };
+
+  gsap.set(sceneCardsOverlay, { autoAlpha: 0 });
+  gsap.set(sceneCards, {
+    autoAlpha: 0,
+    filter: 'blur(4px)',
+    force3D: true,
+    willChange: 'transform, opacity, filter'
+  });
+
+  cameraScrollTimeline
+    .to(sceneCardsOverlay, { autoAlpha: 1, duration: 0.06 }, 0.1)
+    .to(sceneCards[0], {
+      keyframes: [
+        {
+          x: () => getCardPassStyle().startX[0],
+          y: () => getCardPassStyle().startY[0],
+          scale: () => getCardPassStyle().startScale[0],
+          autoAlpha: 0,
+          filter: 'blur(4px)',
+          duration: 0
+        },
+        {
+          x: () => getCardPassStyle().midX[0],
+          y: () => getCardPassStyle().midY[0],
+          scale: () => getCardPassStyle().midScale[0],
+          autoAlpha: 1,
+          filter: 'blur(0px)',
+          duration: 0.1
+        },
+        {
+          x: () => getCardPassStyle().endX[0],
+          y: () => getCardPassStyle().endY[0],
+          scale: () => getCardPassStyle().endScale[0],
+          autoAlpha: 0,
+          filter: 'blur(6px)',
+          duration: 0.1
+        }
+      ]
+    }, 0.42)
+    .to(sceneCards[1], {
+      keyframes: [
+        {
+          x: () => getCardPassStyle().startX[1],
+          y: () => getCardPassStyle().startY[1],
+          scale: () => getCardPassStyle().startScale[1],
+          autoAlpha: 0,
+          filter: 'blur(4px)',
+          duration: 0
+        },
+        {
+          x: () => getCardPassStyle().midX[1],
+          y: () => getCardPassStyle().midY[1],
+          scale: () => getCardPassStyle().midScale[1],
+          autoAlpha: 1,
+          filter: 'blur(0px)',
+          duration: 0.1
+        },
+        {
+          x: () => getCardPassStyle().endX[1],
+          y: () => getCardPassStyle().endY[1],
+          scale: () => getCardPassStyle().endScale[1],
+          autoAlpha: 0,
+          filter: 'blur(6px)',
+          duration: 0.1
+        }
+      ]
+    }, 0.52)
+    .to(sceneCards[2], {
+      keyframes: [
+        {
+          x: () => getCardPassStyle().startX[2],
+          y: () => getCardPassStyle().startY[2],
+          scale: () => getCardPassStyle().startScale[2],
+          autoAlpha: 0,
+          filter: 'blur(4px)',
+          duration: 0
+        },
+        {
+          x: () => getCardPassStyle().midX[2],
+          y: () => getCardPassStyle().midY[2],
+          scale: () => getCardPassStyle().midScale[2],
+          autoAlpha: 1,
+          filter: 'blur(0px)',
+          duration: 0.1
+        },
+        {
+          x: () => getCardPassStyle().endX[2],
+          y: () => getCardPassStyle().endY[2],
+          scale: () => getCardPassStyle().endScale[2],
+          autoAlpha: 0,
+          filter: 'blur(6px)',
+          duration: 0.1
+        }
+      ]
+    }, 0.62)
+    .to(sceneCardsOverlay, { autoAlpha: 0, duration: 0.06 }, 0.94);
+}
 
 if (postSecondPanelDuration > 0) {
   cameraScrollTimeline.to(scrollState, {
@@ -859,8 +1019,8 @@ gsap.ticker.add((time) => {
     pointerCurrent.y * 0.5 + 0.5
   );
 
-  const parallaxX = pointerCurrent.x;
-  const parallaxY = pointerCurrent.y;
+  const parallaxX = pointerCurrent.x * parallaxScrollState.multiplier;
+  const parallaxY = pointerCurrent.y * parallaxScrollState.multiplier;
   const cameraParallaxX = parallaxX * parallaxSettings.cameraX;
   const cameraParallaxY = parallaxY * parallaxSettings.cameraY;
   const lookAtParallaxX = parallaxX * parallaxSettings.lookAtX;
