@@ -92,9 +92,9 @@ body.is-site-loading #webgl {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: clamp(12.8rem, 23vw, 18.2rem);
+  width: clamp(14.6rem, 25.5vw, 20.4rem);
   min-height: clamp(11.2rem, 27vh, 17rem);
-  padding: clamp(1.5rem, 2.8vw, 2.25rem) clamp(0.95rem, 1.8vw, 1.35rem) clamp(0.95rem, 1.6vw, 1.2rem);
+  padding: clamp(1.5rem, 2.8vw, 2.25rem) clamp(1.65rem, 2.8vw, 2.35rem) clamp(0.95rem, 1.6vw, 1.2rem) clamp(0.95rem, 1.8vw, 1.35rem);
   border-radius: 1.05rem;
   border: 1px solid rgba(128, 255, 183, 0.34);
   background: linear-gradient(160deg, rgba(16, 130, 58, 0.93), rgba(6, 84, 39, 0.83));
@@ -107,6 +107,7 @@ body.is-site-loading #webgl {
   -webkit-backdrop-filter: blur(3px);
   opacity: 0;
   transform: translate3d(0, 0, 0);
+  transform-origin: left center;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -117,23 +118,23 @@ body.is-site-loading #webgl {
 .scene-card--three { z-index: 1; }
 
 .scene-card__label,
-.scene-card__value {
+.scene-card__sublabel {
   margin: 0;
 }
 
 .scene-card__label {
-  font-size: clamp(0.68rem, 1.08vw, 0.82rem);
-  letter-spacing: 0.095em;
-  text-transform: uppercase;
-  color: rgba(214, 255, 230, 0.8);
-}
-
-.scene-card__value {
   margin-top: 0.45rem;
-  font-size: clamp(1.45rem, 2.8vw, 2.2rem);
+  font-size: clamp(1.45rem, 2.8vw, 2.0rem);
   font-weight: 650;
   line-height: 1.05;
+  text-transform: uppercase;
   letter-spacing: -0.01em;
+}
+
+.scene-card__sublabel {
+  font-size: clamp(0.68rem, 1.08vw, 0.82rem);
+  letter-spacing: 0.095em;
+  color: rgba(214, 255, 230, 0.8);
 }
 
 .site-loader {
@@ -327,8 +328,9 @@ body.is-site-loading .text-reveal-line {
   }
 
   .scene-card {
-    width: min(12.2rem, 48vw);
+    width: min(13.6rem, 54vw);
     min-height: 10.8rem;
+    padding-right: 1.35rem;
     border-radius: 0.88rem;
   }
 }

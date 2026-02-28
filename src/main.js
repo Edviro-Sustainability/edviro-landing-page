@@ -28,28 +28,8 @@ const canvas = document.querySelector('#webgl');
 const title = document.querySelector('.title');
 const siteLoader = document.querySelector('#site-loader');
 const themeToggleButton = document.querySelector('#theme-toggle');
-let sceneCardsOverlay = document.querySelector('.scene-cards-overlay');
-if (!sceneCardsOverlay) {
-  sceneCardsOverlay = document.createElement('div');
-  sceneCardsOverlay.className = 'scene-cards-overlay';
-  sceneCardsOverlay.setAttribute('aria-hidden', 'true');
-  sceneCardsOverlay.innerHTML = `
-    <article class="scene-card scene-card--one">
-      <p class="scene-card__label">After-hours Load</p>
-      <p class="scene-card__value">+18%</p>
-    </article>
-    <article class="scene-card scene-card--two">
-      <p class="scene-card__label">HVAC Runtime</p>
-      <p class="scene-card__value">2.9 hrs</p>
-    </article>
-    <article class="scene-card scene-card--three">
-      <p class="scene-card__label">Peak Demand</p>
-      <p class="scene-card__value">142 kW</p>
-    </article>
-  `;
-  document.body.appendChild(sceneCardsOverlay);
-}
-const sceneCards = Array.from(sceneCardsOverlay.querySelectorAll('.scene-card'));
+const sceneCardsOverlay = document.querySelector('.scene-cards-overlay');
+const sceneCards = sceneCardsOverlay ? Array.from(sceneCardsOverlay.querySelectorAll('.scene-card')) : [];
 const STORAGE_THEME_KEY = 'edviro-theme';
 const DEFAULT_THEME_NAME = 'light';
 const STREET_LAMP_FALLBACK_POSITIONS = [
@@ -857,9 +837,27 @@ cameraScrollTimeline.to(parallaxScrollState, {
 }, 0);
 
 if (sceneCards.length === 3) {
+  const getRootFontSize = () => {
+    const rootFontSize = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize);
+    return Number.isFinite(rootFontSize) ? rootFontSize : 16;
+  };
+
+  const clampValue = (value, min, max) => Math.min(Math.max(value, min), max);
+
+  const getLegacyCardWidth = (compact) => {
+    const rem = getRootFontSize();
+    if (compact) return Math.min(12.2 * rem, window.innerWidth * 0.48);
+    return clampValue(window.innerWidth * 0.23, 12.8 * rem, 18.2 * rem);
+  };
+
+  const adjustXForLegacyMotion = (xValues, scaleValues, legacyWidth) => {
+    const legacyHalfWidth = legacyWidth * 0.5;
+    return xValues.map((xValue, index) => xValue - ((scaleValues[index] - 1) * legacyHalfWidth));
+  };
+
   const getCardPassStyle = () => {
     const compact = window.innerWidth <= 768;
-    return compact ? {
+    const baseStyle = compact ? {
       startX: [-116, -92, -68],
       startY: [80, 120, 160],
       midX: [-10, 18, 48],
@@ -879,6 +877,15 @@ if (sceneCards.length === 3) {
       startScale: [0.7, 0.64, 0.58],
       midScale: [1.5, 1.44, 1.38],
       endScale: [3.2, 3.08, 2.96]
+    };
+
+    const legacyCardWidth = getLegacyCardWidth(compact);
+
+    return {
+      ...baseStyle,
+      startX: adjustXForLegacyMotion(baseStyle.startX, baseStyle.startScale, legacyCardWidth),
+      midX: adjustXForLegacyMotion(baseStyle.midX, baseStyle.midScale, legacyCardWidth),
+      endX: adjustXForLegacyMotion(baseStyle.endX, baseStyle.endScale, legacyCardWidth)
     };
   };
 
