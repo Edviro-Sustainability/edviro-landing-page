@@ -73,12 +73,27 @@ const loadingState = {
   schoolLoaded: false,
   wiringLoaded: false
 };
+let introRevealQueuedUntilLoad = false;
+
+function isInitialLoadComplete() {
+  return loadingState.windowLoaded && loadingState.schoolLoaded && loadingState.wiringLoaded;
+}
+
+function queueIntroBrandReveal() {
+  if (!isInitialLoadComplete()) {
+    introRevealQueuedUntilLoad = true;
+    return;
+  }
+  introRevealQueuedUntilLoad = false;
+  playIntroBrandReveal();
+}
 
 function markLoadComplete(key) {
   loadingState[key] = true;
-  if (loadingState.windowLoaded && loadingState.schoolLoaded && loadingState.wiringLoaded) {
+  if (isInitialLoadComplete()) {
     document.body.classList.remove('is-site-loading');
     siteLoader?.setAttribute('aria-hidden', 'true');
+    if (introRevealQueuedUntilLoad) queueIntroBrandReveal();
   }
 }
 
@@ -621,19 +636,24 @@ function playIntroBrandReveal() {
     return;
   }
 
-  const leadHoldDuration = prefersReducedMotion ? 0.15 : 0.45;
-  const leadExitDuration = prefersReducedMotion ? 0.26 : 0.5;
+  const hasLeadIntro = introLeadTextLines.length > 0;
+  const leadHoldDuration = hasLeadIntro ? (prefersReducedMotion ? 0.15 : 0.45) : 0;
+  const leadExitDuration = hasLeadIntro ? (prefersReducedMotion ? 0.26 : 0.5) : 0;
+  const brandRevealDelay = hasLeadIntro ? 0 : (prefersReducedMotion ? 0.12 : 0.28);
   const brandRevealDuration = prefersReducedMotion ? 0.26 : 0.8;
-  const brandToCameraDelay = prefersReducedMotion ? 0.04 : 0.2;
+  const brandToCameraDelay = hasLeadIntro ? (prefersReducedMotion ? 0.04 : 0.2) : 0;
 
-  introLeadTextLines.forEach(line => {
-    line.style.animation = 'none';
-    line.style.opacity = '1';
-    line.style.transform = 'translateY(0)';
-  });
+  if (hasLeadIntro) {
+    introLeadTextLines.forEach(line => {
+      line.style.animation = 'none';
+      line.style.opacity = '1';
+      line.style.transform = 'translateY(0)';
+    });
 
-  const titleRect = title.getBoundingClientRect();
-  title.style.height = `${titleRect.height}px`;
+    const titleRect = title.getBoundingClientRect();
+    title.style.height = `${titleRect.height}px`;
+  }
+
   title.style.display = 'flex';
   title.style.flexDirection = 'column';
   title.style.justifyContent = 'center';
@@ -645,13 +665,13 @@ function playIntroBrandReveal() {
     }
   })
     .to({}, { duration: leadHoldDuration })
-
     .to(introLeadTextLines, {
       opacity: 0,
       filter: 'blur(4px)',
       duration: leadExitDuration,
       ease: 'power2.out'
     })
+    .to({}, { duration: brandRevealDelay })
 
     .add(() => {
       title.classList.add('is-brand-phase');
@@ -690,7 +710,7 @@ function playIntroBrandReveal() {
 
 function bindIntroTextRevealUnlock() {
   if (introLeadTextLines.length === 0) {
-    playIntroBrandReveal();
+    queueIntroBrandReveal();
     return;
   }
 
@@ -827,6 +847,14 @@ const cameraScrollTimeline = gsap.timeline({
   }
 });
 
+if (title) {
+  gsap.set(title, { autoAlpha: 1 });
+  cameraScrollTimeline.to(title, {
+    autoAlpha: 0,
+    duration: prefersReducedMotion ? 0.03 : 0.06
+  }, 0.02);
+}
+
 cameraScrollTimeline.to(scrollState, {
   cameraOffsetX: -40.0, cameraOffsetY: -2, cameraOffsetZ: -42.0,
   lookAtOffsetX: -52.0, lookAtOffsetY: 0, lookAtOffsetZ: -52,
@@ -840,9 +868,9 @@ cameraScrollTimeline.to(parallaxScrollState, {
 
 if (scrollPhraseWords.length > 0) {
   const phraseWordsStart = 0.05;
-  const phraseExitStart = 0.3;
-  const phraseOverlayExitStart = 0.35;
-  const getPhraseStartYOffset = () => window.innerHeight * 0.72;
+  const phraseExitStart = 0.4;
+  const phraseOverlayExitStart = 0.5;
+  const getPhraseStartYOffset = () => -window.innerHeight * 0.36;
 
   gsap.set(scrollPhraseOverlay, { autoAlpha: 0 });
   gsap.set(scrollPhraseWords, {
@@ -850,7 +878,6 @@ if (scrollPhraseWords.length > 0) {
     y: () => getPhraseStartYOffset(),
     scale: prefersReducedMotion ? 1 : 0.92,
     rotateZ: (index) => (index % 2 === 0 ? -2.4 : 2.4),
-    filter: prefersReducedMotion ? 'blur(0px)' : 'blur(14px)',
     force3D: true
   });
 
@@ -864,7 +891,6 @@ if (scrollPhraseWords.length > 0) {
       y: 0,
       scale: 1,
       rotateZ: 0,
-      filter: 'blur(0px)',
       duration: prefersReducedMotion ? 0.045 : 0.075,
       ease: 'power3.out',
       stagger: prefersReducedMotion ? 0.015 : 0.03
@@ -875,7 +901,6 @@ if (scrollPhraseWords.length > 0) {
       autoAlpha: 0,
       yPercent: -45,
       scale: prefersReducedMotion ? 1 : 0.95,
-      filter: prefersReducedMotion ? 'blur(0px)' : 'blur(10px)',
       duration: prefersReducedMotion ? 0.05 : 0.09,
       ease: 'power2.in',
       stagger: { each: prefersReducedMotion ? 0.01 : 0.016, from: 'end' }
@@ -887,6 +912,11 @@ if (scrollPhraseWords.length > 0) {
 }
 
 if (sceneCards.length === 3) {
+  const cardOverlayStart = 0.25;
+  const cardOneStart = 0.52;
+  const cardTwoStart = 0.62;
+  const cardThreeStart = 0.72;
+
   const getRootFontSize = () => {
     const rootFontSize = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize);
     return Number.isFinite(rootFontSize) ? rootFontSize : 16;
@@ -948,7 +978,7 @@ if (sceneCards.length === 3) {
   });
 
   cameraScrollTimeline
-    .to(sceneCardsOverlay, { autoAlpha: 1, duration: 0.06 }, 0.1)
+    .to(sceneCardsOverlay, { autoAlpha: 1, duration: 0.06 }, cardOverlayStart)
     .to(sceneCards[0], {
       keyframes: [
         {
@@ -970,21 +1000,21 @@ if (sceneCards.length === 3) {
           duration: 0.1
         }
       ]
-    }, 0.42)
+    }, cardOneStart)
     .to(sceneCards[0], {
       keyframes: [
         { autoAlpha: 1, duration: 0.04 },
         { autoAlpha: 1, duration: 0.08 },
         { autoAlpha: 0, duration: 0.06 }
       ]
-    }, 0.42)
+    }, cardOneStart)
     .to(sceneCards[0], {
       keyframes: [
         { filter: 'blur(0px)', duration: 0.04 },
         { filter: 'blur(0px)', duration: 0.08 },
         { filter: 'blur(6px)', duration: 0.06 }
       ]
-    }, 0.42)
+    }, cardOneStart)
     .to(sceneCards[1], {
       keyframes: [
         {
@@ -1006,21 +1036,21 @@ if (sceneCards.length === 3) {
           duration: 0.1
         }
       ]
-    }, 0.52)
+    }, cardTwoStart)
     .to(sceneCards[1], {
       keyframes: [
         { autoAlpha: 1, duration: 0.04 },
         { autoAlpha: 1, duration: 0.08 },
         { autoAlpha: 0, duration: 0.06 }
       ]
-    }, 0.52)
+    }, cardTwoStart)
     .to(sceneCards[1], {
       keyframes: [
         { filter: 'blur(0px)', duration: 0.04 },
         { filter: 'blur(0px)', duration: 0.08 },
         { filter: 'blur(6px)', duration: 0.06 }
       ]
-    }, 0.52)
+    }, cardTwoStart)
     .to(sceneCards[2], {
       keyframes: [
         {
@@ -1042,21 +1072,21 @@ if (sceneCards.length === 3) {
           duration: 0.1
         }
       ]
-    }, 0.62)
+    }, cardThreeStart)
     .to(sceneCards[2], {
       keyframes: [
         { autoAlpha: 1, duration: 0.04 },
         { autoAlpha: 1, duration: 0.08 },
         { autoAlpha: 0, duration: 0.06 }
       ]
-    }, 0.62)
+    }, cardThreeStart)
     .to(sceneCards[2], {
       keyframes: [
         { filter: 'blur(0px)', duration: 0.04 },
         { filter: 'blur(0px)', duration: 0.08 },
         { filter: 'blur(6px)', duration: 0.06 }
       ]
-    }, 0.62)
+    }, cardThreeStart)
     .to(sceneCardsOverlay, { autoAlpha: 0, duration: 0.06 }, 0.94);
 }
 
