@@ -93,14 +93,12 @@ body.is-site-loading #webgl {
   top: 50%;
   left: 50%;
   width: clamp(12.8rem, 23vw, 18.2rem);
-  min-height: clamp(14.8rem, 38vh, 24rem);
-  padding: clamp(2.2rem, 4.2vw, 3.5rem) clamp(1rem, 1.9vw, 1.45rem) clamp(1.05rem, 1.7vw, 1.35rem);
+  min-height: clamp(11.2rem, 27vh, 17rem);
+  padding: clamp(1.5rem, 2.8vw, 2.25rem) clamp(0.95rem, 1.8vw, 1.35rem) clamp(0.95rem, 1.6vw, 1.2rem);
   border-radius: 1.05rem;
   border: 1px solid rgba(128, 255, 183, 0.34);
-  background:
-    linear-gradient(160deg, rgba(8, 46, 25, 0.93), rgba(12, 72, 37, 0.83)),
-    radial-gradient(circle at 75% 18%, rgba(106, 255, 166, 0.28), rgba(106, 255, 166, 0));
-  color: #d6ffe6;
+  background: linear-gradient(160deg, rgba(16, 130, 58, 0.93), rgba(6, 84, 39, 0.83));
+  color: #ffffff;;
   box-shadow:
     0 0 0 1px rgba(107, 255, 172, 0.14) inset,
     0 1rem 2.2rem rgba(4, 24, 12, 0.42),
@@ -113,6 +111,10 @@ body.is-site-loading #webgl {
   flex-direction: column;
   justify-content: space-between;
 }
+
+.scene-card--one { z-index: 3; }
+.scene-card--two { z-index: 2; }
+.scene-card--three { z-index: 1; }
 
 .scene-card__label,
 .scene-card__value {
@@ -202,6 +204,11 @@ body.is-site-loading .site-loader {
 .panel p {
   max-width: 40ch;
   margin: 0;
+}
+
+.invisible {
+  opacity: 0;
+  visibility: hidden;
 }
 
 .panel h1 {
@@ -321,7 +328,7 @@ body.is-site-loading .text-reveal-line {
 
   .scene-card {
     width: min(12.2rem, 48vw);
-    min-height: 14.2rem;
+    min-height: 10.8rem;
     border-radius: 0.88rem;
   }
 }

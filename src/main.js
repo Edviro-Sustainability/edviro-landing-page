@@ -898,26 +898,34 @@ if (sceneCards.length === 3) {
           x: () => getCardPassStyle().startX[0],
           y: () => getCardPassStyle().startY[0],
           scale: () => getCardPassStyle().startScale[0],
-          autoAlpha: 0,
-          filter: 'blur(4px)',
           duration: 0
         },
         {
           x: () => getCardPassStyle().midX[0],
           y: () => getCardPassStyle().midY[0],
           scale: () => getCardPassStyle().midScale[0],
-          autoAlpha: 1,
-          filter: 'blur(0px)',
           duration: 0.1
         },
         {
           x: () => getCardPassStyle().endX[0],
           y: () => getCardPassStyle().endY[0],
           scale: () => getCardPassStyle().endScale[0],
-          autoAlpha: 0,
-          filter: 'blur(6px)',
           duration: 0.1
         }
+      ]
+    }, 0.42)
+    .to(sceneCards[0], {
+      keyframes: [
+        { autoAlpha: 1, duration: 0.04 },
+        { autoAlpha: 1, duration: 0.08 },
+        { autoAlpha: 0, duration: 0.06 }
+      ]
+    }, 0.42)
+    .to(sceneCards[0], {
+      keyframes: [
+        { filter: 'blur(0px)', duration: 0.04 },
+        { filter: 'blur(0px)', duration: 0.08 },
+        { filter: 'blur(6px)', duration: 0.06 }
       ]
     }, 0.42)
     .to(sceneCards[1], {
@@ -926,26 +934,34 @@ if (sceneCards.length === 3) {
           x: () => getCardPassStyle().startX[1],
           y: () => getCardPassStyle().startY[1],
           scale: () => getCardPassStyle().startScale[1],
-          autoAlpha: 0,
-          filter: 'blur(4px)',
           duration: 0
         },
         {
           x: () => getCardPassStyle().midX[1],
           y: () => getCardPassStyle().midY[1],
           scale: () => getCardPassStyle().midScale[1],
-          autoAlpha: 1,
-          filter: 'blur(0px)',
           duration: 0.1
         },
         {
           x: () => getCardPassStyle().endX[1],
           y: () => getCardPassStyle().endY[1],
           scale: () => getCardPassStyle().endScale[1],
-          autoAlpha: 0,
-          filter: 'blur(6px)',
           duration: 0.1
         }
+      ]
+    }, 0.52)
+    .to(sceneCards[1], {
+      keyframes: [
+        { autoAlpha: 1, duration: 0.04 },
+        { autoAlpha: 1, duration: 0.08 },
+        { autoAlpha: 0, duration: 0.06 }
+      ]
+    }, 0.52)
+    .to(sceneCards[1], {
+      keyframes: [
+        { filter: 'blur(0px)', duration: 0.04 },
+        { filter: 'blur(0px)', duration: 0.08 },
+        { filter: 'blur(6px)', duration: 0.06 }
       ]
     }, 0.52)
     .to(sceneCards[2], {
@@ -954,26 +970,34 @@ if (sceneCards.length === 3) {
           x: () => getCardPassStyle().startX[2],
           y: () => getCardPassStyle().startY[2],
           scale: () => getCardPassStyle().startScale[2],
-          autoAlpha: 0,
-          filter: 'blur(4px)',
           duration: 0
         },
         {
           x: () => getCardPassStyle().midX[2],
           y: () => getCardPassStyle().midY[2],
           scale: () => getCardPassStyle().midScale[2],
-          autoAlpha: 1,
-          filter: 'blur(0px)',
           duration: 0.1
         },
         {
           x: () => getCardPassStyle().endX[2],
           y: () => getCardPassStyle().endY[2],
           scale: () => getCardPassStyle().endScale[2],
-          autoAlpha: 0,
-          filter: 'blur(6px)',
           duration: 0.1
         }
+      ]
+    }, 0.62)
+    .to(sceneCards[2], {
+      keyframes: [
+        { autoAlpha: 1, duration: 0.04 },
+        { autoAlpha: 1, duration: 0.08 },
+        { autoAlpha: 0, duration: 0.06 }
+      ]
+    }, 0.62)
+    .to(sceneCards[2], {
+      keyframes: [
+        { filter: 'blur(0px)', duration: 0.04 },
+        { filter: 'blur(0px)', duration: 0.08 },
+        { filter: 'blur(6px)', duration: 0.06 }
       ]
     }, 0.62)
     .to(sceneCardsOverlay, { autoAlpha: 0, duration: 0.06 }, 0.94);
