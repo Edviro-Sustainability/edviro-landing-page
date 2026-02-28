@@ -6,6 +6,7 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2.js';
 import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry.js';
+import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
@@ -145,7 +146,7 @@ maskComposer.addPass(wireBloomPass);
 
 const hemiLight = new THREE.HemisphereLight(themeConfig.light.hemiColor, themeConfig.light.hemiGroundColor, themeConfig.light.hemiIntensity);
 const dirLight = new THREE.DirectionalLight(themeConfig.light.dirColor, themeConfig.light.dirIntensity);
-dirLight.position.set(0, 5, 3);
+dirLight.position.set(6, 10, -3);
 dirLight.shadow.mapSize.set(2048, 2048);
 dirLight.castShadow = true;
 dirLight.shadow.radius = 20;
@@ -179,10 +180,9 @@ const schoolNoiseOverlays = [];
 const schoolOutlineMaterials = [];
 const streetLampPointLights = [];
 const schoolOutlineStyle = {
-  thresholdAngle: 45,
-  linewidth: 3,
-  color: { light: 0x000000, dark: 0xffffff },
-  opacity: { light: 0.3, dark: 0.04 }
+  thresholdAngle: 36,
+  linewidth: 1,
+  color: { light: 0x000000, dark: 0x333333 }
 };
 
 class ConditionalEdgesGeometry extends THREE.EdgesGeometry {
@@ -349,22 +349,25 @@ function createStreetLampLights(lightsMesh) {
 function createSchoolMeshOutline(mesh) {
   if (!mesh?.isMesh || !mesh.geometry) return null;
 
-  const conditionalEdges = new ConditionalEdgesGeometry(mesh.geometry);
+  const outlineSourceGeometry = mergeVertices(mesh.geometry.clone(), 1e-4);
+  const conditionalEdges = new ConditionalEdgesGeometry(outlineSourceGeometry);
   const positionAttribute = conditionalEdges.getAttribute('position');
   if (!positionAttribute || positionAttribute.count === 0) {
+    outlineSourceGeometry.dispose();
     conditionalEdges.dispose();
     return null;
   }
 
   const conditionalLineGeometry = new ConditionalLineSegmentsGeometry();
   conditionalLineGeometry.fromConditionalEdgesGeometry(conditionalEdges);
+  outlineSourceGeometry.dispose();
   conditionalEdges.dispose();
 
   const outlineMaterial = new LineMaterial({
     linewidth: schoolOutlineStyle.linewidth,
     color: schoolOutlineStyle.color[currentThemeName],
-    transparent: true,
-    opacity: schoolOutlineStyle.opacity[currentThemeName],
+    transparent: false,
+    opacity: 1.0,
     depthTest: true,
     depthWrite: false,
     fog: true
@@ -427,7 +430,6 @@ function applyTheme(nextThemeName, options = {}) {
   applyMaterialTheme(normalizedThemeName);
   for (const outlineMaterial of schoolOutlineMaterials) {
     outlineMaterial.color.set(schoolOutlineStyle.color[normalizedThemeName]);
-    outlineMaterial.opacity = schoolOutlineStyle.opacity[normalizedThemeName];
   }
 
   for (const pointLight of streetLampPointLights) {
@@ -478,7 +480,7 @@ loader.load('/school.obj', (loadedModel) => {
     mesh.castShadow = !isWireMesh;
     mesh.receiveShadow = !isWireMesh;
     if (isWireMesh) mesh.layers.enable(MASK_LAYER);
-    if (!isWireMesh && !isTreeMesh && !isPoleMesh && !isTrunkMesh) createSchoolMeshOutline(mesh);
+    createSchoolMeshOutline(mesh);
 
     if (!mesh.name.startsWith("Tree") && !mesh.name.startsWith("Pole") && !mesh.name.startsWith("Trunk")) {
       const noiseOverlay = new THREE.Mesh(mesh.geometry, schoolNoiseRevealMaterial);
