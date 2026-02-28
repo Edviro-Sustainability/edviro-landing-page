@@ -3,6 +3,9 @@ import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
+import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2.js';
+import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
@@ -73,13 +76,13 @@ const themeConfig = {
   light: {
     sceneColor: 0xf2fff9, fogColor: 0xf2fff9, fogDensity: 0.012, floorColor: 0xf9f0f9,
     hemiColor: 0xffffff, hemiGroundColor: 0xcfd8dc, hemiIntensity: 2.0, dirColor: 0xffffff,
-    dirIntensity: 1.9, exposure: 1.05, wireBloomStrength: 0.24,
+    dirIntensity: 1.9, exposure: 1.0, wireBloomStrength: 0.2,
     streetLampIntensity: 0.0, streetLampColor: 0xffd7ad, streetLampDistance: 16
   },
   dark: {
     sceneColor: 0x050608, fogColor: 0x050608, fogDensity: 0.018, floorColor: 0x3b413d,
     hemiColor: 0x7b899c, hemiGroundColor: 0x020304, hemiIntensity: 0.4, dirColor: 0xffffff,
-    dirIntensity: 0.7, exposure: 0.96, wireBloomStrength: 0.24,
+    dirIntensity: 0.7, exposure: 1.0, wireBloomStrength: 0.24,
     streetLampIntensity: 0.8, streetLampColor: 0xffd8aa, streetLampDistance: 16
   }
 };
@@ -173,7 +176,32 @@ let schoolModel = null;
 let wiringModel = null;
 const schoolMeshes = [];
 const schoolNoiseOverlays = [];
+const schoolOutlineMaterials = [];
 const streetLampPointLights = [];
+const schoolOutlineStyle = {
+  thresholdAngle: 45,
+  linewidth: 3,
+  color: { light: 0x000000, dark: 0xffffff },
+  opacity: { light: 0.3, dark: 0.04 }
+};
+
+class ConditionalEdgesGeometry extends THREE.EdgesGeometry {
+  constructor(geometry, thresholdAngle = schoolOutlineStyle.thresholdAngle) {
+    super(geometry, thresholdAngle);
+    this.type = 'ConditionalEdgesGeometry';
+  }
+}
+
+class ConditionalLineSegmentsGeometry extends LineSegmentsGeometry {
+  constructor() {
+    super();
+    this.type = 'ConditionalLineSegmentsGeometry';
+  }
+
+  fromConditionalEdgesGeometry(geometry) {
+    return this.fromEdgesGeometry(geometry);
+  }
+}
 
 const wiringElectricMaterial = new THREE.ShaderMaterial({
   uniforms: {
@@ -318,6 +346,42 @@ function createStreetLampLights(lightsMesh) {
   }
 }
 
+function createSchoolMeshOutline(mesh) {
+  if (!mesh?.isMesh || !mesh.geometry) return null;
+
+  const conditionalEdges = new ConditionalEdgesGeometry(mesh.geometry);
+  const positionAttribute = conditionalEdges.getAttribute('position');
+  if (!positionAttribute || positionAttribute.count === 0) {
+    conditionalEdges.dispose();
+    return null;
+  }
+
+  const conditionalLineGeometry = new ConditionalLineSegmentsGeometry();
+  conditionalLineGeometry.fromConditionalEdgesGeometry(conditionalEdges);
+  conditionalEdges.dispose();
+
+  const outlineMaterial = new LineMaterial({
+    linewidth: schoolOutlineStyle.linewidth,
+    color: schoolOutlineStyle.color[currentThemeName],
+    transparent: true,
+    opacity: schoolOutlineStyle.opacity[currentThemeName],
+    depthTest: true,
+    depthWrite: false,
+    fog: true
+  });
+  outlineMaterial.resolution.set(window.innerWidth, window.innerHeight);
+
+  const outline = new LineSegments2(conditionalLineGeometry, outlineMaterial);
+  outline.name = `${mesh.name || 'mesh'}Outline`;
+  outline.frustumCulled = false;
+  outline.renderOrder = 975;
+  outline.layers.mask = mesh.layers.mask;
+  mesh.add(outline);
+
+  schoolOutlineMaterials.push(outlineMaterial);
+  return outline;
+}
+
 function applyMaterialTheme(themeName) {
   schoolMaterial.color.set(materialThemeColors.school[themeName]);
   windowMaterial.color.set(materialThemeColors.windows[themeName]);
@@ -361,6 +425,10 @@ function applyTheme(nextThemeName, options = {}) {
   wireBloomPass.strength = theme.wireBloomStrength;
 
   applyMaterialTheme(normalizedThemeName);
+  for (const outlineMaterial of schoolOutlineMaterials) {
+    outlineMaterial.color.set(schoolOutlineStyle.color[normalizedThemeName]);
+    outlineMaterial.opacity = schoolOutlineStyle.opacity[normalizedThemeName];
+  }
 
   for (const pointLight of streetLampPointLights) {
     pointLight.color.set(theme.streetLampColor);
@@ -410,6 +478,7 @@ loader.load('/school.obj', (loadedModel) => {
     mesh.castShadow = !isWireMesh;
     mesh.receiveShadow = !isWireMesh;
     if (isWireMesh) mesh.layers.enable(MASK_LAYER);
+    if (!isWireMesh && !isTreeMesh && !isPoleMesh && !isTrunkMesh) createSchoolMeshOutline(mesh);
 
     if (!mesh.name.startsWith("Tree") && !mesh.name.startsWith("Pole") && !mesh.name.startsWith("Trunk")) {
       const noiseOverlay = new THREE.Mesh(mesh.geometry, schoolNoiseRevealMaterial);
@@ -766,6 +835,9 @@ window.addEventListener('resize', () => {
   composer.setSize(window.innerWidth, window.innerHeight);
   dofPass.setSize(window.innerWidth, window.innerHeight);
   fxaaPass.material.uniforms.resolution.value.set(1 / (window.innerWidth * pixelRatio), 1 / (window.innerHeight * pixelRatio));
+  for (const outlineMaterial of schoolOutlineMaterials) {
+    outlineMaterial.resolution.set(window.innerWidth, window.innerHeight);
+  }
 
   updateRenderResolution();
   computeTitleIntroStartTransform();
