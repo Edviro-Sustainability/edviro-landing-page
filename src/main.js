@@ -30,6 +30,8 @@ const siteLoader = document.querySelector('#site-loader');
 const themeToggleButton = document.querySelector('#theme-toggle');
 const sceneCardsOverlay = document.querySelector('.scene-cards-overlay');
 const sceneCards = sceneCardsOverlay ? Array.from(sceneCardsOverlay.querySelectorAll('.scene-card')) : [];
+const scrollPhraseOverlay = document.querySelector('.scroll-phrase');
+const scrollPhraseWords = scrollPhraseOverlay ? Array.from(scrollPhraseOverlay.querySelectorAll('.scroll-phrase__word')) : [];
 const STORAGE_THEME_KEY = 'edviro-theme';
 const DEFAULT_THEME_NAME = 'light';
 const STREET_LAMP_FALLBACK_POSITIONS = [
@@ -835,6 +837,54 @@ cameraScrollTimeline.to(parallaxScrollState, {
   multiplier: 0,
   duration: 0.4
 }, 0);
+
+if (scrollPhraseWords.length > 0) {
+  const phraseWordsStart = 0.05;
+  const phraseExitStart = 0.3;
+  const phraseOverlayExitStart = 0.35;
+  const getPhraseStartYOffset = () => window.innerHeight * 0.72;
+
+  gsap.set(scrollPhraseOverlay, { autoAlpha: 0 });
+  gsap.set(scrollPhraseWords, {
+    autoAlpha: 0,
+    y: () => getPhraseStartYOffset(),
+    scale: prefersReducedMotion ? 1 : 0.92,
+    rotateZ: (index) => (index % 2 === 0 ? -2.4 : 2.4),
+    filter: prefersReducedMotion ? 'blur(0px)' : 'blur(14px)',
+    force3D: true
+  });
+
+  cameraScrollTimeline
+    .to(scrollPhraseOverlay, {
+      autoAlpha: 1,
+      duration: prefersReducedMotion ? 0.02 : 0.04
+    }, 0.0)
+    .to(scrollPhraseWords, {
+      autoAlpha: 1,
+      y: 0,
+      scale: 1,
+      rotateZ: 0,
+      filter: 'blur(0px)',
+      duration: prefersReducedMotion ? 0.045 : 0.075,
+      ease: 'power3.out',
+      stagger: prefersReducedMotion ? 0.015 : 0.03
+    }, phraseWordsStart);
+
+  cameraScrollTimeline
+    .to(scrollPhraseWords, {
+      autoAlpha: 0,
+      yPercent: -45,
+      scale: prefersReducedMotion ? 1 : 0.95,
+      filter: prefersReducedMotion ? 'blur(0px)' : 'blur(10px)',
+      duration: prefersReducedMotion ? 0.05 : 0.09,
+      ease: 'power2.in',
+      stagger: { each: prefersReducedMotion ? 0.01 : 0.016, from: 'end' }
+    }, phraseExitStart)
+    .to(scrollPhraseOverlay, {
+      autoAlpha: 0,
+      duration: prefersReducedMotion ? 0.03 : 0.05
+    }, phraseOverlayExitStart);
+}
 
 if (sceneCards.length === 3) {
   const getRootFontSize = () => {
