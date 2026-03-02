@@ -228,6 +228,22 @@ body.is-site-loading .site-loader {
   border: 0;
   background: transparent;
   color: var(--text-primary);
+  -webkit-text-fill-color: currentColor;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  white-space: nowrap;
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity, color, text-shadow;
+}
+
+.scroll-phrase__word {
+  display: inline-block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  -webkit-text-fill-color: currentColor;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -237,7 +253,47 @@ body.is-site-loading .site-loader {
 }
 
 .scroll-phrase__word--accent {
+  --accent-shimmer-duration: 2.85s;
+  position: relative;
   color: #16a34a;
+  background-image: linear-gradient(
+    to right, 
+    #16a34a 0%,
+    #86efac 12.5%,
+    #15803d 25%,
+    #4ade80 37.5%,
+    #16a34a 50%,
+    #86efac 62.5%,
+    #15803d 75%,
+    #4ade80 87.5%,
+    #16a34a 100%
+  );
+  background-size: 200% 100%;
+  background-position: 0% 50%;
+  background-repeat: repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 7px rgba(20, 148, 75, 0.2), 0 0 15px rgba(20, 148, 75, 0.14);
+  filter: saturate(1.06) brightness(1.02);
+  animation: scroll-word-accent-shimmer var(--accent-shimmer-duration) linear infinite, scroll-word-accent-breathe 2.6s ease-in-out infinite;
+  will-change: background-position, filter, text-shadow;
+}
+
+.scroll-phrase__word--accent::after {
+  content: '';
+  position: absolute;
+  left: -0.15em;
+  right: -0.15em;
+  bottom: -0.14em;
+  height: 0.44em;
+  border-radius: 999px;
+  background: radial-gradient(circle at center, rgba(22, 163, 74, 0.22) 0%, rgba(22, 163, 74, 0.03) 72%, rgba(22, 163, 74, 0) 100%);
+  opacity: 0.72;
+  transform: scaleX(1);
+  filter: blur(6px);
+  pointer-events: none;
+  z-index: -1;
 }
 
 body[data-theme='dark'] .scroll-phrase__word {
@@ -246,7 +302,25 @@ body[data-theme='dark'] .scroll-phrase__word {
 }
 
 body[data-theme='dark'] .scroll-phrase__word--accent {
+  --accent-shimmer-duration: 2.5s;
+  background-image: linear-gradient(
+    to right, 
+    #74dd95 0%, 
+    #90e469 12.5%, 
+    #54c975 25%, 
+    #bfffd8 37.5%, 
+    #74dd95 50%, 
+    #90e469 62.5%, 
+    #54c975 75%, 
+    #bfffd8 87.5%, 
+    #74dd95 100%
+  );
   color: #5bd584;
+  text-shadow: 0 0 8px rgba(140, 255, 188, 0.28), 0 0 18px rgba(91, 213, 132, 0.2);
+}
+
+body[data-theme='dark'] .scroll-phrase__word--accent::after {
+  background: radial-gradient(circle at center, rgba(123, 246, 168, 0.3) 0%, rgba(123, 246, 168, 0.06) 72%, rgba(123, 246, 168, 0) 100%);
 }
 
 .panel {
@@ -341,6 +415,10 @@ body.is-site-loading .text-reveal-line {
 
 .text-reveal-line--brand {
   color: var(--color-primary);
+  background-image: linear-gradient(90deg, #31c367 0%, #0f8339 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
   font-size: clamp(4.4rem, 12vw, 8rem);
   line-height: 0.95;
   animation: none;
@@ -424,6 +502,30 @@ body.is-site-loading .text-reveal-line {
   }
 }
 
+@keyframes scroll-word-accent-shimmer {
+  from {
+    background-position: 0% 50%;
+  }
+
+  to {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes scroll-word-accent-breathe {
+  0% {
+    filter: saturate(1.03) brightness(1);
+  }
+
+  50% {
+    filter: saturate(1.16) brightness(1.09);
+  }
+
+  100% {
+    filter: saturate(1.03) brightness(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .site-loader__spinner {
     animation: none;
@@ -443,5 +545,11 @@ body.is-site-loading .text-reveal-line {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     text-shadow: 0 2px 8px rgba(17, 20, 23, 0.2);
+  }
+
+  .scroll-phrase__word--accent {
+    animation: none;
+    background-position: 95% 50%;
+    filter: saturate(1.04) brightness(1.01);
   }
 }

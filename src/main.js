@@ -109,7 +109,7 @@ const themeConfig = {
     streetLampIntensity: 0.0, streetLampColor: 0xffd7ad, streetLampDistance: 16
   },
   dark: {
-    sceneColor: 0x050608, fogColor: 0x050608, fogDensity: 0.018, floorColor: 0x3b413d,
+    sceneColor: 0x050608, fogColor: 0x050608, fogDensity: 0.032, floorColor: 0x3b413d,
     hemiColor: 0x7b899c, hemiGroundColor: 0x020304, hemiIntensity: 0.4, dirColor: 0xffffff,
     dirIntensity: 0.7, exposure: 1.0, wireBloomStrength: 0.24,
     streetLampIntensity: 0.8, streetLampColor: 0xffd8aa, streetLampDistance: 16
@@ -452,6 +452,7 @@ function applyTheme(nextThemeName, options = {}) {
   hemiLight.intensity = theme.hemiIntensity;
   dirLight.color.set(theme.dirColor);
   dirLight.intensity = theme.dirIntensity;
+  dirLight.position.z = normalizedThemeName === 'dark' ? 3 : -3;
   renderer.toneMappingExposure = theme.exposure;
   wireBloomPass.strength = theme.wireBloomStrength;
 
@@ -838,6 +839,14 @@ maybeUnlockScroll();
 
 const panels = gsap.utils.toArray('.panel');
 const postSecondPanelDuration = Math.max(panels.length - 2, 0);
+const keyframeTwoCameraOffset = { x: -40.0, y: -2, z: -42.0 };
+const keyframeTwoLookAtOffset = { x: -52.0, y: 0, z: -52 };
+const keyframeThreeCameraOffset = { x: keyframeTwoCameraOffset.x, y: -5.2, z: keyframeTwoCameraOffset.z };
+const keyframeThreeLookAtOffset = {
+  x: introState.endCameraPos.x + keyframeThreeCameraOffset.x,
+  y: grid.position.y,
+  z: introState.endCameraPos.z + keyframeThreeCameraOffset.z
+};
 
 const cameraScrollTimeline = gsap.timeline({
   defaults: { ease: 'none' },
@@ -856,8 +865,8 @@ if (title) {
 }
 
 cameraScrollTimeline.to(scrollState, {
-  cameraOffsetX: -40.0, cameraOffsetY: -2, cameraOffsetZ: -42.0,
-  lookAtOffsetX: -52.0, lookAtOffsetY: 0, lookAtOffsetZ: -52,
+  cameraOffsetX: keyframeTwoCameraOffset.x, cameraOffsetY: keyframeTwoCameraOffset.y, cameraOffsetZ: keyframeTwoCameraOffset.z,
+  lookAtOffsetX: keyframeTwoLookAtOffset.x, lookAtOffsetY: keyframeTwoLookAtOffset.y, lookAtOffsetZ: keyframeTwoLookAtOffset.z,
   duration: 1
 });
 
@@ -1091,11 +1100,17 @@ if (sceneCards.length === 3) {
 }
 
 if (postSecondPanelDuration > 0) {
+  gsap.set(canvas, { opacity: 1 });
   cameraScrollTimeline.to(scrollState, {
-    cameraOffsetX: -13.5, cameraOffsetY: -1.8, cameraOffsetZ: -7.5,
-    lookAtOffsetX: -6.5, lookAtOffsetY: -0.5, lookAtOffsetZ: 1.5,
+    cameraOffsetX: keyframeThreeCameraOffset.x, cameraOffsetY: keyframeThreeCameraOffset.y, cameraOffsetZ: keyframeThreeCameraOffset.z,
+    lookAtOffsetX: keyframeThreeLookAtOffset.x, lookAtOffsetY: keyframeThreeLookAtOffset.y, lookAtOffsetZ: keyframeThreeLookAtOffset.z,
     duration: postSecondPanelDuration
   });
+  cameraScrollTimeline.to(canvas, {
+    opacity: 0,
+    duration: postSecondPanelDuration,
+    ease: 'power1.inOut'
+  }, '<');
 }
 
 window.addEventListener('resize', () => {
