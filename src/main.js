@@ -109,7 +109,7 @@ const themeConfig = {
     streetLampIntensity: 0.0, streetLampColor: 0xffd7ad, streetLampDistance: 16
   },
   dark: {
-    sceneColor: 0x050608, fogColor: 0x050608, fogDensity: 0.032, floorColor: 0x3b413d,
+    sceneColor: 0x050608, fogColor: 0x050608, fogDensity: 0.018, floorColor: 0x3b413d,
     hemiColor: 0x7b899c, hemiGroundColor: 0x020304, hemiIntensity: 0.4, dirColor: 0xffffff,
     dirIntensity: 0.7, exposure: 1.0, wireBloomStrength: 0.24,
     streetLampIntensity: 0.8, streetLampColor: 0xffd8aa, streetLampDistance: 16
