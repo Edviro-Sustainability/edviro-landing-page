@@ -839,14 +839,6 @@ maybeUnlockScroll();
 
 const panels = gsap.utils.toArray('.panel');
 const postSecondPanelDuration = Math.max(panels.length - 2, 0);
-const keyframeTwoCameraOffset = { x: -40.0, y: -2, z: -42.0 };
-const keyframeTwoLookAtOffset = { x: -52.0, y: 0, z: -52 };
-const keyframeThreeCameraOffset = { x: keyframeTwoCameraOffset.x, y: -5.2, z: keyframeTwoCameraOffset.z };
-const keyframeThreeLookAtOffset = {
-  x: introState.endCameraPos.x + keyframeThreeCameraOffset.x,
-  y: grid.position.y,
-  z: introState.endCameraPos.z + keyframeThreeCameraOffset.z
-};
 
 const cameraScrollTimeline = gsap.timeline({
   defaults: { ease: 'none' },
@@ -865,8 +857,8 @@ if (title) {
 }
 
 cameraScrollTimeline.to(scrollState, {
-  cameraOffsetX: keyframeTwoCameraOffset.x, cameraOffsetY: keyframeTwoCameraOffset.y, cameraOffsetZ: keyframeTwoCameraOffset.z,
-  lookAtOffsetX: keyframeTwoLookAtOffset.x, lookAtOffsetY: keyframeTwoLookAtOffset.y, lookAtOffsetZ: keyframeTwoLookAtOffset.z,
+  cameraOffsetX: -40.0, cameraOffsetY: -2, cameraOffsetZ: -42.0,
+  lookAtOffsetX: -52.0, lookAtOffsetY: 0, lookAtOffsetZ: -52,
   duration: 1
 });
 
@@ -1100,17 +1092,11 @@ if (sceneCards.length === 3) {
 }
 
 if (postSecondPanelDuration > 0) {
-  gsap.set(canvas, { opacity: 1 });
   cameraScrollTimeline.to(scrollState, {
-    cameraOffsetX: keyframeThreeCameraOffset.x, cameraOffsetY: keyframeThreeCameraOffset.y, cameraOffsetZ: keyframeThreeCameraOffset.z,
-    lookAtOffsetX: keyframeThreeLookAtOffset.x, lookAtOffsetY: keyframeThreeLookAtOffset.y, lookAtOffsetZ: keyframeThreeLookAtOffset.z,
+    cameraOffsetX: -13.5, cameraOffsetY: -1.8, cameraOffsetZ: -7.5,
+    lookAtOffsetX: -6.5, lookAtOffsetY: -0.5, lookAtOffsetZ: 1.5,
     duration: postSecondPanelDuration
   });
-  cameraScrollTimeline.to(canvas, {
-    opacity: 0,
-    duration: postSecondPanelDuration,
-    ease: 'power1.inOut'
-  }, '<');
 }
 
 window.addEventListener('resize', () => {
