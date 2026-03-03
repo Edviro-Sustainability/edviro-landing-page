@@ -34,6 +34,8 @@ const sceneCardsOverlay = document.querySelector('.scene-cards-overlay');
 const sceneCards = sceneCardsOverlay ? Array.from(sceneCardsOverlay.querySelectorAll('.scene-card')) : [];
 const scrollPhraseOverlay = document.querySelector('.scroll-phrase');
 const scrollPhraseWords = scrollPhraseOverlay ? Array.from(scrollPhraseOverlay.querySelectorAll('.scroll-phrase__word')) : [];
+const statsPanel = document.querySelector('.panel--stats');
+const statsCards = statsPanel ? Array.from(statsPanel.querySelectorAll('.stats-card')) : [];
 const STORAGE_THEME_KEY = 'edviro-theme';
 const DEFAULT_THEME_NAME = 'light';
 const STREET_LAMP_POSITIONS = [
@@ -328,7 +330,7 @@ function buildCounterGeometry(label) {
 function buildCounterContextGeometry(label) {
   const textGeometry = new TextGeometry(label, {
     font: counterFont,
-    size: 0.4,
+    size: 0.32,
     ...counterTextGeometryConfig
   });
   textGeometry.center();
@@ -428,12 +430,12 @@ function addCounter() {
 
     counterTopContextMesh.position.copy(textPosition);
     counterTopContextMesh.position.y = -4;
-    counterTopContextMesh.position.z += -1.4;
+    counterTopContextMesh.position.z += -1;
     counterTopContextMesh.rotation.x = -Math.PI / 2;
 
     counterBottomContextMesh.position.copy(textPosition);
     counterBottomContextMesh.position.y = -4;
-    counterBottomContextMesh.position.z += 1.4;
+    counterBottomContextMesh.position.z += 1;
     counterBottomContextMesh.rotation.x = -Math.PI / 2;
 
     setCounterTextVisibility(false);
@@ -1224,6 +1226,50 @@ if (sceneCards.length === 3) {
     }, cardThreeStart)
     .to(sceneCardsOverlay, { autoAlpha: 0, duration: 0.06 }, 0.94);
   }
+
+if (statsPanel && statsCards.length === 3) {
+  const statsCardEntryOffsets = [
+    { x: () => (window.innerWidth <= 768 ? -90 : -190), y: 0, rotateZ: -7 },
+    { x: 0, y: () => (window.innerWidth <= 768 ? 120 : 180), rotateZ: 0 },
+    { x: () => (window.innerWidth <= 768 ? 90 : 190), y: 0, rotateZ: 7 }
+  ];
+
+  gsap.set(statsCards, {
+    force3D: true,
+    willChange: 'transform, opacity'
+  });
+
+  const statsCardsTimeline = gsap.timeline({
+    scrollTrigger: {
+      trigger: statsPanel,
+      start: 'top 78%',
+      end: 'bottom 24%',
+      toggleActions: 'play none none reverse',
+      invalidateOnRefresh: true
+    }
+  });
+
+  statsCards.forEach((card, index) => {
+    const entryOffset = statsCardEntryOffsets[index];
+    statsCardsTimeline.fromTo(card,
+      {
+        autoAlpha: 0,
+        x: entryOffset.x,
+        y: entryOffset.y,
+        rotateZ: entryOffset.rotateZ
+      },
+      {
+        autoAlpha: 1,
+        x: 0,
+        y: 0,
+        rotateZ: 0,
+        duration: prefersReducedMotion ? 0.1 : 0.5,
+        ease: 'power3.out'
+      },
+      index * (prefersReducedMotion ? 0.02 : 0.1)
+    );
+  });
+}
 
 const scrollHeight = -33.0;
 cameraScrollTimeline.to(scrollState, {
