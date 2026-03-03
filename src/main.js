@@ -197,7 +197,7 @@ floor.rotation.x = -Math.PI / 2;
 floor.position.set(0, -4, 0);
 floor.receiveShadow = true;
 scene.add(floor);
-const grid = new THREE.GridHelper(160, 40, 0x444444, 0x222222);
+const grid = new THREE.GridHelper(160, 60, 0x444444, 0x222222);
 grid.position.set(0, -3.99, 0);
 scene.add(grid);
 
@@ -568,6 +568,8 @@ window.addEventListener('pointerleave', () => {
 });
 
 const parallaxSettings = { cameraX: 0.9, cameraY: 0.9, lookAtX: 0, lookAtY: 0, groupX: 0.08, groupY: 0.05 };
+const WORLD_UP = new THREE.Vector3(0, 1, 0);
+const GRID_NORTH_UP = new THREE.Vector3(0, 0, 1);
 const maskBackground = new THREE.Color(0x000000);
 
 function renderWireMask() {
@@ -587,7 +589,12 @@ function renderWireMask() {
   scene.background = previousBackground;
 }
 
-const scrollState = { progress: 0, cameraOffsetX: 0, cameraOffsetY: 0, cameraOffsetZ: 0, lookAtOffsetX: 0, lookAtOffsetY: 0, lookAtOffsetZ: 0 };
+const scrollState = {
+  progress: 0,
+  cameraOffsetX: 0, cameraOffsetY: 0, cameraOffsetZ: 0,
+  lookAtOffsetX: 0, lookAtOffsetY: 0, lookAtOffsetZ: 0,
+  gridDownLock: 0
+};
 const parallaxScrollState = { multiplier: 1 };
 const introAnimState = { progress: 0 };
 const introCamera = introState.startCameraPos.clone();
@@ -856,10 +863,24 @@ if (title) {
   }, 0.02);
 }
 
+const keyframeTwoLinearPortion = 0.82;
+const keyframeTwoCurvePortion = 1 - keyframeTwoLinearPortion;
+
 cameraScrollTimeline.to(scrollState, {
-  cameraOffsetX: -40.0, cameraOffsetY: -2, cameraOffsetZ: -42.0,
-  lookAtOffsetX: -52.0, lookAtOffsetY: 0, lookAtOffsetZ: -52,
-  duration: 1
+  keyframes: [
+    {
+      cameraOffsetX: -32.8, cameraOffsetY: -1.64, cameraOffsetZ: -34.44,
+      lookAtOffsetX: -42.64, lookAtOffsetY: 0, lookAtOffsetZ: -42.64, gridDownLock: 0,
+      duration: keyframeTwoLinearPortion,
+      ease: 'none'
+    },
+    {
+      cameraOffsetX: -44.0, cameraOffsetY: -2.5, cameraOffsetZ: -42.0,
+      lookAtOffsetX: -36.0, lookAtOffsetY: -18.0, lookAtOffsetZ: -16.0, gridDownLock: 1,
+      duration: keyframeTwoCurvePortion,
+      ease: 'sine.out'
+    }
+  ]
 });
 
 cameraScrollTimeline.to(parallaxScrollState, {
@@ -1094,7 +1115,7 @@ if (sceneCards.length === 3) {
 if (postSecondPanelDuration > 0) {
   cameraScrollTimeline.to(scrollState, {
     cameraOffsetX: -13.5, cameraOffsetY: -1.8, cameraOffsetZ: -7.5,
-    lookAtOffsetX: -6.5, lookAtOffsetY: -0.5, lookAtOffsetZ: 1.5,
+    lookAtOffsetX: -6.5, lookAtOffsetY: -0.5, lookAtOffsetZ: 1.5, gridDownLock: 0,
     duration: postSecondPanelDuration
   });
 }
@@ -1144,19 +1165,19 @@ gsap.ticker.add((time) => {
   if (schoolModel) {
     schoolModel.visible = introCameraStarted;
     const scrollInfluence = introAnimState.progress;
-    
-    camera.position.set(
-      introCamera.x + (scrollState.cameraOffsetX * scrollInfluence) + cameraParallaxX,
-      introCamera.y + (scrollState.cameraOffsetY * scrollInfluence) + cameraParallaxY,
-      introCamera.z + (scrollState.cameraOffsetZ * scrollInfluence)
-    );
-    
-    camera.lookAt(
-      introLookAt.x + (scrollState.lookAtOffsetX * scrollInfluence) + lookAtParallaxX,
-      introLookAt.y + (scrollState.lookAtOffsetY * scrollInfluence) + lookAtParallaxY,
-      introLookAt.z + (scrollState.lookAtOffsetZ * scrollInfluence)
-    );
+
+    const cameraWorldX = introCamera.x + (scrollState.cameraOffsetX * scrollInfluence) + cameraParallaxX;
+    const cameraWorldY = introCamera.y + (scrollState.cameraOffsetY * scrollInfluence) + cameraParallaxY;
+    const cameraWorldZ = introCamera.z + (scrollState.cameraOffsetZ * scrollInfluence);
+    const lookAtWorldX = introLookAt.x + (scrollState.lookAtOffsetX * scrollInfluence) + lookAtParallaxX;
+    const lookAtWorldY = introLookAt.y + (scrollState.lookAtOffsetY * scrollInfluence) + lookAtParallaxY;
+    const lookAtWorldZ = introLookAt.z + (scrollState.lookAtOffsetZ * scrollInfluence);
+
+    camera.up.copy(WORLD_UP).lerp(GRID_NORTH_UP, scrollState.gridDownLock).normalize();
+    camera.position.set(cameraWorldX, cameraWorldY, cameraWorldZ);
+    camera.lookAt(lookAtWorldX, lookAtWorldY, lookAtWorldZ);
   } else {
+    camera.up.copy(WORLD_UP);
     camera.position.set(
       mapScrollToX(scrollState.progress) + cameraParallaxX,
       0.5 + cameraParallaxY,
