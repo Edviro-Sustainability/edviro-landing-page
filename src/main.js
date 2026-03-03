@@ -35,6 +35,9 @@ const scrollPhraseOverlay = document.querySelector('.scroll-phrase');
 const scrollPhraseWords = scrollPhraseOverlay ? Array.from(scrollPhraseOverlay.querySelectorAll('.scroll-phrase__word')) : [];
 const statsPanel = document.querySelector('.panel--stats');
 const statsCards = statsPanel ? Array.from(statsPanel.querySelectorAll('.stats-card')) : [];
+const teamPanel = document.querySelector('.panel--team');
+const teamOverlay = document.querySelector('.team-overlay');
+const teamCards = teamOverlay ? Array.from(teamOverlay.querySelectorAll('.team-card')) : [];
 const STORAGE_THEME_KEY = 'edviro-theme';
 const DEFAULT_THEME_NAME = 'light';
 const STREET_LAMP_POSITIONS = [
@@ -122,6 +125,51 @@ const GREEN_PALETTE = {
   base: 0x16a34a,
   bright: 0x54d36b,
   soft: 0x86efac
+};
+
+const TEAM_MEMBER_CONFIG = [
+  {
+    id: 'hursh',
+    basePosition: new THREE.Vector3(-33.6, -3.9, -9.0),
+    baseRotationY: -0.28,
+    tiltX: 0.24,
+    phase: 0.2,
+    scale: 0.4,
+    floatAmplitude: 0.32,
+    floatSpeed: 1.35,
+    driftY: 0.05,
+    driftZ: 0.1,
+    rotateSpeed: 1.0,
+  },
+  {
+    id: 'tanuj',
+    basePosition: new THREE.Vector3(-38.2, -3.9, -5.6),
+    baseRotationY: 0.34,
+    tiltX: 0.22,
+    phase: 1.6,
+    scale: 0.4,
+    floatAmplitude: 0.35,
+    floatSpeed: 1.24,
+    driftY: 0.05,
+    driftZ: 0.2,
+    rotateSpeed: -1.0,
+  }
+];
+
+const teamCardMap = new Map(
+  teamCards
+    .map((card) => [card.dataset.member, card])
+    .filter(([id]) => typeof id === 'string' && id.length > 0)
+);
+const teamMembers = [];
+let lastTeamUpdateTime = null;
+const teamSceneState = {
+  panelActive: false,
+  overlayVisible: false
+};
+const teamProjection = {
+  world: new THREE.Vector3(),
+  clip: new THREE.Vector3()
 };
 
 const scene = new THREE.Scene();
@@ -297,6 +345,11 @@ const counterParagraphThemeStyle = {
   light: { color: 0x09642a, emissive: 0x000000, emissiveIntensity: 0.0 },
   dark: { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 0.6 }
 };
+const teamMemberThemeStyle = {
+  light: { color: GREEN_PALETTE.base, emissive: 0x000000, emissiveIntensity: 0.0 },
+  dark: { color: 0x000000, emissive: GREEN_PALETTE.base, emissiveIntensity: 1.0 }
+};
+let teamMemberMaterial = null;
 let currentThemeName = getInitialThemeName();
 
 function formatCounterValue(value) {
@@ -317,6 +370,160 @@ function applyCounterParagraphMaterialTheme(themeName) {
   counterParagraphMaterial.color.set(style.color);
   counterParagraphMaterial.emissive.set(style.emissive);
   counterParagraphMaterial.emissiveIntensity = style.emissiveIntensity;
+}
+
+function applyTeamMaterialTheme(themeName) {
+  if (!teamMemberMaterial) return;
+  const style = teamMemberThemeStyle[themeName] ?? teamMemberThemeStyle.light;
+  teamMemberMaterial.color.set(style.color);
+  teamMemberMaterial.emissive.set(style.emissive);
+  teamMemberMaterial.emissiveIntensity = style.emissiveIntensity;
+}
+
+function resetTeamCards() {
+  for (const card of teamCards) {
+    card.style.left = '-200vw';
+    card.style.top = '-200vh';
+    card.style.opacity = '0';
+    card.style.visibility = 'hidden';
+  }
+}
+
+function setTeamOverlayVisibility(isVisible) {
+  if (!teamOverlay) return;
+  if (teamSceneState.overlayVisible === isVisible) return;
+  teamSceneState.overlayVisible = isVisible;
+  teamOverlay.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+  gsap.to(teamOverlay, {
+    autoAlpha: isVisible ? 1 : 0,
+    duration: prefersReducedMotion ? 0.08 : 0.22,
+    ease: 'power2.out',
+    overwrite: 'auto'
+  });
+  if (!isVisible) resetTeamCards();
+}
+
+function centerObjectPivotToGround(object3D) {
+  const bounds = new THREE.Box3().setFromObject(object3D);
+  if (bounds.isEmpty()) return;
+  const center = bounds.getCenter(new THREE.Vector3());
+  object3D.position.x -= center.x;
+  object3D.position.y -= bounds.min.y;
+  object3D.position.z -= center.z;
+}
+
+function createTeamMembersFromModel(personModel) {
+  if (!personModel) return;
+  if (!teamMemberMaterial) {
+    teamMemberMaterial = new THREE.MeshStandardMaterial({
+      color: teamMemberThemeStyle.light.color,
+      emissive: teamMemberThemeStyle.light.emissive,
+      emissiveIntensity: teamMemberThemeStyle.light.emissiveIntensity,
+      roughness: 0.48,
+      metalness: 0.1
+    });
+    applyTeamMaterialTheme(currentThemeName);
+  }
+
+  for (const existingMember of teamMembers) {
+    subjectGroup.remove(existingMember.group);
+  }
+  teamMembers.length = 0;
+  lastTeamUpdateTime = null;
+
+  for (const config of TEAM_MEMBER_CONFIG) {
+    const memberGroup = new THREE.Group();
+    const memberMesh = personModel.clone(true);
+    centerObjectPivotToGround(memberMesh);
+    memberMesh.rotation.x = -Math.PI / 2;
+    memberMesh.traverse((child) => {
+      if (!child.isMesh) return;
+      child.material = teamMemberMaterial;
+      child.castShadow = true;
+      child.receiveShadow = true;
+    });
+
+    const memberBounds = new THREE.Box3().setFromObject(memberMesh);
+    const centerY = memberBounds.isEmpty() ? 0 : (memberBounds.min.y + memberBounds.max.y) * 0.5;
+    memberMesh.position.y -= centerY;
+
+    const tiltGroup = new THREE.Group();
+    tiltGroup.rotation.x = config.tiltX ?? 0.2;
+    tiltGroup.rotation.y = config.baseRotationY;
+    tiltGroup.add(memberMesh);
+
+    const spinGroup = new THREE.Group();
+    spinGroup.position.y = centerY;
+    spinGroup.add(tiltGroup);
+
+    memberGroup.add(spinGroup);
+    memberGroup.scale.setScalar(config.scale);
+    memberGroup.position.copy(config.basePosition);
+    subjectGroup.add(memberGroup);
+
+    teamMembers.push({
+      id: config.id,
+      group: memberGroup,
+      spinGroup,
+      config,
+      rotationZ: config.phase * config.rotateSpeed
+    });
+  }
+}
+
+function updateTeamMembers(time) {
+  if (teamMembers.length === 0) return;
+  const deltaTime = lastTeamUpdateTime === null ? 0 : Math.max(0, time - lastTeamUpdateTime);
+  lastTeamUpdateTime = time;
+
+  for (const member of teamMembers) {
+    const { config, group, spinGroup } = member;
+    const phaseTime = time + config.phase;
+    group.position.x = config.basePosition.x;
+    group.position.z = config.basePosition.z + Math.cos(phaseTime * 0.55) * config.driftZ;
+    group.position.y = config.basePosition.y
+      + (Math.sin(phaseTime * config.floatSpeed) * config.floatAmplitude)
+      + (Math.sin(phaseTime * 0.7) * config.driftY);
+    member.rotationZ += config.rotateSpeed * deltaTime;
+    spinGroup.rotation.z = member.rotationZ;
+  }
+}
+
+function updateTeamCardAnchors() {
+  if (teamCards.length === 0 || teamMembers.length === 0) return;
+  const shouldShowCards = teamSceneState.overlayVisible && introCameraStarted;
+
+  for (const member of teamMembers) {
+    const card = teamCardMap.get(member.id);
+    if (!card) continue;
+
+    if (!shouldShowCards) {
+      card.style.opacity = '0';
+      card.style.visibility = 'hidden';
+      continue;
+    }
+
+    (member.spinGroup ?? member.group).getWorldPosition(teamProjection.world);
+    teamProjection.clip.copy(teamProjection.world).project(camera);
+
+    const withinViewport = teamProjection.clip.z > -1 && teamProjection.clip.z < 1
+      && Math.abs(teamProjection.clip.x) <= 1.1
+      && Math.abs(teamProjection.clip.y) <= 1.1;
+
+    if (!withinViewport) {
+      card.style.opacity = '0';
+      card.style.visibility = 'hidden';
+      continue;
+    }
+
+    const x = (teamProjection.clip.x * 0.5 + 0.5) * window.innerWidth;
+    const y = (-teamProjection.clip.y * 0.5 + 0.5) * window.innerHeight;
+
+    card.style.left = `${x}px`;
+    card.style.top = `${y}px`;
+    card.style.opacity = '1';
+    card.style.visibility = 'visible';
+  }
 }
 
 function buildCounterTextMesh(label, fontSize, material, options = {}) {
@@ -423,11 +630,11 @@ function addCounter() {
   counterBottomContextMesh = buildCounterTextMesh('SAVED', 0.32, textMaterial);
   counterParagraphContextMesh = buildCounterTextMesh(
     `Our pilot program with local school districts uncovered significant billing discrepancies and energy inefficiencies. Using our advanced anomaly detection algorithms, we identified hundreds of thousands in overbilling that schools were able to recover.`,
-    0.16,
+    0.14,
     paragraphTextMaterial,
     {
       maxWidth: 5.0,
-      lineHeight: 1.35,
+      lineHeight: 1.0,
       anchorY: 'top',
       textAlign: 'center'
     }
@@ -588,6 +795,7 @@ function applyTheme(nextThemeName, options = {}) {
   applyMaterialTheme(normalizedThemeName);
   applyCounterMaterialTheme(normalizedThemeName);
   applyCounterParagraphMaterialTheme(normalizedThemeName);
+  applyTeamMaterialTheme(normalizedThemeName);
   for (const outlineMaterial of schoolOutlineMaterials) {
     outlineMaterial.color.set(schoolOutlineStyle.color[normalizedThemeName]);
   }
@@ -680,6 +888,12 @@ loader.load('/wiring.obj', (loadedModel) => {
 }, undefined, (error) => {
   console.error('Failed to load wiring:', error);
   markLoadComplete('wiringLoaded');
+});
+
+loader.load('/person.obj', (loadedModel) => {
+  createTeamMembersFromModel(loadedModel);
+}, undefined, (error) => {
+  console.error('Failed to load team model:', error);
 });
 
 const pointerCurrent = { x: 0, y: 0 };
@@ -975,6 +1189,8 @@ lenis.stop();
 lenis.scrollTo(0, { immediate: true, force: true });
 bindIntroTextRevealUnlock();
 maybeUnlockScroll();
+if (teamOverlay) gsap.set(teamOverlay, { autoAlpha: 0 });
+resetTeamCards();
 
 const panels = gsap.utils.toArray('.panel');
 const postSecondPanelDuration = Math.max(panels.length - 2, 0);
@@ -1285,6 +1501,17 @@ if (statsPanel && statsCards.length === 3) {
   });
 }
 
+if (teamPanel) {
+  ScrollTrigger.create({
+    trigger: teamPanel,
+    start: 'top 80%',
+    end: 'bottom 24%',
+    onToggle: (self) => {
+      teamSceneState.panelActive = self.isActive;
+    }
+  });
+}
+
 const scrollHeight = -32.0;
 cameraScrollTimeline.to(scrollState, {
   cameraOffsetX: -44.0, cameraOffsetY: -1.5, cameraOffsetZ: scrollHeight,
@@ -1332,9 +1559,12 @@ gsap.ticker.add((time) => {
   const lookAtParallaxX = parallaxX * parallaxSettings.lookAtX;
   const lookAtParallaxY = parallaxY * parallaxSettings.lookAtY;
 
+  updateTeamMembers(time);
+  setTeamOverlayVisibility(teamSceneState.panelActive && teamMembers.length === TEAM_MEMBER_CONFIG.length && introCameraStarted);
+
   subjectGroup.position.x = -parallaxX * parallaxSettings.groupX;
   subjectGroup.position.y = -parallaxY * parallaxSettings.groupY;
-  setCounterTextVisibility(scrollState.cameraOffsetX <= -32.5);
+  setCounterTextVisibility(scrollState.cameraOffsetX <= -32.5 && !teamSceneState.panelActive);
 
   if (schoolModel) {
     schoolModel.visible = introCameraStarted;
@@ -1363,6 +1593,8 @@ gsap.ticker.add((time) => {
       introState.endLookAt.z
     );
   }
+
+  updateTeamCardAnchors();
 
   if (schoolNoiseOverlays.length > 0) renderWireMask();
   
