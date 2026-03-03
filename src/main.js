@@ -34,6 +34,8 @@ const sceneCardsOverlay = document.querySelector('.scene-cards-overlay');
 const sceneCards = sceneCardsOverlay ? Array.from(sceneCardsOverlay.querySelectorAll('.scene-card')) : [];
 const scrollPhraseOverlay = document.querySelector('.scroll-phrase');
 const scrollPhraseWords = scrollPhraseOverlay ? Array.from(scrollPhraseOverlay.querySelectorAll('.scroll-phrase__word')) : [];
+const counterContextOverlay = document.querySelector('.counter-context');
+const counterContextLines = counterContextOverlay ? Array.from(counterContextOverlay.querySelectorAll('.counter-context__line')) : [];
 const STORAGE_THEME_KEY = 'edviro-theme';
 const DEFAULT_THEME_NAME = 'light';
 const STREET_LAMP_POSITIONS = [
@@ -292,7 +294,7 @@ const counterTextGeometryConfig = {
 };
 const counterThemeStyle = {
   light: { color: 0x0f9f44, emissive: 0x000000, emissiveIntensity: 0.0 },
-  dark: { color: 0x3ddf7d, emissive: 0x32d74d, emissiveIntensity: 0.28 }
+  dark: { color: 0x5bd584, emissive: 0x5bd584, emissiveIntensity: 0.5 }
 };
 
 function formatCounterValue(value) {
@@ -525,7 +527,7 @@ function applyTheme(nextThemeName, options = {}) {
   hemiLight.intensity = theme.hemiIntensity;
   dirLight.color.set(theme.dirColor);
   dirLight.intensity = theme.dirIntensity;
-  dirLight.position.z = normalizedThemeName === 'dark' ? 3 : 6;
+  dirLight.position.z = normalizedThemeName === 'dark' ? 12 : 6;
   renderer.toneMappingExposure = theme.exposure;
   wireBloomPass.strength = theme.wireBloomStrength;
 
@@ -1004,6 +1006,29 @@ if (scrollPhraseWords.length > 0) {
     }, phraseOverlayExitStart);
 }
 
+if (counterContextOverlay && counterContextLines.length > 0) {
+
+  gsap.set(counterContextOverlay, { autoAlpha: 0 });
+  gsap.set(counterContextLines, {
+    autoAlpha: 0,
+    y: (index) => (index === 0 ? -12 : 12),
+    force3D: true
+  });
+
+  cameraScrollTimeline
+    .to(counterContextOverlay, {
+      autoAlpha: 1,
+      duration: prefersReducedMotion ? 0.015 : 0.035
+    }, 1.0)
+    .to(counterContextLines, {
+      autoAlpha: 1,
+      y: 0,
+      duration: prefersReducedMotion ? 0.03 : 0.07,
+      ease: 'power2.out',
+      stagger: prefersReducedMotion ? 0.005 : 0.015
+    }, 1.0);
+}
+
 if (sceneCards.length === 3) {
   const cardOverlayStart = 0.25;
   const cardOneStart = 0.52;
@@ -1181,16 +1206,15 @@ if (sceneCards.length === 3) {
       ]
     }, cardThreeStart)
     .to(sceneCardsOverlay, { autoAlpha: 0, duration: 0.06 }, 0.94);
-}
+  }
 
-if (postSecondPanelDuration > 0) {
-  cameraScrollTimeline.to(scrollState, {
-    cameraOffsetX: -44.0, cameraOffsetY: -1.5, cameraOffsetZ: -33.0,
-    lookAtOffsetX: -36.0, lookAtOffsetY: 0.0, lookAtOffsetZ: -7.0,
-    gridDownLock: 1,
-    duration: postSecondPanelDuration
-  });
-}
+const scrollHeight = -33.0;
+cameraScrollTimeline.to(scrollState, {
+  cameraOffsetX: -44.0, cameraOffsetY: -1.5, cameraOffsetZ: scrollHeight,
+  lookAtOffsetX: -36.0, lookAtOffsetY: 0.0, lookAtOffsetZ: scrollHeight + 26.0,
+  gridDownLock: 1,
+  duration: postSecondPanelDuration
+});
 
 window.addEventListener('resize', () => {
   const pixelRatio = Math.min(window.devicePixelRatio, 2);
@@ -1233,7 +1257,7 @@ gsap.ticker.add((time) => {
 
   subjectGroup.position.x = -parallaxX * parallaxSettings.groupX;
   subjectGroup.position.y = -parallaxY * parallaxSettings.groupY;
-  if (counterMesh) counterMesh.visible = scrollState.cameraOffsetX <= -32.8;
+  if (counterMesh) counterMesh.visible = scrollState.cameraOffsetX <= -32.5;
 
   if (schoolModel) {
     schoolModel.visible = introCameraStarted;
