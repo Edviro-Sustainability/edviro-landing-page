@@ -34,8 +34,6 @@ const sceneCardsOverlay = document.querySelector('.scene-cards-overlay');
 const sceneCards = sceneCardsOverlay ? Array.from(sceneCardsOverlay.querySelectorAll('.scene-card')) : [];
 const scrollPhraseOverlay = document.querySelector('.scroll-phrase');
 const scrollPhraseWords = scrollPhraseOverlay ? Array.from(scrollPhraseOverlay.querySelectorAll('.scroll-phrase__word')) : [];
-const counterContextOverlay = document.querySelector('.counter-context');
-const counterContextLines = counterContextOverlay ? Array.from(counterContextOverlay.querySelectorAll('.counter-context__line')) : [];
 const STORAGE_THEME_KEY = 'edviro-theme';
 const DEFAULT_THEME_NAME = 'light';
 const STREET_LAMP_POSITIONS = [
@@ -272,6 +270,8 @@ const fontLoader = new FontLoader();
 const keyframeTwoEndLookAtOffset = new THREE.Vector3(-36.0, -18.0, -16.0);
 let counterMaterial = null;
 let counterMesh = null;
+let counterTopContextMesh = null;
+let counterBottomContextMesh = null;
 let counterFont = null;
 let counterDemoIntervalId = null;
 const counterValueState = {
@@ -281,7 +281,6 @@ const counterValueState = {
   lastRenderedValue: null
 };
 const counterTextGeometryConfig = {
-  size: 1.0,
   depth: 0.001,
   curveSegments: 8,
   bevelEnabled: true,
@@ -312,10 +311,27 @@ function applyCounterMaterialTheme(themeName) {
 function buildCounterGeometry(label) {
   const textGeometry = new TextGeometry(label, {
     font: counterFont,
+    size: 1.0,
     ...counterTextGeometryConfig
   });
   textGeometry.center();
   return textGeometry;
+}
+
+function buildCounterContextGeometry(label) {
+  const textGeometry = new TextGeometry(label, {
+    font: counterFont,
+    size: 0.4,
+    ...counterTextGeometryConfig
+  });
+  textGeometry.center();
+  return textGeometry;
+}
+
+function setCounterTextVisibility(isVisible) {
+  if (counterMesh) counterMesh.visible = isVisible;
+  if (counterTopContextMesh) counterTopContextMesh.visible = isVisible;
+  if (counterBottomContextMesh) counterBottomContextMesh.visible = isVisible;
 }
 
 function renderCounterValue() {
@@ -380,7 +396,9 @@ window.sceneCounter = {
 function addCounter() {
   fontLoader.load('/avenir.json', (font) => {
     counterFont = font;
-    const textGeometry = buildCounterGeometry(formatCounterValue(counterValueState.displayValue));
+    const counterTextGeometry = buildCounterGeometry(formatCounterValue(counterValueState.displayValue));
+    const topContextGeometry = buildCounterContextGeometry("OVER");
+    const bottomContextGeometry = buildCounterContextGeometry("SAVED");
 
     const textMaterial = new THREE.MeshStandardMaterial({
       color: counterThemeStyle.light.color,
@@ -391,16 +409,31 @@ function addCounter() {
     });
     counterMaterial = textMaterial;
     applyCounterMaterialTheme(currentThemeName);
-    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-    counterMesh = textMesh;
+    counterMesh = new THREE.Mesh(counterTextGeometry, textMaterial);
+    counterTopContextMesh = new THREE.Mesh(topContextGeometry, textMaterial);
+    counterBottomContextMesh = new THREE.Mesh(bottomContextGeometry, textMaterial);
 
     const textPosition = introState.endLookAt.clone().add(keyframeTwoEndLookAtOffset);
-    textMesh.position.copy(textPosition);
-    textMesh.position.y = (floor?.position.y ?? -4) + 0.08;
-    textMesh.rotation.x = -Math.PI / 2;
-    textMesh.visible = false;
 
-    subjectGroup.add(textMesh);
+    counterMesh.position.copy(textPosition);
+    counterMesh.position.y = -4;
+    counterMesh.rotation.x = -Math.PI / 2;
+
+    counterTopContextMesh.position.copy(textPosition);
+    counterTopContextMesh.position.y = -4;
+    counterTopContextMesh.position.z += -1.4;
+    counterTopContextMesh.rotation.x = -Math.PI / 2;
+
+    counterBottomContextMesh.position.copy(textPosition);
+    counterBottomContextMesh.position.y = -4;
+    counterBottomContextMesh.position.z += 1.4;
+    counterBottomContextMesh.rotation.x = -Math.PI / 2;
+
+    setCounterTextVisibility(false);
+
+    subjectGroup.add(counterMesh);
+    subjectGroup.add(counterTopContextMesh);
+    subjectGroup.add(counterBottomContextMesh);
     renderCounterValue();
     startCounterDemo();
   }, undefined, (error) => {
@@ -1006,29 +1039,6 @@ if (scrollPhraseWords.length > 0) {
     }, phraseOverlayExitStart);
 }
 
-if (counterContextOverlay && counterContextLines.length > 0) {
-
-  gsap.set(counterContextOverlay, { autoAlpha: 0 });
-  gsap.set(counterContextLines, {
-    autoAlpha: 0,
-    y: (index) => (index === 0 ? -12 : 12),
-    force3D: true
-  });
-
-  cameraScrollTimeline
-    .to(counterContextOverlay, {
-      autoAlpha: 1,
-      duration: prefersReducedMotion ? 0.015 : 0.035
-    }, 1.0)
-    .to(counterContextLines, {
-      autoAlpha: 1,
-      y: 0,
-      duration: prefersReducedMotion ? 0.03 : 0.07,
-      ease: 'power2.out',
-      stagger: prefersReducedMotion ? 0.005 : 0.015
-    }, 1.0);
-}
-
 if (sceneCards.length === 3) {
   const cardOverlayStart = 0.25;
   const cardOneStart = 0.52;
@@ -1257,7 +1267,7 @@ gsap.ticker.add((time) => {
 
   subjectGroup.position.x = -parallaxX * parallaxSettings.groupX;
   subjectGroup.position.y = -parallaxY * parallaxSettings.groupY;
-  if (counterMesh) counterMesh.visible = scrollState.cameraOffsetX <= -32.5;
+  setCounterTextVisibility(scrollState.cameraOffsetX <= -32.5);
 
   if (schoolModel) {
     schoolModel.visible = introCameraStarted;
