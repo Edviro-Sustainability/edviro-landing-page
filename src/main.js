@@ -3,6 +3,8 @@ import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2.js';
 import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry.js';
@@ -266,6 +268,42 @@ const introState = {
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const introDuration = prefersReducedMotion ? 1.35 : 2.55;
 const loader = new OBJLoader();
+const fontLoader = new FontLoader();
+const keyframeTwoEndLookAtOffset = new THREE.Vector3(-36.0, -18.0, -16.0);
+
+function addKeyframeTwoTextGeometry() {
+  fontLoader.load('./public/avenir.json', (font) => {
+    const textGeometry = new TextGeometry('5678', {
+      font,
+      size: 2.2,
+      depth: 0.3,
+      curveSegments: 6,
+      bevelEnabled: false
+    });
+    textGeometry.center();
+
+    const textMaterial = new THREE.MeshStandardMaterial({
+      color: 0x16a34a,
+      roughness: 0.4,
+      metalness: 0.08,
+      side: THREE.DoubleSide
+    });
+    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+
+    const textPosition = introState.endLookAt.clone().add(keyframeTwoEndLookAtOffset);
+    textMesh.position.copy(textPosition);
+    textMesh.position.y = (floor?.position.y ?? -4) + 0.08;
+    textMesh.rotation.x = -Math.PI / 2;
+    textMesh.castShadow = true;
+    textMesh.receiveShadow = true;
+
+    subjectGroup.add(textMesh);
+  }, undefined, (error) => {
+    console.error('Failed to load text font:', error);
+  });
+}
+
+addKeyframeTwoTextGeometry();
 
 const schoolMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });
 const windowMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });

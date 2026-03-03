@@ -95,7 +95,7 @@ body.is-site-loading #webgl {
   width: clamp(14.6rem, 25.5vw, 20.4rem);
   min-height: clamp(11.2rem, 27vh, 17rem);
   padding: clamp(1.5rem, 2.8vw, 2.25rem) clamp(1.65rem, 2.8vw, 2.35rem) clamp(0.95rem, 1.6vw, 1.2rem) clamp(0.95rem, 1.8vw, 1.35rem);
-  border-radius: 1.05rem;
+  border-radius: 0.6rem;
   border: 1px solid rgba(128, 255, 183, 0.34);
   background: linear-gradient(160deg, rgba(16, 130, 58, 0.93), rgba(6, 84, 39, 0.83));
   color: #ffffff;;
