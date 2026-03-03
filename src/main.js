@@ -3,8 +3,6 @@ import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
-import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2.js';
 import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry.js';
@@ -16,6 +14,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
+import { Text } from 'troika-three-text';
 import './style.css';
 import wiringVertexShader from './wiringvertex.glsl?raw';
 import wiringFragmentShader from './wiringfragment.glsl?raw';
@@ -275,13 +274,12 @@ const introState = {
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const introDuration = prefersReducedMotion ? 1.35 : 2.55;
 const loader = new OBJLoader();
-const fontLoader = new FontLoader();
 const keyframeTwoEndLookAtOffset = new THREE.Vector3(-36.0, -18.0, -16.0);
+const counterFontUrl = '/Avenir Black.ttf';
 let counterMaterial = null;
 let counterMesh = null;
 let counterTopContextMesh = null;
 let counterBottomContextMesh = null;
-let counterFont = null;
 let counterDemoIntervalId = null;
 const counterValueState = {
   value: 400000,
@@ -289,21 +287,11 @@ const counterValueState = {
   displayValue: 400000,
   lastRenderedValue: null
 };
-const counterTextGeometryConfig = {
-  depth: 0.001,
-  curveSegments: 8,
-  bevelEnabled: true,
-  bevelThickness: 0.05,
-  bevelSize: 0.03,
-  bevelOffset: 0,
-  bevelSegments: 3,
-  receiveShadow: true,
-  castShadow: true
-};
 const counterThemeStyle = {
   light: { color: GREEN_PALETTE.base, emissive: 0x000000, emissiveIntensity: 0.0 },
   dark: { color: 0x000000, emissive: GREEN_PALETTE.base, emissiveIntensity: 1.0 }
 };
+let currentThemeName = getInitialThemeName();
 
 function formatCounterValue(value) {
   return `$${Math.round(value).toLocaleString('en-US')}`;
@@ -317,24 +305,17 @@ function applyCounterMaterialTheme(themeName) {
   counterMaterial.emissiveIntensity = style.emissiveIntensity;
 }
 
-function buildCounterGeometry(label) {
-  const textGeometry = new TextGeometry(label, {
-    font: counterFont,
-    size: 1.0,
-    ...counterTextGeometryConfig
-  });
-  textGeometry.center();
-  return textGeometry;
-}
-
-function buildCounterContextGeometry(label) {
-  const textGeometry = new TextGeometry(label, {
-    font: counterFont,
-    size: 0.32,
-    ...counterTextGeometryConfig
-  });
-  textGeometry.center();
-  return textGeometry;
+function buildCounterTextMesh(label, fontSize, material) {
+  const textMesh = new Text();
+  textMesh.font = counterFontUrl;
+  textMesh.fontSize = fontSize;
+  textMesh.text = label;
+  textMesh.anchorX = 'center';
+  textMesh.anchorY = 'middle';
+  textMesh.textAlign = 'center';
+  textMesh.material = material;
+  textMesh.sync();
+  return textMesh;
 }
 
 function setCounterTextVisibility(isVisible) {
@@ -344,14 +325,12 @@ function setCounterTextVisibility(isVisible) {
 }
 
 function renderCounterValue() {
-  if (!counterMesh || !counterFont) return;
+  if (!counterMesh) return;
   const roundedValue = Math.round(counterValueState.displayValue);
   if (roundedValue === counterValueState.lastRenderedValue) return;
   counterValueState.lastRenderedValue = roundedValue;
-
-  const nextGeometry = buildCounterGeometry(formatCounterValue(roundedValue));
-  if (counterMesh.geometry) counterMesh.geometry.dispose();
-  counterMesh.geometry = nextGeometry;
+  counterMesh.text = formatCounterValue(roundedValue);
+  counterMesh.sync();
 }
 
 function setCounterValue(nextValue, options = {}) {
@@ -403,51 +382,43 @@ window.sceneCounter = {
 };
 
 function addCounter() {
-  fontLoader.load('/avenir.json', (font) => {
-    counterFont = font;
-    const counterTextGeometry = buildCounterGeometry(formatCounterValue(counterValueState.displayValue));
-    const topContextGeometry = buildCounterContextGeometry("OVER");
-    const bottomContextGeometry = buildCounterContextGeometry("SAVED");
-
-    const textMaterial = new THREE.MeshStandardMaterial({
-      color: counterThemeStyle.light.color,
-      emissive: counterThemeStyle.light.emissive,
-      emissiveIntensity: counterThemeStyle.light.emissiveIntensity,
-      roughness: 0.85,
-      side: THREE.DoubleSide
-    });
-    counterMaterial = textMaterial;
-    applyCounterMaterialTheme(currentThemeName);
-    counterMesh = new THREE.Mesh(counterTextGeometry, textMaterial);
-    counterTopContextMesh = new THREE.Mesh(topContextGeometry, textMaterial);
-    counterBottomContextMesh = new THREE.Mesh(bottomContextGeometry, textMaterial);
-
-    const textPosition = introState.endLookAt.clone().add(keyframeTwoEndLookAtOffset);
-
-    counterMesh.position.copy(textPosition);
-    counterMesh.position.y = -4;
-    counterMesh.rotation.x = -Math.PI / 2;
-
-    counterTopContextMesh.position.copy(textPosition);
-    counterTopContextMesh.position.y = -4;
-    counterTopContextMesh.position.z += -1;
-    counterTopContextMesh.rotation.x = -Math.PI / 2;
-
-    counterBottomContextMesh.position.copy(textPosition);
-    counterBottomContextMesh.position.y = -4;
-    counterBottomContextMesh.position.z += 1;
-    counterBottomContextMesh.rotation.x = -Math.PI / 2;
-
-    setCounterTextVisibility(false);
-
-    subjectGroup.add(counterMesh);
-    subjectGroup.add(counterTopContextMesh);
-    subjectGroup.add(counterBottomContextMesh);
-    renderCounterValue();
-    startCounterDemo();
-  }, undefined, (error) => {
-    console.error('Failed to load text font:', error);
+  const textMaterial = new THREE.MeshStandardMaterial({
+    color: counterThemeStyle.light.color,
+    emissive: counterThemeStyle.light.emissive,
+    emissiveIntensity: counterThemeStyle.light.emissiveIntensity,
+    roughness: 0.85,
+    side: THREE.DoubleSide
   });
+  counterMaterial = textMaterial;
+  applyCounterMaterialTheme(currentThemeName);
+
+  counterMesh = buildCounterTextMesh(formatCounterValue(counterValueState.displayValue), 1.0, textMaterial);
+  counterTopContextMesh = buildCounterTextMesh('OVER', 0.32, textMaterial);
+  counterBottomContextMesh = buildCounterTextMesh('SAVED', 0.32, textMaterial);
+
+  const textPosition = introState.endLookAt.clone().add(keyframeTwoEndLookAtOffset);
+
+  counterMesh.position.copy(textPosition);
+  counterMesh.position.y = -3.9;
+  counterMesh.rotation.x = -Math.PI / 2;
+
+  counterTopContextMesh.position.copy(textPosition);
+  counterTopContextMesh.position.y = -3.9;
+  counterTopContextMesh.position.z += -1;
+  counterTopContextMesh.rotation.x = -Math.PI / 2;
+
+  counterBottomContextMesh.position.copy(textPosition);
+  counterBottomContextMesh.position.y = -3.9;
+  counterBottomContextMesh.position.z += 1;
+  counterBottomContextMesh.rotation.x = -Math.PI / 2;
+
+  setCounterTextVisibility(false);
+
+  subjectGroup.add(counterMesh);
+  subjectGroup.add(counterTopContextMesh);
+  subjectGroup.add(counterBottomContextMesh);
+  renderCounterValue();
+  startCounterDemo();
 }
 
 addCounter();
@@ -548,8 +519,6 @@ function updateThemeToggleButton(themeName) {
   themeToggleButton.setAttribute('aria-label', `Switch to ${nextThemeName} mode`);
   themeToggleButton.setAttribute('aria-pressed', themeName === 'dark' ? 'true' : 'false');
 }
-
-let currentThemeName = getInitialThemeName();
 
 function applyTheme(nextThemeName, options = {}) {
   const normalizedThemeName = nextThemeName === 'dark' ? 'dark' : 'light';
@@ -1271,7 +1240,7 @@ if (statsPanel && statsCards.length === 3) {
   });
 }
 
-const scrollHeight = -33.0;
+const scrollHeight = -35.0;
 cameraScrollTimeline.to(scrollState, {
   cameraOffsetX: -44.0, cameraOffsetY: -1.5, cameraOffsetZ: scrollHeight,
   lookAtOffsetX: -36.0, lookAtOffsetY: 0.0, lookAtOffsetZ: scrollHeight + 26.0,
