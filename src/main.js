@@ -199,7 +199,7 @@ floor.rotation.x = -Math.PI / 2;
 floor.position.set(0, -4, 0);
 floor.receiveShadow = true;
 scene.add(floor);
-const grid = new THREE.GridHelper(160, 60, 0x444444, 0x222222);
+const grid = new THREE.GridHelper(160, 60, 0x666666, 0x333333);
 grid.position.set(0, -3.99, 0);
 scene.add(grid);
 
@@ -272,31 +272,128 @@ const fontLoader = new FontLoader();
 const keyframeTwoEndLookAtOffset = new THREE.Vector3(-36.0, -18.0, -16.0);
 const counterState = { opacity: 0 };
 let counterMaterial = null;
+let counterMesh = null;
+let counterFont = null;
+let counterDemoIntervalId = null;
+const counterValueState = {
+  value: 400000,
+  targetValue: 400000,
+  displayValue: 400000,
+  lastRenderedValue: null
+};
+const counterTextGeometryConfig = {
+  size: 1.0,
+  depth: 0.001,
+  curveSegments: 8,
+  bevelEnabled: true,
+  bevelThickness: 0.05,
+  bevelSize: 0.03,
+  bevelOffset: 0,
+  bevelSegments: 3,
+  receiveShadow: true
+};
+const counterThemeStyle = {
+  light: { color: 0x16a34a, emissive: 0x000000, emissiveIntensity: 0.0 },
+  dark: { color: 0x1bd35f, emissive: 0x1bd35f, emissiveIntensity: 0.3 }
+};
+
+function formatCounterValue(value) {
+  return `$${Math.round(value).toLocaleString('en-US')}`;
+}
+
+function applyCounterMaterialTheme(themeName) {
+  if (!counterMaterial) return;
+  const style = counterThemeStyle[themeName] ?? counterThemeStyle.light;
+  counterMaterial.color.set(style.color);
+  counterMaterial.emissive.set(style.emissive);
+  counterMaterial.emissiveIntensity = style.emissiveIntensity;
+}
+
+function buildCounterGeometry(label) {
+  const textGeometry = new TextGeometry(label, {
+    font: counterFont,
+    ...counterTextGeometryConfig
+  });
+  textGeometry.center();
+  return textGeometry;
+}
+
+function renderCounterValue() {
+  if (!counterMesh || !counterFont) return;
+  const roundedValue = Math.round(counterValueState.displayValue);
+  if (roundedValue === counterValueState.lastRenderedValue) return;
+  counterValueState.lastRenderedValue = roundedValue;
+
+  const nextGeometry = buildCounterGeometry(formatCounterValue(roundedValue));
+  if (counterMesh.geometry) counterMesh.geometry.dispose();
+  counterMesh.geometry = nextGeometry;
+}
+
+function setCounterValue(nextValue, options = {}) {
+  const safeValue = Number.isFinite(nextValue) ? Math.max(0, nextValue) : counterValueState.targetValue;
+  const duration = Number.isFinite(options.duration) ? options.duration : 0.82;
+  const ease = options.ease ?? 'power2.out';
+
+  counterValueState.value = safeValue;
+  counterValueState.targetValue = safeValue;
+  gsap.killTweensOf(counterValueState, 'displayValue');
+  gsap.to(counterValueState, {
+    displayValue: safeValue,
+    duration,
+    ease,
+    onUpdate: renderCounterValue
+  });
+}
+
+function incrementCounterValue(delta, options = {}) {
+  setCounterValue(counterValueState.targetValue + delta, options);
+}
+
+function applyCounterApiPayload(payload, options = {}) {
+  const apiValue = Number(payload?.total ?? payload?.count ?? payload?.value);
+  if (!Number.isFinite(apiValue)) return;
+  setCounterValue(apiValue, options);
+}
+
+function startCounterDemo() {
+  if (counterDemoIntervalId) return;
+  counterDemoIntervalId = window.setInterval(() => {
+    const randomIncrement = Math.floor(100 + Math.random() * 100);
+    incrementCounterValue(randomIncrement, { duration: 0.74, ease: 'power2.out' });
+  }, 1000);
+}
+
+function stopCounterDemo() {
+  if (!counterDemoIntervalId) return;
+  window.clearInterval(counterDemoIntervalId);
+  counterDemoIntervalId = null;
+}
+
+window.sceneCounter = {
+  setValue: setCounterValue,
+  increment: incrementCounterValue,
+  applyApiPayload: applyCounterApiPayload,
+  startDemo: startCounterDemo,
+  stopDemo: stopCounterDemo
+};
 
 function addCounter() {
   fontLoader.load('/avenir.json', (font) => {
-    const textGeometry = new TextGeometry('$400,000', {
-      font,
-      size: 1.0,
-      depth: 0.01,
-      curveSegments: 8,
-      bevelEnabled: true,
-      bevelThickness: 0.05,
-      bevelSize: 0.03,
-      bevelOffset: 0,
-      bevelSegments: 3
-    });
-    textGeometry.center();
+    counterFont = font;
+    const textGeometry = buildCounterGeometry(formatCounterValue(counterValueState.displayValue));
 
     const textMaterial = new THREE.MeshStandardMaterial({
-      color: 0x16a34a,
-      roughness: 1.0,
+      color: counterThemeStyle.light.color,
+      emissive: counterThemeStyle.light.emissive,
+      emissiveIntensity: counterThemeStyle.light.emissiveIntensity,
       side: THREE.DoubleSide,
       transparent: true,
       opacity: counterState.opacity
     });
     counterMaterial = textMaterial;
+    applyCounterMaterialTheme(currentThemeName);
     const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+    counterMesh = textMesh;
 
     const textPosition = introState.endLookAt.clone().add(keyframeTwoEndLookAtOffset);
     textMesh.position.copy(textPosition);
@@ -304,6 +401,8 @@ function addCounter() {
     textMesh.rotation.x = -Math.PI / 2;
 
     subjectGroup.add(textMesh);
+    renderCounterValue();
+    startCounterDemo();
   }, undefined, (error) => {
     console.error('Failed to load text font:', error);
   });
@@ -501,6 +600,7 @@ function applyTheme(nextThemeName, options = {}) {
   wireBloomPass.strength = theme.wireBloomStrength;
 
   applyMaterialTheme(normalizedThemeName);
+  applyCounterMaterialTheme(normalizedThemeName);
   for (const outlineMaterial of schoolOutlineMaterials) {
     outlineMaterial.color.set(schoolOutlineStyle.color[normalizedThemeName]);
   }
