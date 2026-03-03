@@ -36,13 +36,13 @@ const scrollPhraseOverlay = document.querySelector('.scroll-phrase');
 const scrollPhraseWords = scrollPhraseOverlay ? Array.from(scrollPhraseOverlay.querySelectorAll('.scroll-phrase__word')) : [];
 const STORAGE_THEME_KEY = 'edviro-theme';
 const DEFAULT_THEME_NAME = 'light';
-const STREET_LAMP_FALLBACK_POSITIONS = [
-  new THREE.Vector3(-67.31, 15.5, 71.74),
-  new THREE.Vector3(-44.8, 15.5, 71.74),
-  new THREE.Vector3(-20.78, 15.5, 71.74),
-  new THREE.Vector3(19.85, 15.5, 71.74),
-  new THREE.Vector3(43.87, 15.5, 71.74),
-  new THREE.Vector3(66.38, 15.5, 71.74)
+const STREET_LAMP_POSITIONS = [
+  new THREE.Vector3(-67.31, 15.5, 72),
+  new THREE.Vector3(-44.8, 15.5, 72),
+  new THREE.Vector3(-20.78, 15.5, 72),
+  new THREE.Vector3(19.85, 15.5, 72),
+  new THREE.Vector3(43.87, 15.5, 72),
+  new THREE.Vector3(66.38, 15.5, 72)
 ];
 
 document.body.classList.add('is-site-loading');
@@ -106,14 +106,12 @@ if (!loadingState.windowLoaded) {
 const themeConfig = {
   light: {
     sceneColor: 0xffffff, fogColor: 0xf2fff9, fogDensity: 0.012, floorColor: 0xf9f0f9,
-    hemiColor: 0xffffff, hemiGroundColor: 0xcfd8dc, hemiIntensity: 2.0, dirColor: 0xffffff,
-    dirIntensity: 1.9, exposure: 1.0, wireBloomStrength: 0.2,
-    streetLampIntensity: 0.0, streetLampColor: 0xffd7ad, streetLampDistance: 16
+    hemiColor: 0xffffff, hemiGroundColor: 0xcfd8dc, hemiIntensity: 2.0, dirColor: 0xffffff, dirIntensity: 1.9, exposure: 1.0, wireBloomStrength: 0.2,
+    streetLampIntensity: 0.0, streetLampColor: 0x000000, streetLampDistance: 0
   },
   dark: {
-    sceneColor: 0x050608, fogColor: 0x050608, fogDensity: 0.018, floorColor: 0x3b413d,
-    hemiColor: 0x7b899c, hemiGroundColor: 0x020304, hemiIntensity: 0.4, dirColor: 0xffffff,
-    dirIntensity: 0.7, exposure: 1.0, wireBloomStrength: 0.24,
+    sceneColor: 0x050608, fogColor: 0x050608, fogDensity: 0.016, floorColor: 0x3b413d,
+    hemiColor: 0x7b899c, hemiGroundColor: 0x020304, hemiIntensity: 0.4, dirColor: 0xffffff, dirIntensity: 0.4, exposure: 1.0, wireBloomStrength: 0.24,
     streetLampIntensity: 0.8, streetLampColor: 0xffd8aa, streetLampDistance: 16
   }
 };
@@ -176,7 +174,7 @@ maskComposer.addPass(wireBloomPass);
 
 const hemiLight = new THREE.HemisphereLight(themeConfig.light.hemiColor, themeConfig.light.hemiGroundColor, themeConfig.light.hemiIntensity);
 const dirLight = new THREE.DirectionalLight(themeConfig.light.dirColor, themeConfig.light.dirIntensity);
-dirLight.position.set(6, 10, -3);
+dirLight.position.set(-6, 10, 12);
 dirLight.shadow.mapSize.set(2048, 2048);
 dirLight.castShadow = true;
 dirLight.shadow.radius = 20;
@@ -289,11 +287,12 @@ const counterTextGeometryConfig = {
   bevelSize: 0.03,
   bevelOffset: 0,
   bevelSegments: 3,
-  receiveShadow: true
+  receiveShadow: true,
+  castShadow: true
 };
 const counterThemeStyle = {
-  light: { color: 0x16a34a, emissive: 0x000000, emissiveIntensity: 0.0 },
-  dark: { color: 0x1bd35f, emissive: 0x1bd35f, emissiveIntensity: 0.3 }
+  light: { color: 0x0f9f44, emissive: 0x000000, emissiveIntensity: 0.0 },
+  dark: { color: 0x3ddf7d, emissive: 0x32d74d, emissiveIntensity: 0.28 }
 };
 
 function formatCounterValue(value) {
@@ -385,6 +384,7 @@ function addCounter() {
       color: counterThemeStyle.light.color,
       emissive: counterThemeStyle.light.emissive,
       emissiveIntensity: counterThemeStyle.light.emissiveIntensity,
+      roughness: 0.85,
       side: THREE.DoubleSide
     });
     counterMaterial = textMaterial;
@@ -416,7 +416,7 @@ const woodMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });
 const rimMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });
 const materialThemeColors = {
   school: { light: 0xffffff, dark: 0xcbcfcb }, windows: { light: 0x71c1cf, dark: 0xfffcc9 },
-  tree: { light: 0x44af60, dark: 0x52c878 }, pole: { light: 0xc7c7c7, dark: 0xbbc4cd },
+  tree: { light: 0x0f9f44, dark: 0x52c878 }, pole: { light: 0xc7c7c7, dark: 0xbbc4cd },
   wood: { light: 0xa38764, dark: 0x987a5d }, rim: { light: 0x898f89, dark: 0x8c8e8c }
 };
 const windowEmission = {
@@ -431,85 +431,17 @@ function getInitialThemeName() {
   return DEFAULT_THEME_NAME;
 }
 
-function toVertexKey(x, y, z) {
-  return `${Math.round(x * 1000)}|${Math.round(y * 1000)}|${Math.round(z * 1000)}`;
-}
-
-function extractDisconnectedComponentCenters(geometry) {
-  const positionAttribute = geometry?.getAttribute('position');
-  if (!positionAttribute || positionAttribute.count < 3) return [];
-
-  const indexAttribute = geometry.index;
-  const rawVertexCount = indexAttribute ? indexAttribute.count : positionAttribute.count;
-  const triangleCount = Math.floor(rawVertexCount / 3);
-  if (triangleCount <= 0) return [];
-
-  const faceVertexKeys = new Array(triangleCount);
-  const vertexToFaces = new Map();
-  const keyToPosition = new Map();
-
-  for (let faceIndex = 0; faceIndex < triangleCount; faceIndex++) {
-    const keys = [];
-    for (let corner = 0; corner < 3; corner++) {
-      const baseIndex = faceIndex * 3 + corner;
-      const vertexIndex = indexAttribute ? indexAttribute.getX(baseIndex) : baseIndex;
-      const x = positionAttribute.getX(vertexIndex); const y = positionAttribute.getY(vertexIndex); const z = positionAttribute.getZ(vertexIndex);
-      const key = toVertexKey(x, y, z);
-
-      if (!keyToPosition.has(key)) keyToPosition.set(key, new THREE.Vector3(x, y, z));
-      if (!vertexToFaces.has(key)) vertexToFaces.set(key, []);
-      vertexToFaces.get(key).push(faceIndex);
-      keys.push(key);
-    }
-    faceVertexKeys[faceIndex] = keys;
-  }
-
-  const visitedFaces = new Array(triangleCount).fill(false);
-  const centers = [];
-
-  for (let startFace = 0; startFace < triangleCount; startFace++) {
-    if (visitedFaces[startFace]) continue;
-
-    const stack = [startFace];
-    const componentKeys = new Set();
-    visitedFaces[startFace] = true;
-
-    while (stack.length > 0) {
-      const currentFace = stack.pop();
-      for (const key of faceVertexKeys[currentFace]) {
-        componentKeys.add(key);
-        for (const neighborFace of vertexToFaces.get(key)) {
-          if (!visitedFaces[neighborFace]) {
-            visitedFaces[neighborFace] = true;
-            stack.push(neighborFace);
-          }
-        }
-      }
-    }
-
-    if (componentKeys.size === 0) continue;
-
-    const center = new THREE.Vector3();
-    for (const key of componentKeys) center.add(keyToPosition.get(key));
-    center.multiplyScalar(1 / componentKeys.size);
-    centers.push(center);
-  }
-
-  return centers.sort((a, b) => a.x - b.x);
-}
-
 function createStreetLampLights(lightsMesh) {
   if (!lightsMesh || streetLampPointLights.length > 0) return;
 
-  const extractedCenters = extractDisconnectedComponentCenters(lightsMesh.geometry);
-  const centers = (extractedCenters.length >= 6 ? extractedCenters.slice(0, 6) : STREET_LAMP_FALLBACK_POSITIONS).map((center) => center.clone());
+  const centers = (STREET_LAMP_POSITIONS).map((center) => center.clone());
 
   for (const center of centers) {
     const pointLight = new THREE.PointLight(themeConfig.dark.streetLampColor, 0, themeConfig.dark.streetLampDistance, 2);
     pointLight.position.copy(center);
     pointLight.position.y -= 2.0;
     pointLight.visible = false;
-    pointLight.castShadow = false;
+    pointLight.castShadow = true;
     lightsMesh.add(pointLight);
     streetLampPointLights.push(pointLight);
   }
@@ -593,7 +525,7 @@ function applyTheme(nextThemeName, options = {}) {
   hemiLight.intensity = theme.hemiIntensity;
   dirLight.color.set(theme.dirColor);
   dirLight.intensity = theme.dirIntensity;
-  dirLight.position.z = normalizedThemeName === 'dark' ? 3 : -3;
+  dirLight.position.z = normalizedThemeName === 'dark' ? 3 : 6;
   renderer.toneMappingExposure = theme.exposure;
   wireBloomPass.strength = theme.wireBloomStrength;
 
@@ -1253,8 +1185,9 @@ if (sceneCards.length === 3) {
 
 if (postSecondPanelDuration > 0) {
   cameraScrollTimeline.to(scrollState, {
-    cameraOffsetX: -44.0, cameraOffsetY: -1.5, cameraOffsetZ: 0.0,
-    lookAtOffsetX: -36.0, lookAtOffsetY: -18.0, lookAtOffsetZ: 26.0, gridDownLock: 1,
+    cameraOffsetX: -44.0, cameraOffsetY: -1.5, cameraOffsetZ: -33.0,
+    lookAtOffsetX: -36.0, lookAtOffsetY: 0.0, lookAtOffsetZ: -7.0,
+    gridDownLock: 1,
     duration: postSecondPanelDuration
   });
 }
