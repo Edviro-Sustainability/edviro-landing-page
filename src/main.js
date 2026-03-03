@@ -105,7 +105,7 @@ if (!loadingState.windowLoaded) {
 
 const themeConfig = {
   light: {
-    sceneColor: 0xf2fff9, fogColor: 0xf2fff9, fogDensity: 0.012, floorColor: 0xf9f0f9,
+    sceneColor: 0xffffff, fogColor: 0xf2fff9, fogDensity: 0.012, floorColor: 0xf9f0f9,
     hemiColor: 0xffffff, hemiGroundColor: 0xcfd8dc, hemiIntensity: 2.0, dirColor: 0xffffff,
     dirIntensity: 1.9, exposure: 1.0, wireBloomStrength: 0.2,
     streetLampIntensity: 0.0, streetLampColor: 0xffd7ad, streetLampDistance: 16
@@ -180,10 +180,10 @@ dirLight.position.set(6, 10, -3);
 dirLight.shadow.mapSize.set(2048, 2048);
 dirLight.castShadow = true;
 dirLight.shadow.radius = 20;
-dirLight.shadow.camera.left = -20;
-dirLight.shadow.camera.right = 20;
-dirLight.shadow.camera.top = 20;
-dirLight.shadow.camera.bottom = -20;
+dirLight.shadow.camera.left = -40;
+dirLight.shadow.camera.right = 40;
+dirLight.shadow.camera.top = 40;
+dirLight.shadow.camera.bottom = -40;
 dirLight.shadow.camera.far = 40;
 dirLight.shadow.camera.updateProjectionMatrix();
 scene.add(hemiLight, dirLight); 
@@ -270,32 +270,38 @@ const introDuration = prefersReducedMotion ? 1.35 : 2.55;
 const loader = new OBJLoader();
 const fontLoader = new FontLoader();
 const keyframeTwoEndLookAtOffset = new THREE.Vector3(-36.0, -18.0, -16.0);
+const counterState = { opacity: 0 };
+let counterMaterial = null;
 
-function addKeyframeTwoTextGeometry() {
-  fontLoader.load('./public/avenir.json', (font) => {
-    const textGeometry = new TextGeometry('5678', {
+function addCounter() {
+  fontLoader.load('/avenir.json', (font) => {
+    const textGeometry = new TextGeometry('$400,000', {
       font,
-      size: 2.2,
-      depth: 0.3,
-      curveSegments: 6,
-      bevelEnabled: false
+      size: 1.0,
+      depth: 0.01,
+      curveSegments: 8,
+      bevelEnabled: true,
+      bevelThickness: 0.05,
+      bevelSize: 0.03,
+      bevelOffset: 0,
+      bevelSegments: 3
     });
     textGeometry.center();
 
     const textMaterial = new THREE.MeshStandardMaterial({
       color: 0x16a34a,
-      roughness: 0.4,
-      metalness: 0.08,
-      side: THREE.DoubleSide
+      roughness: 1.0,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: counterState.opacity
     });
+    counterMaterial = textMaterial;
     const textMesh = new THREE.Mesh(textGeometry, textMaterial);
 
     const textPosition = introState.endLookAt.clone().add(keyframeTwoEndLookAtOffset);
     textMesh.position.copy(textPosition);
     textMesh.position.y = (floor?.position.y ?? -4) + 0.08;
     textMesh.rotation.x = -Math.PI / 2;
-    textMesh.castShadow = true;
-    textMesh.receiveShadow = true;
 
     subjectGroup.add(textMesh);
   }, undefined, (error) => {
@@ -303,7 +309,7 @@ function addKeyframeTwoTextGeometry() {
   });
 }
 
-addKeyframeTwoTextGeometry();
+addCounter();
 
 const schoolMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });
 const windowMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });
@@ -917,6 +923,15 @@ cameraScrollTimeline.to(scrollState, {
     }
   ]
 });
+cameraScrollTimeline.to(counterState, {
+  opacity: 1,
+  duration: 0.12,
+  ease: 'none',
+  onUpdate: () => {
+    if (!counterMaterial) return;
+    counterMaterial.opacity = counterState.opacity;
+  }
+}, 0.88);
 
 cameraScrollTimeline.to(parallaxScrollState, {
   multiplier: 0,
