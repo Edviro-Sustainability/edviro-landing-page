@@ -388,7 +388,7 @@ body[data-theme='dark'] .scroll-phrase__word--accent::after {
 }
 
 .panel {
-  min-height: 84vh;
+  min-height: 116vh;
   display: flex;
   flex-direction: column;
   text-align: center;

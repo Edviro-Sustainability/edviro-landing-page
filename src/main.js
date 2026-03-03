@@ -217,7 +217,7 @@ const schoolOutlineMaterials = [];
 const streetLampPointLights = [];
 const schoolOutlineStyle = {
   thresholdAngle: 36,
-  linewidth: 1,
+  linewidth: 1.4,
   color: { light: 0x000000, dark: 0x333333 }
 };
 
@@ -277,9 +277,11 @@ const loader = new OBJLoader();
 const keyframeTwoEndLookAtOffset = new THREE.Vector3(-36.0, -18.0, -16.0);
 const counterFontUrl = '/Avenir Black.ttf';
 let counterMaterial = null;
+let counterParagraphMaterial = null;
 let counterMesh = null;
 let counterTopContextMesh = null;
 let counterBottomContextMesh = null;
+let counterParagraphContextMesh = null;
 let counterDemoIntervalId = null;
 const counterValueState = {
   value: 400000,
@@ -290,6 +292,10 @@ const counterValueState = {
 const counterThemeStyle = {
   light: { color: GREEN_PALETTE.base, emissive: 0x000000, emissiveIntensity: 0.0 },
   dark: { color: 0x000000, emissive: GREEN_PALETTE.base, emissiveIntensity: 1.0 }
+};
+const counterParagraphThemeStyle = {
+  light: { color: 0x09642a, emissive: 0x000000, emissiveIntensity: 0.0 },
+  dark: { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 0.6 }
 };
 let currentThemeName = getInitialThemeName();
 
@@ -305,14 +311,26 @@ function applyCounterMaterialTheme(themeName) {
   counterMaterial.emissiveIntensity = style.emissiveIntensity;
 }
 
-function buildCounterTextMesh(label, fontSize, material) {
+function applyCounterParagraphMaterialTheme(themeName) {
+  if (!counterParagraphMaterial) return;
+  const style = counterParagraphThemeStyle[themeName] ?? counterParagraphThemeStyle.light;
+  counterParagraphMaterial.color.set(style.color);
+  counterParagraphMaterial.emissive.set(style.emissive);
+  counterParagraphMaterial.emissiveIntensity = style.emissiveIntensity;
+}
+
+function buildCounterTextMesh(label, fontSize, material, options = {}) {
   const textMesh = new Text();
   textMesh.font = counterFontUrl;
   textMesh.fontSize = fontSize;
   textMesh.text = label;
-  textMesh.anchorX = 'center';
-  textMesh.anchorY = 'middle';
-  textMesh.textAlign = 'center';
+  textMesh.anchorX = options.anchorX ?? 'center';
+  textMesh.anchorY = options.anchorY ?? 'middle';
+  textMesh.textAlign = options.textAlign ?? 'center';
+  if (Number.isFinite(options.maxWidth)) textMesh.maxWidth = options.maxWidth;
+  if (Number.isFinite(options.lineHeight)) textMesh.lineHeight = options.lineHeight;
+  if (Number.isFinite(options.letterSpacing)) textMesh.letterSpacing = options.letterSpacing;
+  if (options.whiteSpace) textMesh.whiteSpace = options.whiteSpace;
   textMesh.material = material;
   textMesh.sync();
   return textMesh;
@@ -322,6 +340,7 @@ function setCounterTextVisibility(isVisible) {
   if (counterMesh) counterMesh.visible = isVisible;
   if (counterTopContextMesh) counterTopContextMesh.visible = isVisible;
   if (counterBottomContextMesh) counterBottomContextMesh.visible = isVisible;
+  if (counterParagraphContextMesh) counterParagraphContextMesh.visible = isVisible;
 }
 
 function renderCounterValue() {
@@ -386,15 +405,33 @@ function addCounter() {
     color: counterThemeStyle.light.color,
     emissive: counterThemeStyle.light.emissive,
     emissiveIntensity: counterThemeStyle.light.emissiveIntensity,
-    roughness: 0.85,
+    side: THREE.DoubleSide
+  });
+  const paragraphTextMaterial = new THREE.MeshStandardMaterial({
+    color: counterParagraphThemeStyle.light.color,
+    emissive: counterParagraphThemeStyle.light.emissive,
+    emissiveIntensity: counterParagraphThemeStyle.light.emissiveIntensity,
     side: THREE.DoubleSide
   });
   counterMaterial = textMaterial;
+  counterParagraphMaterial = paragraphTextMaterial;
   applyCounterMaterialTheme(currentThemeName);
+  applyCounterParagraphMaterialTheme(currentThemeName);
 
   counterMesh = buildCounterTextMesh(formatCounterValue(counterValueState.displayValue), 1.0, textMaterial);
   counterTopContextMesh = buildCounterTextMesh('OVER', 0.32, textMaterial);
   counterBottomContextMesh = buildCounterTextMesh('SAVED', 0.32, textMaterial);
+  counterParagraphContextMesh = buildCounterTextMesh(
+    `Our pilot program with local school districts uncovered significant billing discrepancies and energy inefficiencies. Using our advanced anomaly detection algorithms, we identified hundreds of thousands in overbilling that schools were able to recover.`,
+    0.16,
+    paragraphTextMaterial,
+    {
+      maxWidth: 5.0,
+      lineHeight: 1.35,
+      anchorY: 'top',
+      textAlign: 'center'
+    }
+  );
 
   const textPosition = introState.endLookAt.clone().add(keyframeTwoEndLookAtOffset);
 
@@ -412,11 +449,17 @@ function addCounter() {
   counterBottomContextMesh.position.z += 1;
   counterBottomContextMesh.rotation.x = -Math.PI / 2;
 
+  counterParagraphContextMesh.position.copy(textPosition);
+  counterParagraphContextMesh.position.y = -3.9;
+  counterParagraphContextMesh.position.z += 1.55;
+  counterParagraphContextMesh.rotation.x = -Math.PI / 2;
+
   setCounterTextVisibility(false);
 
   subjectGroup.add(counterMesh);
   subjectGroup.add(counterTopContextMesh);
   subjectGroup.add(counterBottomContextMesh);
+  subjectGroup.add(counterParagraphContextMesh);
   renderCounterValue();
   startCounterDemo();
 }
@@ -544,6 +587,7 @@ function applyTheme(nextThemeName, options = {}) {
 
   applyMaterialTheme(normalizedThemeName);
   applyCounterMaterialTheme(normalizedThemeName);
+  applyCounterParagraphMaterialTheme(normalizedThemeName);
   for (const outlineMaterial of schoolOutlineMaterials) {
     outlineMaterial.color.set(schoolOutlineStyle.color[normalizedThemeName]);
   }
@@ -582,6 +626,7 @@ loader.load('/school.obj', (loadedModel) => {
     const isTreeMesh = mesh.name.startsWith("Tree");
     const isPoleMesh = mesh.name.startsWith("Pole");
     const isTrunkMesh = mesh.name.startsWith("Trunk");
+    const isTreeOrPoleMesh = isTreeMesh || isPoleMesh || isTrunkMesh;
     if (mesh.name === 'Lights') lightsMesh = mesh;
 
     const materialMap = {
@@ -596,9 +641,9 @@ loader.load('/school.obj', (loadedModel) => {
     mesh.castShadow = !isWireMesh;
     mesh.receiveShadow = !isWireMesh;
     if (isWireMesh) mesh.layers.enable(MASK_LAYER);
-    createSchoolMeshOutline(mesh);
+    if (!isTreeOrPoleMesh) createSchoolMeshOutline(mesh);
 
-    if (!mesh.name.startsWith("Tree") && !mesh.name.startsWith("Pole") && !mesh.name.startsWith("Trunk")) {
+    if (!isTreeOrPoleMesh) {
       const noiseOverlay = new THREE.Mesh(mesh.geometry, schoolNoiseRevealMaterial);
       noiseOverlay.renderOrder = 950; noiseOverlay.castShadow = false; noiseOverlay.receiveShadow = false;
       mesh.add(noiseOverlay);
@@ -1198,9 +1243,9 @@ if (sceneCards.length === 3) {
 
 if (statsPanel && statsCards.length === 3) {
   const statsCardEntryOffsets = [
-    { x: () => (window.innerWidth <= 768 ? -90 : -190), y: 0, rotateZ: -7 },
-    { x: 0, y: () => (window.innerWidth <= 768 ? 120 : 180), rotateZ: 0 },
-    { x: () => (window.innerWidth <= 768 ? 90 : 190), y: 0, rotateZ: 7 }
+    { x: () => (window.innerWidth <= 768 ? -90 : -190), y: () => (window.innerWidth <= 768 ? 24 : 34), rotateZ: -7 },
+    { x: 0, y: () => (window.innerWidth <= 768 ? 140 : 205), rotateZ: 0 },
+    { x: () => (window.innerWidth <= 768 ? 90 : 190), y: () => (window.innerWidth <= 768 ? 24 : 34), rotateZ: 7 }
   ];
 
   gsap.set(statsCards, {
@@ -1211,7 +1256,7 @@ if (statsPanel && statsCards.length === 3) {
   const statsCardsTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: statsPanel,
-      start: 'top 78%',
+      start: 'top 72%',
       end: 'bottom 24%',
       toggleActions: 'play none none reverse',
       invalidateOnRefresh: true
@@ -1240,7 +1285,7 @@ if (statsPanel && statsCards.length === 3) {
   });
 }
 
-const scrollHeight = -35.0;
+const scrollHeight = -32.0;
 cameraScrollTimeline.to(scrollState, {
   cameraOffsetX: -44.0, cameraOffsetY: -1.5, cameraOffsetZ: scrollHeight,
   lookAtOffsetX: -36.0, lookAtOffsetY: 0.0, lookAtOffsetZ: scrollHeight + 26.0,
