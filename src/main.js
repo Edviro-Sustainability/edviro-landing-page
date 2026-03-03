@@ -116,6 +116,13 @@ const themeConfig = {
   }
 };
 
+const GREEN_PALETTE = {
+  deep: 0x0f8339,
+  base: 0x16a34a,
+  bright: 0x54d36b,
+  soft: 0x86efac
+};
+
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(themeConfig.light.sceneColor);
 scene.fog = new THREE.FogExp2(themeConfig.light.fogColor, themeConfig.light.fogDensity);
@@ -234,8 +241,8 @@ class ConditionalLineSegmentsGeometry extends LineSegmentsGeometry {
 const wiringElectricMaterial = new THREE.ShaderMaterial({
   uniforms: {
     uTime: { value: 0 },
-    uColorBase: { value: new THREE.Color(0x167437) },
-    uColorHot: { value: new THREE.Color(0x54d36b) },
+    uColorBase: { value: new THREE.Color(GREEN_PALETTE.deep) },
+    uColorHot: { value: new THREE.Color(GREEN_PALETTE.bright) },
     uSpeed: { value: 0.2 },
     uPulse: { value: 1.5 },
   },
@@ -292,8 +299,8 @@ const counterTextGeometryConfig = {
   castShadow: true
 };
 const counterThemeStyle = {
-  light: { color: 0x0f9f44, emissive: 0x000000, emissiveIntensity: 0.0 },
-  dark: { color: 0x5bd584, emissive: 0x5bd584, emissiveIntensity: 0.5 }
+  light: { color: GREEN_PALETTE.base, emissive: 0x000000, emissiveIntensity: 0.0 },
+  dark: { color: 0x000000, emissive: GREEN_PALETTE.base, emissiveIntensity: 1.0 }
 };
 
 function formatCounterValue(value) {
@@ -451,7 +458,7 @@ const woodMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });
 const rimMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });
 const materialThemeColors = {
   school: { light: 0xffffff, dark: 0xcbcfcb }, windows: { light: 0x71c1cf, dark: 0xfffcc9 },
-  tree: { light: 0x0f9f44, dark: 0x52c878 }, pole: { light: 0xc7c7c7, dark: 0xbbc4cd },
+  tree: { light: GREEN_PALETTE.base, dark: GREEN_PALETTE.bright }, pole: { light: 0xc7c7c7, dark: 0xbbc4cd },
   wood: { light: 0xa38764, dark: 0x987a5d }, rim: { light: 0x898f89, dark: 0x8c8e8c }
 };
 const windowEmission = {
