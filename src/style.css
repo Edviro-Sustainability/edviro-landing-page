@@ -414,9 +414,9 @@ body.is-site-loading .text-reveal-line {
 }
 
 .text-reveal-line--brand {
-  color: var(--color-primary);
   background-image: linear-gradient(90deg, #31c367 0%, #0f8339 100%);
   -webkit-background-clip: text;
+  text-rendering: optimizeLegibility;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   font-size: clamp(4.4rem, 12vw, 8rem);
@@ -428,6 +428,7 @@ body.is-site-loading .text-reveal-line {
 
 .text-reveal-line--subtitle {
   color: var(--text-primary);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
   font-size: clamp(1rem, 2.2vw, 1.7rem);
   line-height: 1.1;
   letter-spacing: 0.05em;

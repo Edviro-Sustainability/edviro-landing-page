@@ -270,7 +270,6 @@ const introDuration = prefersReducedMotion ? 1.35 : 2.55;
 const loader = new OBJLoader();
 const fontLoader = new FontLoader();
 const keyframeTwoEndLookAtOffset = new THREE.Vector3(-36.0, -18.0, -16.0);
-const counterState = { opacity: 0 };
 let counterMaterial = null;
 let counterMesh = null;
 let counterFont = null;
@@ -386,9 +385,7 @@ function addCounter() {
       color: counterThemeStyle.light.color,
       emissive: counterThemeStyle.light.emissive,
       emissiveIntensity: counterThemeStyle.light.emissiveIntensity,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: counterState.opacity
+      side: THREE.DoubleSide
     });
     counterMaterial = textMaterial;
     applyCounterMaterialTheme(currentThemeName);
@@ -399,6 +396,7 @@ function addCounter() {
     textMesh.position.copy(textPosition);
     textMesh.position.y = (floor?.position.y ?? -4) + 0.08;
     textMesh.rotation.x = -Math.PI / 2;
+    textMesh.visible = false;
 
     subjectGroup.add(textMesh);
     renderCounterValue();
@@ -1023,15 +1021,6 @@ cameraScrollTimeline.to(scrollState, {
     }
   ]
 });
-cameraScrollTimeline.to(counterState, {
-  opacity: 1,
-  duration: 0.12,
-  ease: 'none',
-  onUpdate: () => {
-    if (!counterMaterial) return;
-    counterMaterial.opacity = counterState.opacity;
-  }
-}, 0.88);
 
 cameraScrollTimeline.to(parallaxScrollState, {
   multiplier: 0,
@@ -1311,6 +1300,7 @@ gsap.ticker.add((time) => {
 
   subjectGroup.position.x = -parallaxX * parallaxSettings.groupX;
   subjectGroup.position.y = -parallaxY * parallaxSettings.groupY;
+  if (counterMesh) counterMesh.visible = scrollState.cameraOffsetX <= -32.8;
 
   if (schoolModel) {
     schoolModel.visible = introCameraStarted;
