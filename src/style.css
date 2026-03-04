@@ -151,19 +151,17 @@ body.is-site-loading #webgl {
 
 
 .panel--stats {
-  min-height: 0px !important;
   width: min(1220px, 96vw);
   margin-inline: auto;
   align-items: center;
+  justify-content: center;
 }
 
 .panel--team {
-  min-height: max(130vh, 56rem);
+min-height: 80vh !important;
   width: min(1220px, 96vw);
   margin-inline: auto;
-  padding-block: clamp(3rem, 10vh, 8rem);
   align-items: flex-start;
-  justify-content: center;
   text-align: left;
 }
 
@@ -203,9 +201,17 @@ body[data-theme='dark'] .team-copy__subtitle {
   text-align: left;
 }
 
+.join-showcase {
+  width: min(74rem, 96vw);
+  display: grid;
+  justify-items: center;
+  align-items: center;
+  gap: clamp(1.2rem, 3vw, 2.3rem);
+}
+
 .join-card {
   position: relative;
-  width: min(64rem, 96vw);
+  width: min(60rem, 94vw);
   padding: clamp(1.55rem, 3vw, 2.9rem);
   border-radius: 1.25rem;
   border: 1px solid rgba(var(--green-rgb-600), 0.34);
@@ -218,6 +224,12 @@ body[data-theme='dark'] .team-copy__subtitle {
   justify-items: flex-start;
   overflow: hidden;
   isolation: isolate;
+}
+
+.join-card--copy {
+  justify-items: center;
+  text-align: center;
+  gap: clamp(1rem, 1.9vw, 1.4rem);
 }
 
 .join-card::before,
@@ -255,12 +267,102 @@ body[data-theme='dark'] .team-copy__subtitle {
   color: rgba(15, 131, 57, 0.8);
 }
 
-.join-card__title {
+.join-calendar-shell {
+  position: relative;
+  width: min(48rem, 96vw);
+  padding: clamp(1.05rem, 2.8vw, 1.5rem) clamp(0.95rem, 2.2vw, 1.4rem) clamp(1.2rem, 2.8vw, 1.65rem);
+  border-radius: 1.05rem;
+  border: 1px solid rgba(var(--green-rgb-600), 0.34);
+  background: linear-gradient(146deg, rgba(245, 255, 249, 0.92), rgba(226, 248, 235, 0.9));
+  box-shadow:
+    0 0 0 1px rgba(var(--green-rgb-300), 0.22) inset,
+    0 0.9rem 1.9rem rgba(5, 26, 12, 0.17);
+  transform-style: preserve-3d;
+  perspective: 1400px;
+  will-change: transform;
+}
+
+.join-calendar__binder {
+  position: absolute;
+  top: clamp(0.42rem, 1.1vw, 0.62rem);
+  left: 50%;
+  width: min(76%, 31rem);
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.join-calendar__ring {
+  width: clamp(2.7rem, 8.2vw, 4rem);
+  height: clamp(0.66rem, 1.6vw, 0.9rem);
+  border-radius: 999px;
+  border: 1px solid rgba(var(--green-rgb-900), 0.18);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(220, 235, 226, 0.92));
+  box-shadow:
+    0 0 0 1px rgba(var(--green-rgb-300), 0.22) inset,
+    0 0.2rem 0.46rem rgba(7, 25, 12, 0.13);
+}
+
+.join-calendar__stack {
+  position: relative;
+  margin-top: clamp(0.9rem, 2.2vw, 1.2rem);
+  height: clamp(15rem, 40vw, 23rem);
+  transform-style: preserve-3d;
+}
+
+.join-calendar__page {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(var(--green-rgb-600), 0.24);
+  box-shadow:
+    0 0 0 1px rgba(var(--green-rgb-300), 0.15) inset,
+    0 0.6rem 1.3rem rgba(5, 24, 11, 0.12);
+  transform-origin: 50% 0%;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+.join-calendar__page--final {
+  background: linear-gradient(158deg, rgba(var(--green-rgb-600), 0.97), rgba(var(--green-rgb-900), 0.9));
+  border-color: rgba(var(--green-rgb-400), 0.42);
+  box-shadow:
+    0 0 0 1px rgba(var(--green-rgb-200), 0.16) inset,
+    0 1rem 1.8rem rgba(4, 24, 12, 0.34),
+    0 0 1.4rem rgba(var(--green-rgb-400), 0.18);
+  display: grid;
+  place-items: center;
+}
+
+.join-calendar__page--flip {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(236, 250, 242, 0.95)),
+    repeating-linear-gradient(
+      180deg,
+      rgba(var(--green-rgb-300), 0.1) 0,
+      rgba(var(--green-rgb-300), 0.1) 1px,
+      rgba(255, 255, 255, 0) 1px,
+      rgba(255, 255, 255, 0) 22px
+    );
+}
+
+.join-calendar__quarter {
   margin: 0;
-  max-width: none;
-  font-size: clamp(2rem, 5vw, 4rem);
-  line-height: 0.94;
-  letter-spacing: -0.02em;
+  font-size: clamp(2.4rem, 8.2vw, 5.4rem);
+  line-height: 0.9;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-shadow: 0 0.45rem 1.2rem rgba(0, 0, 0, 0.23);
+}
+
+.join-calendar-copy {
+  width: min(64ch, 100%);
+  display: grid;
+  gap: clamp(0.65rem, 1.1vw, 0.9rem);
+  justify-items: center;
 }
 
 .join-card__description {
@@ -276,36 +378,6 @@ body[data-theme='dark'] .team-copy__subtitle {
   color: rgba(15, 131, 57, 0.9);
 }
 
-.join-card__button {
-  margin-top: clamp(0.25rem, 0.8vw, 0.5rem);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  padding: 0.75rem 1.35rem;
-  border-radius: 999px;
-  border: 1px solid rgba(var(--green-rgb-900), 0.4);
-  background: linear-gradient(130deg, rgba(var(--green-rgb-600), 0.98), rgba(var(--green-rgb-900), 0.94));
-  color: #ffffff;
-  text-decoration: none;
-  font-size: clamp(0.86rem, 1.05vw, 0.95rem);
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  font-weight: 650;
-  transition: transform 200ms ease, box-shadow 200ms ease, filter 200ms ease;
-}
-
-.join-card__button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0.6rem 1.65rem rgba(6, 25, 11, 0.24);
-  filter: brightness(1.04);
-}
-
-.join-card__button:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
 body[data-theme='dark'] .join-card {
   border-color: rgba(var(--green-rgb-300), 0.34);
   background: linear-gradient(145deg, rgba(7, 20, 12, 0.92), rgba(8, 27, 16, 0.88));
@@ -318,17 +390,41 @@ body[data-theme='dark'] .join-card__eyebrow {
   color: rgba(var(--green-rgb-300), 0.86);
 }
 
+body[data-theme='dark'] .join-calendar-shell {
+  border-color: rgba(var(--green-rgb-300), 0.44);
+  background: linear-gradient(146deg, rgba(10, 30, 17, 0.9), rgba(9, 27, 15, 0.86));
+  box-shadow:
+    0 0 0 1px rgba(var(--green-rgb-300), 0.2) inset,
+    0 1rem 2rem rgba(0, 0, 0, 0.34);
+}
+
+body[data-theme='dark'] .join-calendar__ring {
+  border-color: rgba(var(--green-rgb-300), 0.34);
+  background: linear-gradient(180deg, rgba(26, 45, 33, 0.9), rgba(19, 34, 25, 0.84));
+  box-shadow:
+    0 0 0 1px rgba(var(--green-rgb-300), 0.18) inset,
+    0 0.2rem 0.44rem rgba(0, 0, 0, 0.35);
+}
+
+body[data-theme='dark'] .join-calendar__page--flip {
+  border-color: rgba(var(--green-rgb-300), 0.34);
+  background:
+    linear-gradient(180deg, rgba(22, 38, 27, 0.94), rgba(13, 27, 19, 0.88)),
+    repeating-linear-gradient(
+      180deg,
+      rgba(var(--green-rgb-300), 0.12) 0,
+      rgba(var(--green-rgb-300), 0.12) 1px,
+      rgba(255, 255, 255, 0) 1px,
+      rgba(255, 255, 255, 0) 22px
+    );
+}
+
 body[data-theme='dark'] .join-card__description {
   color: rgba(247, 248, 250, 0.82);
 }
 
 body[data-theme='dark'] .join-card__description--strong {
   color: rgba(var(--green-rgb-200), 0.92);
-}
-
-body[data-theme='dark'] .join-card__button {
-  border-color: rgba(var(--green-rgb-300), 0.52);
-  box-shadow: 0 0 0 1px rgba(var(--green-rgb-200), 0.14) inset;
 }
 
 .stats-cards {
@@ -375,7 +471,7 @@ body[data-theme='dark'] .join-card__button {
 }
 
 .panel:last-child {
-  padding-bottom: 18vh;
+  padding-bottom: 100vh;
 }
 
 .site-loader {
@@ -680,7 +776,7 @@ body[data-theme='dark'] .scroll-phrase__word--accent::after {
 }
 
 .panel {
-  min-height: 80vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -803,13 +899,22 @@ body.is-site-loading .text-reveal-line {
     padding-block: clamp(2.2rem, 8vh, 4.5rem);
   }
 
+  .join-showcase {
+    gap: clamp(1rem, 5vw, 1.5rem);
+  }
+
   .join-card {
     border-radius: 1rem;
     padding: clamp(1.2rem, 5vw, 1.8rem);
   }
 
-  .join-card__button {
-    width: 100%;
+  .join-calendar-shell {
+    width: min(100%, 33rem);
+    padding-inline: clamp(0.65rem, 2vw, 0.9rem);
+  }
+
+  .join-calendar__stack {
+    height: clamp(12rem, 58vw, 15.5rem);
   }
 }
 

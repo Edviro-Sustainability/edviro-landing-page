@@ -36,6 +36,13 @@ const scrollPhraseWords = scrollPhraseOverlay ? Array.from(scrollPhraseOverlay.q
 const statsPanel = document.querySelector('.panel--stats');
 const statsCards = statsPanel ? Array.from(statsPanel.querySelectorAll('.stats-card')) : [];
 const teamPanel = document.querySelector('.panel--team');
+const joinPanel = document.querySelector('.panel--join');
+const joinShowcase = joinPanel ? joinPanel.querySelector('.join-showcase') : null;
+const joinCalendarShell = joinPanel ? joinPanel.querySelector('.join-calendar-shell') : null;
+const joinCalendarStack = joinCalendarShell ? joinCalendarShell.querySelector('.join-calendar__stack') : null;
+const joinCalendarFlipPages = joinCalendarStack ? Array.from(joinCalendarStack.querySelectorAll('.join-calendar__page--flip')) : [];
+const joinCalendarFinalPage = joinCalendarStack ? joinCalendarStack.querySelector('.join-calendar__page--final') : null;
+const joinCalendarQuarter = joinCalendarFinalPage ? joinCalendarFinalPage.querySelector('.join-calendar__quarter') : null;
 const teamOverlay = document.querySelector('.team-overlay');
 const teamCards = teamOverlay ? Array.from(teamOverlay.querySelectorAll('.team-card')) : [];
 const STORAGE_THEME_KEY = 'edviro-theme';
@@ -130,31 +137,31 @@ const GREEN_PALETTE = {
 const TEAM_MEMBER_CONFIG = [
   {
     id: 'hursh',
-    basePosition: new THREE.Vector3(-33.6, -3.9, -9.0),
+    basePosition: new THREE.Vector3(-33.6, -3.9, -10.0),
     baseRotationY: -0.28,
-    tiltX: 0.24,
+    tiltX: 0.1,
     phase: 0.2,
     scale: 0.4,
-    floatAmplitude: 0.32,
+    floatAmplitude: 0.2,
     floatSpeed: 1.35,
     driftY: 0.05,
     driftZ: 0.1,
-    rotateSpeed: 1.0,
+    rotateSpeed: 0.6,
     labelOffsetX: 220,
     labelOffsetY: -24
   },
   {
     id: 'tanuj',
-    basePosition: new THREE.Vector3(-38.2, -3.9, -5.6),
+    basePosition: new THREE.Vector3(-38.2, -3.9, -8.0),
     baseRotationY: 0.34,
-    tiltX: 0.22,
+    tiltX: 0.1,
     phase: 1.6,
     scale: 0.4,
-    floatAmplitude: 0.35,
+    floatAmplitude: 0.2,
     floatSpeed: 1.24,
     driftY: 0.05,
-    driftZ: 0.2,
-    rotateSpeed: -1.0,
+    driftZ: 0.21,
+    rotateSpeed: -0.6,
     labelOffsetX: 220,
     labelOffsetY: 22
   }
@@ -1563,7 +1570,147 @@ if (teamPanel) {
   });
 }
 
-const scrollHeight = -30.0;
+if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCalendarFinalPage) {
+  // Source-inspired tuning values from the provided book/page animation.
+  const calendarSweepConfig = {
+    easingFactor: 0.5,
+    easingFactorFold: 0.3,
+    insideCurveStrength: 0.18,
+    outsideCurveStrength: 0.05,
+    turningCurveStrength: 0.09
+  };
+
+  const getCalendarRestPose = () => (window.innerWidth <= 780
+    ? { rotateX: 10, rotateY: -7, rotateZ: -3.5, yPercent: 0, scale: 0.98 }
+    : { rotateX: 12, rotateY: -12, rotateZ: -6, yPercent: 0, scale: 1 });
+
+  const getCalendarEndPose = () => (window.innerWidth <= 780
+    ? { rotateX: 3, rotateY: -2, rotateZ: -1.5, yPercent: -2, scale: 1 }
+    : { rotateX: 4, rotateY: -4, rotateZ: -2, yPercent: -4, scale: 1.02 });
+
+  const totalFlipPages = joinCalendarFlipPages.length;
+
+  const getPageRestOffset = (index) => {
+    // Ensure deterministic stacking: index 0 is the top-most page.
+    const layer = totalFlipPages - index;
+    return {
+      y: index * 1.05,
+      z: 0,
+      rotateX: 0,
+      rotateZ: index * -0.1,
+      zIndex: layer + 2
+    };
+  };
+
+  gsap.set(joinCalendarShell, {
+    ...getCalendarRestPose(),
+    transformOrigin: '50% 0%',
+    force3D: true
+  });
+  gsap.set(joinCalendarStack, { transformStyle: 'preserve-3d' });
+  gsap.set(joinCalendarFinalPage, {
+    z: -1,
+    zIndex: 1,
+    transformOrigin: '50% 0%',
+    force3D: true,
+    autoAlpha: 1
+  });
+  if (joinCalendarQuarter) {
+    gsap.set(joinCalendarQuarter, {
+      autoAlpha: prefersReducedMotion ? 1 : 0.78,
+      yPercent: prefersReducedMotion ? 0 : 10
+    });
+  }
+
+  joinCalendarFlipPages.forEach((page, index) => {
+    const restOffset = getPageRestOffset(index);
+    gsap.set(page, {
+      ...restOffset,
+      autoAlpha: 1,
+      transformOrigin: '50% 0%',
+      force3D: true
+    });
+  });
+
+  const calendarTimeline = gsap.timeline({
+    scrollTrigger: {
+      trigger: joinShowcase || joinPanel,
+      start: 'top 92%',
+      end: 'center center',
+      scrub: true,
+      invalidateOnRefresh: true
+    }
+  });
+
+  calendarTimeline.to(joinCalendarShell, {
+    rotateX: () => getCalendarEndPose().rotateX,
+    rotateY: () => getCalendarEndPose().rotateY,
+    rotateZ: () => getCalendarEndPose().rotateZ,
+    yPercent: () => getCalendarEndPose().yPercent,
+    scale: () => getCalendarEndPose().scale,
+    duration: 1,
+    ease: 'none'
+  }, 0);
+
+  if (joinCalendarQuarter) {
+    calendarTimeline.to(joinCalendarQuarter, {
+      autoAlpha: 1,
+      yPercent: 0,
+      duration: 0.28,
+      ease: 'sine.out'
+    }, 0.65);
+  }
+
+  const totalPages = totalFlipPages;
+
+  joinCalendarFlipPages.forEach((page, index) => {
+    const insideCurveIntensity = index < Math.ceil(totalPages * 0.35) ? Math.sin(index * 0.2 + 0.25) : 0;
+    const outsideCurveIntensity = index >= Math.ceil(totalPages * 0.35) ? Math.cos(index * 0.3 + 0.09) : 0;
+    const turningIntensity = Math.sin(index * Math.PI * (1 / totalPages));
+
+    const layer = totalPages - index;
+    const activeLayer = totalPages + 20;
+    const curvedRotation =
+      126
+      + (
+        calendarSweepConfig.insideCurveStrength * insideCurveIntensity
+        - calendarSweepConfig.outsideCurveStrength * outsideCurveIntensity
+        + calendarSweepConfig.turningCurveStrength * turningIntensity
+      ) * 24;
+
+    const pageStart = index * 0.12;
+    const sweepDuration = prefersReducedMotion ? 0.04 : 0.2;
+    const foldDuration = prefersReducedMotion ? 0.03 : 0.14;
+    const lift = 40 + index * 8;
+    const zLift = 10 + index * 1.8;
+    const foldZ = (index % 2 === 0 ? -6 : 6) * calendarSweepConfig.easingFactorFold;
+
+    calendarTimeline
+      .set(page, { zIndex: activeLayer }, pageStart)
+      .to(page, {
+        rotateX: curvedRotation,
+        y: -lift,
+        z: zLift,
+        duration: sweepDuration,
+        ease: `power${Math.max(1, Math.round(2 * calendarSweepConfig.easingFactor))}.in`
+      }, pageStart)
+      .to(page, {
+        rotateX: curvedRotation + 8,
+        rotateZ: foldZ,
+        y: -lift - 7,
+        duration: foldDuration,
+        ease: 'sine.inOut'
+      }, pageStart + (sweepDuration * 0.44))
+      .to(page, {
+        autoAlpha: 0,
+        duration: foldDuration,
+        ease: 'power1.out'
+      }, pageStart + (sweepDuration * 0.54))
+      .set(page, { zIndex: layer }, pageStart + sweepDuration + foldDuration + 0.001);
+  });
+}
+
+const scrollHeight = -24.0;
 cameraScrollTimeline.to(scrollState, {
   cameraOffsetX: -44.0, cameraOffsetY: -1.5, cameraOffsetZ: scrollHeight,
   lookAtOffsetX: -36.0, lookAtOffsetY: 0.0, lookAtOffsetZ: scrollHeight + 26.0,
