@@ -157,15 +157,15 @@ body.is-site-loading #webgl {
   padding-block: clamp(2.4rem, 7vh, 5.2rem);
   align-items: center;
   justify-content: flex-start;
-  gap: clamp(1.1rem, 2.4vw, 1.8rem);
+  gap: 8rem;
 }
 
 .pilot-insight-card {
-  width: min(78ch, 96vw);
+  width: 50vw;
   padding: clamp(1.05rem, 2.2vw, 1.55rem) clamp(1.1rem, 2.6vw, 1.8rem);
   border-radius: 1rem;
   border: 1px solid rgba(var(--green-rgb-600), 0.28);
-  background: linear-gradient(150deg, rgba(250, 255, 252, 0.96), rgba(238, 250, 244, 0.94));
+  background: rgba(255, 255, 255, 0.4);
   box-shadow:
     0 0 0 1px rgba(var(--green-rgb-300), 0.18) inset,
     0 0.9rem 1.85rem rgba(4, 24, 12, 0.13);
@@ -174,9 +174,8 @@ body.is-site-loading #webgl {
 .panel .pilot-insight-card__text {
   margin: 0;
   max-width: none;
-  font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+  font-size: 24px;
   line-height: 1.52;
-  letter-spacing: 0.005em;
   text-align: left;
   color: rgba(var(--green-rgb-900), 0.95);
 }
@@ -233,7 +232,13 @@ body.is-site-loading #webgl {
 .section-title-line {
   position: relative;
   margin: 0;
-  color: var(--green-600);
+  --section-underline-progress: 0;
+  background-image: linear-gradient(90deg, var(--color-primary) 0%, var(--green-900) 100%);
+  -webkit-background-clip: text;
+  text-rendering: optimizeLegibility;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 .panel h2.section-title-line {
@@ -248,10 +253,10 @@ body.is-site-loading #webgl {
   width: 100%;
   height: 0.08em;
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(var(--green-rgb-600), 0.92), rgba(var(--green-rgb-400), 0.88));
-  transform: scaleX(0);
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--green-900) 100%);
+  transform: scaleX(var(--section-underline-progress));
   transform-origin: left center;
-  animation: section-underline-reveal 760ms cubic-bezier(0.22, 0.8, 0.24, 1) 100ms forwards;
+  will-change: transform;
 }
 
 .section-title-line--contact {
@@ -268,24 +273,15 @@ body[data-theme='dark'] .team-copy__subtitle {
   color: rgba(247, 248, 250, 0.86);
 }
 
-body[data-theme='dark'] .section-title-line {
-  color: var(--green-300);
-}
-
-body[data-theme='dark'] .section-title-line::after {
-  background: linear-gradient(90deg, rgba(var(--green-rgb-300), 0.94), rgba(var(--green-rgb-200), 0.9));
-}
-
 body[data-theme='dark'] .pilot-insight-card {
   border-color: rgba(var(--green-rgb-300), 0.36);
-  background: linear-gradient(150deg, rgba(246, 255, 250, 0.94), rgba(232, 250, 240, 0.9));
   box-shadow:
     0 0 0 1px rgba(var(--green-rgb-300), 0.22) inset,
     0 1rem 2rem rgba(0, 0, 0, 0.24);
 }
 
 body[data-theme='dark'] .pilot-insight-card__text {
-  color: rgba(var(--green-rgb-900), 0.95);
+  color: rgba(var(--green-rgb-200), 0.95) !important;
 }
 
 .panel--join {
@@ -549,7 +545,7 @@ body[data-theme='dark'] .join-card__description--strong {
 }
 
 .stats-card__label {
-  font-size: clamp(0.72rem, 1vw, 0.86rem);
+  font-size: 24px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(var(--green-rgb-200), 0.82);
@@ -559,7 +555,6 @@ body[data-theme='dark'] .join-card__description--strong {
   font-size: clamp(2.5rem, 5vw, 4.25rem);
   font-weight: 650;
   line-height: 0.9;
-  letter-spacing: -0.03em;
 }
 
 .panel:first-child {
@@ -873,7 +868,6 @@ body[data-theme='dark'] .scroll-phrase__word--accent::after {
   display: flex;
   flex-direction: column;
   text-align: center;
-  gap: 1rem;
   margin: 0 auto;
 }
 
@@ -1015,15 +1009,5 @@ body.is-site-loading .text-reveal-line {
   to {
     transform: translateY(0);
     opacity: 1;
-  }
-}
-
-@keyframes section-underline-reveal {
-  from {
-    transform: scaleX(0);
-  }
-
-  to {
-    transform: scaleX(1);
   }
 }

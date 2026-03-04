@@ -44,6 +44,7 @@ const joinCalendarStack = joinCalendarShell ? joinCalendarShell.querySelector('.
 const joinCalendarFlipPages = joinCalendarStack ? Array.from(joinCalendarStack.querySelectorAll('.join-calendar__page--flip')) : [];
 const joinCalendarFinalPage = joinCalendarStack ? joinCalendarStack.querySelector('.join-calendar__page--final') : null;
 const joinCalendarQuarter = joinCalendarFinalPage ? joinCalendarFinalPage.querySelector('.join-calendar__quarter') : null;
+const sectionTitleLines = Array.from(document.querySelectorAll('.section-title-line'));
 const teamOverlay = document.querySelector('.team-overlay');
 const teamCards = teamOverlay ? Array.from(teamOverlay.querySelectorAll('.team-card')) : [];
 const STORAGE_THEME_KEY = 'edviro-theme';
@@ -461,6 +462,7 @@ function createTeamMembersFromModel(personModel) {
     memberGroup.add(spinGroup);
     memberGroup.scale.setScalar(config.scale);
     memberGroup.position.copy(config.basePosition);
+    memberGroup.visible = false;
     subjectGroup.add(memberGroup);
 
     teamMembers.push({
@@ -488,6 +490,13 @@ function updateTeamMembers(time) {
       + (Math.sin(phaseTime * 0.7) * config.driftY);
     member.rotationZ += config.rotateSpeed * deltaTime;
     spinGroup.rotation.z = member.rotationZ;
+  }
+}
+
+function setTeamMembersVisibility(isVisible) {
+  for (const member of teamMembers) {
+    if (!member?.group) continue;
+    member.group.visible = isVisible;
   }
 }
 
@@ -1481,6 +1490,23 @@ if (sceneCards.length === 3) {
     .to(sceneCardsOverlay, { autoAlpha: 0, duration: 0.06 }, 0.94);
   }
 
+if (sectionTitleLines.length > 0) {
+  gsap.set(sectionTitleLines, { '--section-underline-progress': 0 });
+  sectionTitleLines.forEach((titleLine) => {
+    gsap.to(titleLine, {
+      '--section-underline-progress': 1,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: titleLine,
+        start: 'top 84%',
+        end: 'top 64%',
+        scrub: true,
+        invalidateOnRefresh: true
+      }
+    });
+  });
+}
+
 if (statsPanel && statsCards.length === 3) {
   const statsCardEntryOffsets = [
     { x: () => (window.innerWidth <= 768 ? -90 : -190), y: () => (window.innerWidth <= 768 ? 52 : 74), rotateZ: -7 },
@@ -1492,7 +1518,6 @@ if (statsPanel && statsCards.length === 3) {
     gsap.set(statsInsightCard, {
       autoAlpha: 0,
       y: () => (window.innerWidth <= 768 ? 34 : 56),
-      filter: 'blur(6px)',
       force3D: true,
       willChange: 'transform, opacity'
     });
@@ -1520,14 +1545,12 @@ if (statsPanel && statsCards.length === 3) {
       {
         autoAlpha: 0,
         y: () => (window.innerWidth <= 768 ? 34 : 56),
-        filter: 'blur(6px)'
       },
       {
         autoAlpha: 1,
         y: () => (window.innerWidth <= 768 ? -4 : -14),
-        filter: 'blur(0px)',
         ease: 'none',
-        duration: 0.3
+        duration: 0.2
       },
       0
     );
@@ -1754,13 +1777,20 @@ gsap.ticker.add((time) => {
   const cameraParallaxY = parallaxY * parallaxSettings.cameraY;
   const lookAtParallaxX = parallaxX * parallaxSettings.lookAtX;
   const lookAtParallaxY = parallaxY * parallaxSettings.lookAtY;
+  const counterAndTeamVisible = scrollState.cameraOffsetX <= -32.5;
 
   updateTeamMembers(time);
-  setTeamOverlayVisibility(teamSceneState.panelActive && teamMembers.length === TEAM_MEMBER_CONFIG.length && introCameraStarted);
+  setTeamMembersVisibility(counterAndTeamVisible);
+  setTeamOverlayVisibility(
+    teamSceneState.panelActive
+    && teamMembers.length === TEAM_MEMBER_CONFIG.length
+    && introCameraStarted
+    && counterAndTeamVisible
+  );
 
   subjectGroup.position.x = -parallaxX * parallaxSettings.groupX;
   subjectGroup.position.y = -parallaxY * parallaxSettings.groupY;
-  setCounterTextVisibility(scrollState.cameraOffsetX <= -32.5);
+  setCounterTextVisibility(counterAndTeamVisible);
 
   if (schoolModel) {
     schoolModel.visible = introCameraStarted;
