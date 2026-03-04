@@ -1338,10 +1338,10 @@ if (sceneCards.length === 3) {
   const getCardPassStyle = () => {
     const compact = window.innerWidth <= 768;
     const baseStyle = {
-      startX: [-600, -600, -600],
-      startY: [-100, -100, -100],
+      startX: [-600, -580, -560],
+      startY: [-250, -250, -250],
       midX: [-360, -360, -360],
-      midY: [-50, -50, -50],
+      midY: [-150, -150, -150],
       endX: [100, 100, 100],
       endY: [50, 50, 50],
       startScale: [0.5, 0.5, 0.5],
