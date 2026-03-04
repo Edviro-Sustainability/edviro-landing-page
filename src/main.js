@@ -34,16 +34,16 @@ const sceneCards = sceneCardsOverlay ? Array.from(sceneCardsOverlay.querySelecto
 const scrollPhraseOverlay = document.querySelector('.scroll-phrase');
 const scrollPhraseWords = scrollPhraseOverlay ? Array.from(scrollPhraseOverlay.querySelectorAll('.scroll-phrase__word')) : [];
 const statsPanel = document.querySelector('.panel--stats');
-const statsInsightCard = statsPanel ? statsPanel.querySelector('.pilot-insight-card') : null;
+const statsInsightCard = statsPanel ? statsPanel.querySelector('.insight-card') : null;
 const statsCards = statsPanel ? Array.from(statsPanel.querySelectorAll('.stats-card')) : [];
 const teamPanel = document.querySelector('.panel--team');
-const joinPanel = document.querySelector('.panel--join');
-const joinShowcase = joinPanel ? joinPanel.querySelector('.join-showcase') : null;
-const joinCalendarShell = joinPanel ? joinPanel.querySelector('.join-calendar-shell') : null;
-const joinCalendarStack = joinCalendarShell ? joinCalendarShell.querySelector('.join-calendar__stack') : null;
-const joinCalendarFlipPages = joinCalendarStack ? Array.from(joinCalendarStack.querySelectorAll('.join-calendar__page--flip')) : [];
-const joinCalendarFinalPage = joinCalendarStack ? joinCalendarStack.querySelector('.join-calendar__page--final') : null;
-const joinCalendarQuarter = joinCalendarFinalPage ? joinCalendarFinalPage.querySelector('.join-calendar__quarter') : null;
+const joinPanel = document.querySelector('.panel--contact');
+const joinShowcase = joinPanel ? joinPanel.querySelector('.contact-showcase') : null;
+const joinCalendarShell = joinPanel ? joinPanel.querySelector('.calendar-shell') : null;
+const joinCalendarStack = joinCalendarShell ? joinCalendarShell.querySelector('.calendar__stack') : null;
+const joinCalendarFlipPages = joinCalendarStack ? Array.from(joinCalendarStack.querySelectorAll('.calendar__page--flip')) : [];
+const joinCalendarFinalPage = joinCalendarStack ? joinCalendarStack.querySelector('.calendar__page--final') : null;
+const joinCalendarQuarter = joinCalendarFinalPage ? joinCalendarFinalPage.querySelector('.calendar__quarter') : null;
 const sectionTitleLines = Array.from(document.querySelectorAll('.section-title-line'));
 const teamOverlay = document.querySelector('.team-overlay');
 const teamCards = teamOverlay ? Array.from(teamOverlay.querySelectorAll('.team-card')) : [];
@@ -975,7 +975,7 @@ const introLookAt = introState.startLookAt.clone();
 const titleIntroState = { offsetX: 0, offsetY: 0, startScale: 2.3, endYOffset: 0 };
 const titleIntroAnimState = { progress: 0 };
 const introLeadTextLines = gsap.utils.toArray('.text-reveal-line--lead');
-const introBrandLine = document.querySelector('.text-reveal-line--brand');
+const introBrandLine = document.querySelector('.title .text-gradient');
 const introSubtitleLine = document.querySelector('.text-reveal-line--subtitle');
 const introUnlockState = { cameraIntroDone: false, textRevealDone: false, scrollUnlocked: false };
 let introCameraStarted = false;
@@ -1337,26 +1337,16 @@ if (sceneCards.length === 3) {
 
   const getCardPassStyle = () => {
     const compact = window.innerWidth <= 768;
-    const baseStyle = compact ? {
-      startX: [-116, -92, -68],
-      startY: [80, 120, 160],
-      midX: [-10, 18, 48],
-      midY: [50, 92, 136],
-      endX: [124, 164, 208],
-      endY: [12, 56, 104],
-      startScale: [0.66, 0.62, 0.58],
-      midScale: [1.02, 0.96, 0.92],
-      endScale: [1.52, 1.46, 1.38]
-    } : {
-      startX: [-380, -380, -380],
+    const baseStyle = {
+      startX: [-600, -600, -600],
       startY: [-100, -100, -100],
-      midX: [-150, -165, -180],
+      midX: [-360, -360, -360],
       midY: [-50, -50, -50],
-      endX: [300, 250, 200],
+      endX: [100, 100, 100],
       endY: [50, 50, 50],
-      startScale: [0.7, 0.64, 0.58],
-      midScale: [1.5, 1.44, 1.38],
-      endScale: [3.2, 3.08, 2.96]
+      startScale: [0.5, 0.5, 0.5],
+      midScale: [1.0, 1.0, 1.0],
+      endScale: [2.5, 2.5, 2.5]
     };
 
     const legacyCardWidth = getLegacyCardWidth(compact);
@@ -1508,10 +1498,23 @@ if (sectionTitleLines.length > 0) {
 }
 
 if (statsPanel && statsCards.length === 3) {
+  const isCompactStatsLayout = () => window.innerWidth <= 980;
   const statsCardEntryOffsets = [
-    { x: () => (window.innerWidth <= 768 ? -90 : -190), y: () => (window.innerWidth <= 768 ? 52 : 74), rotateZ: -7 },
-    { x: 0, y: () => (window.innerWidth <= 768 ? 152 : 228), rotateZ: 0 },
-    { x: () => (window.innerWidth <= 768 ? 90 : 190), y: () => (window.innerWidth <= 768 ? 52 : 74), rotateZ: 7 }
+    {
+      x: () => (isCompactStatsLayout() ? 0 : -170),
+      y: () => (isCompactStatsLayout() ? 62 : 72),
+      rotateZ: () => (isCompactStatsLayout() ? 0 : -6)
+    },
+    {
+      x: 0,
+      y: () => (isCompactStatsLayout() ? 78 : 102),
+      rotateZ: 0
+    },
+    {
+      x: () => (isCompactStatsLayout() ? 0 : 170),
+      y: () => (isCompactStatsLayout() ? 62 : 72),
+      rotateZ: () => (isCompactStatsLayout() ? 0 : 6)
+    }
   ];
 
   if (statsInsightCard) {
@@ -1532,8 +1535,8 @@ if (statsPanel && statsCards.length === 3) {
   const statsCardsTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: statsPanel,
-      start: 'top 56%',
-      end: 'top 14%',
+      start: 'top 68%',
+      end: 'top 28%',
       scrub: true,
       invalidateOnRefresh: true
     }
@@ -1548,15 +1551,15 @@ if (statsPanel && statsCards.length === 3) {
       },
       {
         autoAlpha: 1,
-        y: () => (window.innerWidth <= 768 ? -4 : -14),
+        y: 0,
         ease: 'none',
         duration: 0.2
       },
-      0
+      "+=0.3"
     );
   }
 
-  const statsCardsStartOffset = prefersReducedMotion ? 0.02 : 0.16;
+  const statsCardsStartOffset = prefersReducedMotion ? 0.02 : 0.18;
 
   statsCards.forEach((card, index) => {
     const entryOffset = statsCardEntryOffsets[index];
@@ -1570,7 +1573,7 @@ if (statsPanel && statsCards.length === 3) {
       {
         autoAlpha: 1,
         x: 0,
-        y: () => (window.innerWidth <= 768 ? -8 : -18),
+        y: 0,
         rotateZ: 0,
         duration: prefersReducedMotion ? 0.12 : 0.3,
         ease: 'none'
@@ -1731,7 +1734,7 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
   });
 }
 
-const scrollHeight = -32.5;
+const scrollHeight = -30; // bigger -> faster, smaller -> slower
 cameraScrollTimeline.to(scrollState, {
   cameraOffsetX: -44.0, cameraOffsetY: -1.5, cameraOffsetZ: scrollHeight,
   lookAtOffsetX: -36.0, lookAtOffsetY: 0.0, lookAtOffsetZ: scrollHeight + 26.0,
