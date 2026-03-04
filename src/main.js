@@ -1492,12 +1492,14 @@ if (statsPanel && statsCards.length === 3) {
     gsap.set(statsInsightCard, {
       autoAlpha: 0,
       y: () => (window.innerWidth <= 768 ? 34 : 56),
+      filter: 'blur(6px)',
       force3D: true,
       willChange: 'transform, opacity'
     });
   }
 
   gsap.set(statsCards, {
+    autoAlpha: 0,
     force3D: true,
     willChange: 'transform, opacity'
   });
@@ -1505,9 +1507,9 @@ if (statsPanel && statsCards.length === 3) {
   const statsCardsTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: statsPanel,
-      start: 'top 88%',
-      end: 'bottom 24%',
-      toggleActions: 'play none none reverse',
+      start: 'top 56%',
+      end: 'top 14%',
+      scrub: true,
       invalidateOnRefresh: true
     }
   });
@@ -1517,19 +1519,21 @@ if (statsPanel && statsCards.length === 3) {
       statsInsightCard,
       {
         autoAlpha: 0,
-        y: () => (window.innerWidth <= 768 ? 34 : 56)
+        y: () => (window.innerWidth <= 768 ? 34 : 56),
+        filter: 'blur(6px)'
       },
       {
         autoAlpha: 1,
-        y: () => (window.innerWidth <= 768 ? -6 : -18),
-        duration: prefersReducedMotion ? 0.12 : 0.62,
-        ease: 'power2.out'
+        y: () => (window.innerWidth <= 768 ? -4 : -14),
+        filter: 'blur(0px)',
+        ease: 'none',
+        duration: 0.3
       },
       0
     );
   }
 
-  const statsCardsStartOffset = statsInsightCard ? (prefersReducedMotion ? 0.02 : 0.14) : 0;
+  const statsCardsStartOffset = prefersReducedMotion ? 0.02 : 0.16;
 
   statsCards.forEach((card, index) => {
     const entryOffset = statsCardEntryOffsets[index];
@@ -1543,12 +1547,12 @@ if (statsPanel && statsCards.length === 3) {
       {
         autoAlpha: 1,
         x: 0,
-        y: () => (window.innerWidth <= 768 ? -8 : -22),
+        y: () => (window.innerWidth <= 768 ? -8 : -18),
         rotateZ: 0,
-        duration: prefersReducedMotion ? 0.1 : 0.62,
-        ease: 'power2.out'
+        duration: prefersReducedMotion ? 0.12 : 0.3,
+        ease: 'none'
       },
-      statsCardsStartOffset + (index * (prefersReducedMotion ? 0.02 : 0.14))
+      statsCardsStartOffset + (index * (prefersReducedMotion ? 0.02 : 0.09))
     );
   });
 }
@@ -1672,7 +1676,7 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
         + calendarSweepConfig.turningCurveStrength * turningIntensity
       ) * 24;
 
-    const pageStart = index * 0.135;
+    const pageStart = totalPages <= 1 ? 0 : ((index / (totalPages - 1)) * 1.05);
     const sweepDuration = prefersReducedMotion ? 0.05 : 0.24;
     const foldDuration = prefersReducedMotion ? 0.035 : 0.165;
     const lift = 40 + index * 8;
