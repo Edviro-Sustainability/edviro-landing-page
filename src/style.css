@@ -158,8 +158,10 @@ body.is-site-loading #webgl {
 }
 
 .panel--team {
+  min-height: max(130vh, 56rem);
   width: min(1220px, 96vw);
   margin-inline: auto;
+  padding-block: clamp(3rem, 10vh, 8rem);
   align-items: flex-start;
   justify-content: center;
   text-align: left;
@@ -229,7 +231,9 @@ body[data-theme='dark'] .team-copy__subtitle {
 }
 
 .panel:first-child {
-  padding-top: 8vh;
+  min-height: 100vh;
+  padding-top: 10vh;
+  align-items: center;
 }
 
 .panel:last-child {
@@ -335,6 +339,28 @@ body.is-site-loading .site-loader {
   transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
 }
 
+.team-card__line,
+.team-card__dot {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 2;
+}
+
+.team-card__line {
+  height: 1px;
+  background: var(--text-primary);
+  transform-origin: left center;
+}
+
+.team-card__dot {
+  width: 0.46rem;
+  height: 0.46rem;
+  border-radius: 50%;
+  background: var(--text-primary);
+  transform: translate(-50%, -50%);
+}
+
 .team-card:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
@@ -383,6 +409,15 @@ body[data-theme='dark'] .team-card {
 
 body[data-theme='dark'] .team-card__detail {
   color: rgba(231, 255, 238, 0.84);
+}
+
+body[data-theme='dark'] .team-card__line {
+  background: rgba(var(--green-rgb-300), 0.96);
+}
+
+body[data-theme='dark'] .team-card__dot {
+  background: rgba(var(--green-rgb-300), 0.98);
+  box-shadow: 0 0 0 2px rgba(var(--green-rgb-300), 0.22);
 }
 
 .scroll-phrase__line {
@@ -507,7 +542,7 @@ body[data-theme='dark'] .scroll-phrase__word--accent::after {
 }
 
 .panel {
-  min-height: 100vh;
+  min-height: 80vh;
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -534,6 +569,8 @@ body[data-theme='dark'] .scroll-phrase__word--accent::after {
 .title {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: 0.8rem;
   transform-origin: center center;
   will-change: transform;

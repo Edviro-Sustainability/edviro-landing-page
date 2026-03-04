@@ -140,6 +140,8 @@ const TEAM_MEMBER_CONFIG = [
     driftY: 0.05,
     driftZ: 0.1,
     rotateSpeed: 1.0,
+    labelOffsetX: 220,
+    labelOffsetY: -24
   },
   {
     id: 'tanuj',
@@ -153,6 +155,8 @@ const TEAM_MEMBER_CONFIG = [
     driftY: 0.05,
     driftZ: 0.2,
     rotateSpeed: -1.0,
+    labelOffsetX: 220,
+    labelOffsetY: 22
   }
 ];
 
@@ -382,10 +386,14 @@ function applyTeamMaterialTheme(themeName) {
 
 function resetTeamCards() {
   for (const card of teamCards) {
+    const line = card.querySelector('.team-card__line');
+    const dot = card.querySelector('.team-card__dot');
     card.style.left = '-200vw';
     card.style.top = '-200vh';
     card.style.opacity = '0';
     card.style.visibility = 'hidden';
+    if (line) line.style.opacity = '0';
+    if (dot) dot.style.opacity = '0';
   }
 }
 
@@ -492,14 +500,19 @@ function updateTeamMembers(time) {
 function updateTeamCardAnchors() {
   if (teamCards.length === 0 || teamMembers.length === 0) return;
   const shouldShowCards = teamSceneState.overlayVisible && introCameraStarted;
+  const clampValue = (value, min, max) => Math.min(Math.max(value, min), max);
 
   for (const member of teamMembers) {
     const card = teamCardMap.get(member.id);
     if (!card) continue;
+    const line = card.querySelector('.team-card__line');
+    const dot = card.querySelector('.team-card__dot');
 
     if (!shouldShowCards) {
       card.style.opacity = '0';
       card.style.visibility = 'hidden';
+      if (line) line.style.opacity = '0';
+      if (dot) dot.style.opacity = '0';
       continue;
     }
 
@@ -513,16 +526,53 @@ function updateTeamCardAnchors() {
     if (!withinViewport) {
       card.style.opacity = '0';
       card.style.visibility = 'hidden';
+      if (line) line.style.opacity = '0';
+      if (dot) dot.style.opacity = '0';
       continue;
     }
 
-    const x = (teamProjection.clip.x * 0.5 + 0.5) * window.innerWidth;
-    const y = (-teamProjection.clip.y * 0.5 + 0.5) * window.innerHeight;
+    const meshX = (teamProjection.clip.x * 0.5 + 0.5) * window.innerWidth;
+    const meshY = (-teamProjection.clip.y * 0.5 + 0.5) * window.innerHeight;
+    const inwardSign = meshX < window.innerWidth * 0.5 ? 1 : -1;
+    const labelOffsetX = Number.isFinite(member.config.labelOffsetX) ? member.config.labelOffsetX : 200;
+    const labelOffsetY = Number.isFinite(member.config.labelOffsetY) ? member.config.labelOffsetY : 0;
+    const labelX = clampValue(meshX + (inwardSign * labelOffsetX), 130, window.innerWidth - 130);
+    const labelY = clampValue(meshY + labelOffsetY, 90, window.innerHeight - 90);
 
-    card.style.left = `${x}px`;
-    card.style.top = `${y}px`;
+    card.style.left = `${labelX}px`;
+    card.style.top = `${labelY}px`;
     card.style.opacity = '1';
     card.style.visibility = 'visible';
+
+    if (!line || !dot) continue;
+
+    const cardWidth = card.offsetWidth;
+    const cardHeight = card.offsetHeight;
+    const cardLeft = labelX - (cardWidth * 0.5);
+    const cardTop = labelY - (cardHeight * 0.5);
+    const localStartX = meshX >= labelX ? cardWidth : 0;
+    const localStartY = clampValue(meshY - cardTop, 8, cardHeight - 8);
+    const startX = cardLeft + localStartX;
+    const startY = cardTop + localStartY;
+    const dx = meshX - startX;
+    const dy = meshY - startY;
+    const lineLength = Math.hypot(dx, dy);
+
+    if (lineLength < 2) {
+      line.style.opacity = '0';
+      dot.style.opacity = '0';
+      continue;
+    }
+
+    line.style.left = `${localStartX}px`;
+    line.style.top = `${localStartY}px`;
+    line.style.width = `${lineLength}px`;
+    line.style.transform = `translateY(-50%) rotate(${Math.atan2(dy, dx)}rad)`;
+    line.style.opacity = '1';
+
+    dot.style.left = `${localStartX + dx}px`;
+    dot.style.top = `${localStartY + dy}px`;
+    dot.style.opacity = '1';
   }
 }
 
@@ -539,6 +589,7 @@ function buildCounterTextMesh(label, fontSize, material, options = {}) {
   if (Number.isFinite(options.letterSpacing)) textMesh.letterSpacing = options.letterSpacing;
   if (options.whiteSpace) textMesh.whiteSpace = options.whiteSpace;
   textMesh.material = material;
+  textMesh.frustumCulled = false;
   textMesh.sync();
   return textMesh;
 }
@@ -1108,7 +1159,7 @@ function computeTitleIntroStartTransform() {
 
   const desiredStartScale = window.innerWidth <= 768 ? 2.15 : 2.8;
   titleIntroState.startScale = desiredStartScale;
-  titleIntroState.endYOffset = window.innerWidth <= 768 ? -18 : -30;
+  titleIntroState.endYOffset = 0;
 }
 
 function updateRenderResolution() {
@@ -1512,7 +1563,7 @@ if (teamPanel) {
   });
 }
 
-const scrollHeight = -32.0;
+const scrollHeight = -30.0;
 cameraScrollTimeline.to(scrollState, {
   cameraOffsetX: -44.0, cameraOffsetY: -1.5, cameraOffsetZ: scrollHeight,
   lookAtOffsetX: -36.0, lookAtOffsetY: 0.0, lookAtOffsetZ: scrollHeight + 26.0,
@@ -1564,7 +1615,7 @@ gsap.ticker.add((time) => {
 
   subjectGroup.position.x = -parallaxX * parallaxSettings.groupX;
   subjectGroup.position.y = -parallaxY * parallaxSettings.groupY;
-  setCounterTextVisibility(scrollState.cameraOffsetX <= -32.5 && !teamSceneState.panelActive);
+  setCounterTextVisibility(scrollState.cameraOffsetX <= -32.5);
 
   if (schoolModel) {
     schoolModel.visible = introCameraStarted;
