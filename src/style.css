@@ -151,25 +151,52 @@ body.is-site-loading #webgl {
 
 
 .panel--stats {
+  min-height: max(92vh, 42rem);
   width: min(1220px, 96vw);
   margin-inline: auto;
+  padding-block: clamp(2.4rem, 7vh, 5.2rem);
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: 8rem !important;
+}
+
+.pilot-insight-card {
+  width: min(78ch, 96vw);
+  padding: clamp(1.05rem, 2.2vw, 1.55rem) clamp(1.1rem, 2.6vw, 1.8rem);
+  border-radius: 1rem;
+  border: 1px solid rgba(var(--green-rgb-600), 0.28);
+  background: linear-gradient(150deg, rgba(250, 255, 252, 0.96), rgba(238, 250, 244, 0.94));
+  box-shadow:
+    0 0 0 1px rgba(var(--green-rgb-300), 0.18) inset,
+    0 0.9rem 1.85rem rgba(4, 24, 12, 0.13);
+}
+
+.panel .pilot-insight-card__text {
+  margin: 0;
+  max-width: none;
+  font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+  line-height: 1.52;
+  letter-spacing: 0.005em;
+  text-align: left;
+  color: rgba(var(--green-rgb-900), 0.95);
 }
 
 .panel--team {
-min-height: 80vh !important;
+  min-height: 80vh !important;
   width: min(1220px, 96vw);
   margin-inline: auto;
+  padding-block: clamp(3rem, 9vh, 7rem);
   align-items: flex-start;
+  justify-content: center;
   text-align: left;
 }
 
 .team-copy {
-  width: min(54rem, 96vw);
-  margin-inline: clamp(0.5rem, 4vw, 2.5rem) auto;
+  width: min(76rem, 96vw);
+  min-height: 50vh;
+  margin-inline: auto;
   display: grid;
-  gap: clamp(1rem, 1.8vw, 1.35rem);
+  grid-template-rows: auto 1fr auto;
 }
 
 .panel--team .team-copy__title {
@@ -181,21 +208,49 @@ min-height: 80vh !important;
 
 .panel--team .team-copy__subtitle {
   margin: 0;
-  max-width: 62ch;
+  max-width: 56ch;
   font-size: clamp(0.95rem, 1.45vw, 1.25rem);
   line-height: 1.45;
   color: rgba(17, 20, 23, 0.86);
+}
+
+.panel--team .team-copy__title--diagonal {
+  grid-column: 1 / span 5;
+  grid-row: 1;
+  justify-self: start;
+  align-self: start;
+  text-align: left;
+}
+
+.panel--team .team-copy__subtitle--diagonal {
+  grid-column: 7 / -1;
+  grid-row: 3;
+  justify-self: end;
+  align-self: end;
+  text-align: right;
 }
 
 body[data-theme='dark'] .team-copy__subtitle {
   color: rgba(247, 248, 250, 0.86);
 }
 
+body[data-theme='dark'] .pilot-insight-card {
+  border-color: rgba(var(--green-rgb-300), 0.36);
+  background: linear-gradient(150deg, rgba(246, 255, 250, 0.94), rgba(232, 250, 240, 0.9));
+  box-shadow:
+    0 0 0 1px rgba(var(--green-rgb-300), 0.22) inset,
+    0 1rem 2rem rgba(0, 0, 0, 0.24);
+}
+
+body[data-theme='dark'] .pilot-insight-card__text {
+  color: rgba(var(--green-rgb-900), 0.95);
+}
+
 .panel--join {
-  min-height: max(105vh, 46rem);
+  min-height: max(122vh, 58rem);
   width: min(1220px, 96vw);
   margin-inline: auto;
-  padding-block: clamp(3rem, 9vh, 7rem);
+  padding-block: clamp(3.5rem, 10vh, 8rem);
   align-items: center;
   justify-content: center;
   text-align: left;
@@ -433,6 +488,7 @@ body[data-theme='dark'] .join-card__description--strong {
   gap: clamp(0.8rem, 2vw, 1.4rem);
   width: min(100%, 1100px);
   margin-inline: auto;
+  transform: translateY(clamp(-3.4rem, -4.4vw, -1.8rem));
 }
 
 .stats-card {
@@ -465,13 +521,8 @@ body[data-theme='dark'] .join-card__description--strong {
 }
 
 .panel:first-child {
-  min-height: 100vh;
   padding-top: 10vh;
   align-items: center;
-}
-
-.panel:last-child {
-  padding-bottom: 100vh;
 }
 
 .site-loader {
@@ -776,7 +827,7 @@ body[data-theme='dark'] .scroll-phrase__word--accent::after {
 }
 
 .panel {
-  min-height: 100vh;
+  min-height: 60vh;
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -891,31 +942,6 @@ body.is-site-loading .text-reveal-line {
 
 .panel p {
   line-height: 1.5;
-}
-
-@media (max-width: 780px) {
-  .panel--join {
-    min-height: max(88vh, 38rem);
-    padding-block: clamp(2.2rem, 8vh, 4.5rem);
-  }
-
-  .join-showcase {
-    gap: clamp(1rem, 5vw, 1.5rem);
-  }
-
-  .join-card {
-    border-radius: 1rem;
-    padding: clamp(1.2rem, 5vw, 1.8rem);
-  }
-
-  .join-calendar-shell {
-    width: min(100%, 33rem);
-    padding-inline: clamp(0.65rem, 2vw, 0.9rem);
-  }
-
-  .join-calendar__stack {
-    height: clamp(12rem, 58vw, 15.5rem);
-  }
 }
 
 @keyframes site-loader-spin {

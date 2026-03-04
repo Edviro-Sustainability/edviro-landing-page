@@ -34,6 +34,7 @@ const sceneCards = sceneCardsOverlay ? Array.from(sceneCardsOverlay.querySelecto
 const scrollPhraseOverlay = document.querySelector('.scroll-phrase');
 const scrollPhraseWords = scrollPhraseOverlay ? Array.from(scrollPhraseOverlay.querySelectorAll('.scroll-phrase__word')) : [];
 const statsPanel = document.querySelector('.panel--stats');
+const statsInsightCard = statsPanel ? statsPanel.querySelector('.pilot-insight-card') : null;
 const statsCards = statsPanel ? Array.from(statsPanel.querySelectorAll('.stats-card')) : [];
 const teamPanel = document.querySelector('.panel--team');
 const joinPanel = document.querySelector('.panel--join');
@@ -336,11 +337,9 @@ const loader = new OBJLoader();
 const keyframeTwoEndLookAtOffset = new THREE.Vector3(-36.0, -18.0, -16.0);
 const counterFontUrl = '/Avenir Black.ttf';
 let counterMaterial = null;
-let counterParagraphMaterial = null;
 let counterMesh = null;
 let counterTopContextMesh = null;
 let counterBottomContextMesh = null;
-let counterParagraphContextMesh = null;
 let counterDemoIntervalId = null;
 const counterValueState = {
   value: 400000,
@@ -351,10 +350,6 @@ const counterValueState = {
 const counterThemeStyle = {
   light: { color: GREEN_PALETTE.base, emissive: 0x000000, emissiveIntensity: 0.0 },
   dark: { color: 0x000000, emissive: GREEN_PALETTE.base, emissiveIntensity: 1.0 }
-};
-const counterParagraphThemeStyle = {
-  light: { color: 0x09642a, emissive: 0x000000, emissiveIntensity: 0.0 },
-  dark: { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 0.6 }
 };
 const teamMemberThemeStyle = {
   light: { color: GREEN_PALETTE.base, emissive: 0x000000, emissiveIntensity: 0.0 },
@@ -373,14 +368,6 @@ function applyCounterMaterialTheme(themeName) {
   counterMaterial.color.set(style.color);
   counterMaterial.emissive.set(style.emissive);
   counterMaterial.emissiveIntensity = style.emissiveIntensity;
-}
-
-function applyCounterParagraphMaterialTheme(themeName) {
-  if (!counterParagraphMaterial) return;
-  const style = counterParagraphThemeStyle[themeName] ?? counterParagraphThemeStyle.light;
-  counterParagraphMaterial.color.set(style.color);
-  counterParagraphMaterial.emissive.set(style.emissive);
-  counterParagraphMaterial.emissiveIntensity = style.emissiveIntensity;
 }
 
 function applyTeamMaterialTheme(themeName) {
@@ -605,7 +592,6 @@ function setCounterTextVisibility(isVisible) {
   if (counterMesh) counterMesh.visible = isVisible;
   if (counterTopContextMesh) counterTopContextMesh.visible = isVisible;
   if (counterBottomContextMesh) counterBottomContextMesh.visible = isVisible;
-  if (counterParagraphContextMesh) counterParagraphContextMesh.visible = isVisible;
 }
 
 function renderCounterValue() {
@@ -672,31 +658,12 @@ function addCounter() {
     emissiveIntensity: counterThemeStyle.light.emissiveIntensity,
     side: THREE.DoubleSide
   });
-  const paragraphTextMaterial = new THREE.MeshStandardMaterial({
-    color: counterParagraphThemeStyle.light.color,
-    emissive: counterParagraphThemeStyle.light.emissive,
-    emissiveIntensity: counterParagraphThemeStyle.light.emissiveIntensity,
-    side: THREE.DoubleSide
-  });
   counterMaterial = textMaterial;
-  counterParagraphMaterial = paragraphTextMaterial;
   applyCounterMaterialTheme(currentThemeName);
-  applyCounterParagraphMaterialTheme(currentThemeName);
 
   counterMesh = buildCounterTextMesh(formatCounterValue(counterValueState.displayValue), 1.0, textMaterial);
   counterTopContextMesh = buildCounterTextMesh('OVER', 0.32, textMaterial);
   counterBottomContextMesh = buildCounterTextMesh('SAVED', 0.32, textMaterial);
-  counterParagraphContextMesh = buildCounterTextMesh(
-    `Our pilot program with local school districts uncovered significant billing discrepancies and energy inefficiencies. Using our advanced anomaly detection algorithms, we identified hundreds of thousands in overbilling that schools were able to recover.`,
-    0.14,
-    paragraphTextMaterial,
-    {
-      maxWidth: 5.0,
-      lineHeight: 1.0,
-      anchorY: 'top',
-      textAlign: 'center'
-    }
-  );
 
   const textPosition = introState.endLookAt.clone().add(keyframeTwoEndLookAtOffset);
 
@@ -714,17 +681,11 @@ function addCounter() {
   counterBottomContextMesh.position.z += 1;
   counterBottomContextMesh.rotation.x = -Math.PI / 2;
 
-  counterParagraphContextMesh.position.copy(textPosition);
-  counterParagraphContextMesh.position.y = -3.9;
-  counterParagraphContextMesh.position.z += 1.55;
-  counterParagraphContextMesh.rotation.x = -Math.PI / 2;
-
   setCounterTextVisibility(false);
 
   subjectGroup.add(counterMesh);
   subjectGroup.add(counterTopContextMesh);
   subjectGroup.add(counterBottomContextMesh);
-  subjectGroup.add(counterParagraphContextMesh);
   renderCounterValue();
   startCounterDemo();
 }
@@ -852,7 +813,6 @@ function applyTheme(nextThemeName, options = {}) {
 
   applyMaterialTheme(normalizedThemeName);
   applyCounterMaterialTheme(normalizedThemeName);
-  applyCounterParagraphMaterialTheme(normalizedThemeName);
   applyTeamMaterialTheme(normalizedThemeName);
   for (const outlineMaterial of schoolOutlineMaterials) {
     outlineMaterial.color.set(schoolOutlineStyle.color[normalizedThemeName]);
@@ -1250,8 +1210,14 @@ maybeUnlockScroll();
 if (teamOverlay) gsap.set(teamOverlay, { autoAlpha: 0 });
 resetTeamCards();
 
-const panels = gsap.utils.toArray('.panel');
-const postSecondPanelDuration = Math.max(panels.length - 2, 0);
+const postSecondPanelDuration = (() => {
+  const weightedDuration = (prefersReducedMotion ? 0.8 : 1.25) * (
+    (statsPanel ? 1.0 : 0)
+    + (teamPanel ? 1.2 : 0)
+    + (joinPanel ? 1.4 : 0)
+  );
+  return weightedDuration > 0 ? weightedDuration : Math.max(gsap.utils.toArray('.panel').length - 2, 0);
+})();
 
 const cameraScrollTimeline = gsap.timeline({
   defaults: { ease: 'none' },
@@ -1517,10 +1483,19 @@ if (sceneCards.length === 3) {
 
 if (statsPanel && statsCards.length === 3) {
   const statsCardEntryOffsets = [
-    { x: () => (window.innerWidth <= 768 ? -90 : -190), y: () => (window.innerWidth <= 768 ? 24 : 34), rotateZ: -7 },
-    { x: 0, y: () => (window.innerWidth <= 768 ? 140 : 205), rotateZ: 0 },
-    { x: () => (window.innerWidth <= 768 ? 90 : 190), y: () => (window.innerWidth <= 768 ? 24 : 34), rotateZ: 7 }
+    { x: () => (window.innerWidth <= 768 ? -90 : -190), y: () => (window.innerWidth <= 768 ? 52 : 74), rotateZ: -7 },
+    { x: 0, y: () => (window.innerWidth <= 768 ? 152 : 228), rotateZ: 0 },
+    { x: () => (window.innerWidth <= 768 ? 90 : 190), y: () => (window.innerWidth <= 768 ? 52 : 74), rotateZ: 7 }
   ];
+
+  if (statsInsightCard) {
+    gsap.set(statsInsightCard, {
+      autoAlpha: 0,
+      y: () => (window.innerWidth <= 768 ? 34 : 56),
+      force3D: true,
+      willChange: 'transform, opacity'
+    });
+  }
 
   gsap.set(statsCards, {
     force3D: true,
@@ -1530,12 +1505,31 @@ if (statsPanel && statsCards.length === 3) {
   const statsCardsTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: statsPanel,
-      start: 'top 72%',
+      start: 'top 88%',
       end: 'bottom 24%',
       toggleActions: 'play none none reverse',
       invalidateOnRefresh: true
     }
   });
+
+  if (statsInsightCard) {
+    statsCardsTimeline.fromTo(
+      statsInsightCard,
+      {
+        autoAlpha: 0,
+        y: () => (window.innerWidth <= 768 ? 34 : 56)
+      },
+      {
+        autoAlpha: 1,
+        y: () => (window.innerWidth <= 768 ? -6 : -18),
+        duration: prefersReducedMotion ? 0.12 : 0.62,
+        ease: 'power2.out'
+      },
+      0
+    );
+  }
+
+  const statsCardsStartOffset = statsInsightCard ? (prefersReducedMotion ? 0.02 : 0.14) : 0;
 
   statsCards.forEach((card, index) => {
     const entryOffset = statsCardEntryOffsets[index];
@@ -1549,12 +1543,12 @@ if (statsPanel && statsCards.length === 3) {
       {
         autoAlpha: 1,
         x: 0,
-        y: 0,
+        y: () => (window.innerWidth <= 768 ? -8 : -22),
         rotateZ: 0,
-        duration: prefersReducedMotion ? 0.1 : 0.5,
-        ease: 'power3.out'
+        duration: prefersReducedMotion ? 0.1 : 0.62,
+        ease: 'power2.out'
       },
-      index * (prefersReducedMotion ? 0.02 : 0.1)
+      statsCardsStartOffset + (index * (prefersReducedMotion ? 0.02 : 0.14))
     );
   });
 }
@@ -1562,8 +1556,8 @@ if (statsPanel && statsCards.length === 3) {
 if (teamPanel) {
   ScrollTrigger.create({
     trigger: teamPanel,
-    start: 'top 80%',
-    end: 'bottom 24%',
+    start: 'top 76%',
+    end: 'bottom 18%',
     onToggle: (self) => {
       teamSceneState.panelActive = self.isActive;
     }
@@ -1635,7 +1629,7 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
   const calendarTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: joinShowcase || joinPanel,
-      start: 'top 92%',
+      start: 'top 94%',
       end: 'center center',
       scrub: true,
       invalidateOnRefresh: true
@@ -1656,9 +1650,9 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
     calendarTimeline.to(joinCalendarQuarter, {
       autoAlpha: 1,
       yPercent: 0,
-      duration: 0.28,
+      duration: 0.32,
       ease: 'sine.out'
-    }, 0.65);
+    }, 0.7);
   }
 
   const totalPages = totalFlipPages;
@@ -1678,9 +1672,9 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
         + calendarSweepConfig.turningCurveStrength * turningIntensity
       ) * 24;
 
-    const pageStart = index * 0.12;
-    const sweepDuration = prefersReducedMotion ? 0.04 : 0.2;
-    const foldDuration = prefersReducedMotion ? 0.03 : 0.14;
+    const pageStart = index * 0.135;
+    const sweepDuration = prefersReducedMotion ? 0.05 : 0.24;
+    const foldDuration = prefersReducedMotion ? 0.035 : 0.165;
     const lift = 40 + index * 8;
     const zLift = 10 + index * 1.8;
     const foldZ = (index % 2 === 0 ? -6 : 6) * calendarSweepConfig.easingFactorFold;
@@ -1710,7 +1704,7 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
   });
 }
 
-const scrollHeight = -24.0;
+const scrollHeight = -32.5;
 cameraScrollTimeline.to(scrollState, {
   cameraOffsetX: -44.0, cameraOffsetY: -1.5, cameraOffsetZ: scrollHeight,
   lookAtOffsetX: -36.0, lookAtOffsetY: 0.0, lookAtOffsetZ: scrollHeight + 26.0,
