@@ -193,6 +193,144 @@ body[data-theme='dark'] .team-copy__subtitle {
   color: rgba(247, 248, 250, 0.86);
 }
 
+.panel--join {
+  min-height: max(105vh, 46rem);
+  width: min(1220px, 96vw);
+  margin-inline: auto;
+  padding-block: clamp(3rem, 9vh, 7rem);
+  align-items: center;
+  justify-content: center;
+  text-align: left;
+}
+
+.join-card {
+  position: relative;
+  width: min(64rem, 96vw);
+  padding: clamp(1.55rem, 3vw, 2.9rem);
+  border-radius: 1.25rem;
+  border: 1px solid rgba(var(--green-rgb-600), 0.34);
+  background: linear-gradient(145deg, rgba(247, 255, 250, 0.96), rgba(231, 250, 239, 0.9));
+  box-shadow:
+    0 0 0 1px rgba(var(--green-rgb-300), 0.2) inset,
+    0 1rem 2.5rem rgba(4, 25, 12, 0.16);
+  display: grid;
+  gap: clamp(0.82rem, 1.5vw, 1.2rem);
+  justify-items: flex-start;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.join-card::before,
+.join-card::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.join-card::before {
+  width: clamp(10rem, 26vw, 18rem);
+  aspect-ratio: 1;
+  right: clamp(-5.5rem, -8vw, -2rem);
+  top: clamp(-7.5rem, -8vw, -2rem);
+  background: radial-gradient(circle at center, rgba(var(--green-rgb-300), 0.45) 0%, rgba(var(--green-rgb-300), 0) 72%);
+}
+
+.join-card::after {
+  width: clamp(9rem, 24vw, 15rem);
+  aspect-ratio: 1;
+  left: clamp(-5rem, -7vw, -1.5rem);
+  bottom: clamp(-8rem, -9vw, -2rem);
+  background: radial-gradient(circle at center, rgba(var(--green-rgb-600), 0.24) 0%, rgba(var(--green-rgb-600), 0) 70%);
+}
+
+.join-card__eyebrow {
+  margin: 0;
+  max-width: none;
+  font-size: clamp(0.72rem, 1.06vw, 0.84rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 650;
+  color: rgba(15, 131, 57, 0.8);
+}
+
+.join-card__title {
+  margin: 0;
+  max-width: none;
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 0.94;
+  letter-spacing: -0.02em;
+}
+
+.join-card__description {
+  margin: 0;
+  max-width: min(64ch, 100%);
+  font-size: clamp(0.96rem, 1.4vw, 1.2rem);
+  line-height: 1.45;
+  color: rgba(17, 20, 23, 0.84);
+}
+
+.join-card__description--strong {
+  font-weight: 600;
+  color: rgba(15, 131, 57, 0.9);
+}
+
+.join-card__button {
+  margin-top: clamp(0.25rem, 0.8vw, 0.5rem);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.75rem 1.35rem;
+  border-radius: 999px;
+  border: 1px solid rgba(var(--green-rgb-900), 0.4);
+  background: linear-gradient(130deg, rgba(var(--green-rgb-600), 0.98), rgba(var(--green-rgb-900), 0.94));
+  color: #ffffff;
+  text-decoration: none;
+  font-size: clamp(0.86rem, 1.05vw, 0.95rem);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  font-weight: 650;
+  transition: transform 200ms ease, box-shadow 200ms ease, filter 200ms ease;
+}
+
+.join-card__button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0.6rem 1.65rem rgba(6, 25, 11, 0.24);
+  filter: brightness(1.04);
+}
+
+.join-card__button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+body[data-theme='dark'] .join-card {
+  border-color: rgba(var(--green-rgb-300), 0.34);
+  background: linear-gradient(145deg, rgba(7, 20, 12, 0.92), rgba(8, 27, 16, 0.88));
+  box-shadow:
+    0 0 0 1px rgba(var(--green-rgb-300), 0.18) inset,
+    0 1.2rem 2.4rem rgba(0, 0, 0, 0.35);
+}
+
+body[data-theme='dark'] .join-card__eyebrow {
+  color: rgba(var(--green-rgb-300), 0.86);
+}
+
+body[data-theme='dark'] .join-card__description {
+  color: rgba(247, 248, 250, 0.82);
+}
+
+body[data-theme='dark'] .join-card__description--strong {
+  color: rgba(var(--green-rgb-200), 0.92);
+}
+
+body[data-theme='dark'] .join-card__button {
+  border-color: rgba(var(--green-rgb-300), 0.52);
+  box-shadow: 0 0 0 1px rgba(var(--green-rgb-200), 0.14) inset;
+}
+
 .stats-cards {
   display: grid;
   grid-template-columns: repeat(3, minmax(18rem, 1fr));
@@ -657,6 +795,22 @@ body.is-site-loading .text-reveal-line {
 
 .panel p {
   line-height: 1.5;
+}
+
+@media (max-width: 780px) {
+  .panel--join {
+    min-height: max(88vh, 38rem);
+    padding-block: clamp(2.2rem, 8vh, 4.5rem);
+  }
+
+  .join-card {
+    border-radius: 1rem;
+    padding: clamp(1.2rem, 5vw, 1.8rem);
+  }
+
+  .join-card__button {
+    width: 100%;
+  }
 }
 
 @keyframes site-loader-spin {
