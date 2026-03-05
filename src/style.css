@@ -57,7 +57,6 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth iframe { pointer-events: none; }
 
 .container {
-  width: min(1220px, 96vw);
   margin-inline: auto;
 }
 
@@ -500,29 +499,53 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 }
 
 .panel--contact {
-  min-height: max(122vh, 58rem);
-  padding-block: clamp(3.5rem, 10vh, 8rem);
+  min-height: max(126vh, 62rem);
+  padding-block: clamp(3.2rem, 9vh, 7rem);
   align-items: center;
   justify-content: center;
   text-align: left;
 }
 
 .contact-showcase {
-  width: min(74rem, 96vw);
+  width: min(88rem, 96vw);
+  min-height: clamp(34rem, 74vh, 50rem);
   display: grid;
-  justify-items: center;
-  gap: clamp(1.2rem, 3vw, 2.3rem);
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    'blank title'
+    'calendar card';
+  align-items: stretch;
+  column-gap: clamp(2rem, 5vw, 5.5rem);
+  row-gap: clamp(1rem, 2vw, 1.8rem);
+  position: relative;
+  isolation: isolate;
 }
 
 .contact-showcase__title {
-  justify-self: center;
-  text-align: center;
+  grid-area: title;
+  margin: 0;
+  justify-self: stretch;
+  align-self: end;
+  text-align: left;
+  line-height: 0.98;
+  white-space: nowrap;
+  position: relative;
+  z-index: 3;
 }
 
 .calendar-shell {
+  grid-area: calendar;
+  justify-self: stretch;
+  align-self: stretch;
   position: relative;
-  width: min(48rem, 96vw);
-  padding: clamp(1.05rem, 2.8vw, 1.5rem) clamp(0.95rem, 2.2vw, 1.4rem) clamp(1.2rem, 2.8vw, 1.65rem);
+  z-index: 1;
+  margin-top: 8rem;
+  width: 100%;
+  height: 32rem;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.15rem, 2.8vw, 1.6rem) clamp(1rem, 2.5vw, 1.55rem) clamp(1.35rem, 3.2vw, 1.95rem);
   border-radius: 1.05rem;
   border: 1px solid rgba(var(--green-rgb-600), 0.34);
   background: linear-gradient(146deg, rgba(245, 255, 249, 0.92), rgba(226, 248, 235, 0.9));
@@ -533,17 +556,17 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 .calendar__binder {
   position: absolute;
-  top: clamp(0.42rem, 1.1vw, 0.62rem);
+  top: clamp(0.46rem, 1.2vw, 0.72rem);
   left: 50%;
-  width: min(76%, 31rem);
+  width: min(80%, 36rem);
   transform: translateX(-50%);
   display: flex;
   justify-content: space-between;
 }
 
 .calendar__ring {
-  width: clamp(2.7rem, 8.2vw, 4rem);
-  height: clamp(0.66rem, 1.6vw, 0.9rem);
+  width: clamp(2.9rem, 8.8vw, 4.4rem);
+  height: clamp(0.72rem, 1.8vw, 1rem);
   border-radius: 999px;
   border: 1px solid rgba(var(--green-rgb-900), 0.18);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(220, 235, 226, 0.92));
@@ -552,8 +575,8 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 .calendar__stack {
   position: relative;
-  margin-top: clamp(0.9rem, 2.2vw, 1.2rem);
-  height: clamp(15rem, 40vw, 23rem);
+  margin-top: clamp(1rem, 2.4vw, 1.5rem);
+  flex: 1 1 auto;
   transform-style: preserve-3d;
 }
 
@@ -589,14 +612,18 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 }
 
 .contact-card {
+  grid-area: card;
   position: relative;
-  width: min(60rem, 94vw);
-  padding: clamp(1.55rem, 3vw, 2.9rem);
+  align-self: stretch;
+  width: 100%;
+  height: 100%;
+  padding: clamp(1.55rem, 3vw, 2.85rem);
   border-radius: 1.25rem;
   border: 1px solid rgba(var(--green-rgb-600), 0.34);
   background: linear-gradient(145deg, rgba(247, 255, 250, 0.96), rgba(231, 250, 239, 0.9));
   box-shadow: 0 0 0 1px rgba(var(--green-rgb-300), 0.2) inset, 0 1rem 2.5rem rgba(4, 25, 12, 0.16);
   display: grid;
+  align-content: center;
   gap: clamp(0.82rem, 1.5vw, 1.2rem);
   overflow: hidden;
   isolation: isolate;
@@ -639,7 +666,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 }
 
 .contact-card__content {
-  width: min(64ch, 100%);
+  width: min(68ch, 100%);
   display: grid;
   gap: clamp(0.65rem, 1.1vw, 0.9rem);
 }
@@ -694,6 +721,34 @@ body[data-theme='dark'] .calendar__page--flip {
   border-color: rgba(var(--green-rgb-300), 0.34);
   background: linear-gradient(180deg, rgba(22, 38, 27, 0.94), rgba(13, 27, 19, 0.88)),
               repeating-linear-gradient(180deg, rgba(var(--green-rgb-300), 0.12) 0, rgba(var(--green-rgb-300), 0.12) 1px, transparent 1px, transparent 22px);
+}
+
+@media (max-width: 980px) {
+  .contact-showcase {
+    width: min(42rem, 96vw);
+    min-height: 0;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      'calendar'
+      'title'
+      'card';
+    justify-items: center;
+    row-gap: clamp(1.6rem, 6vw, 2.8rem);
+  }
+
+  .contact-showcase__title {
+    justify-self: center;
+    text-align: center;
+  }
+
+  .calendar-shell {
+    max-width: min(40rem, 96vw);
+  }
+
+  .contact-card {
+    height: auto;
+  }
 }
 
 @keyframes site-loader-spin {

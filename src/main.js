@@ -1595,7 +1595,6 @@ if (teamPanel) {
 }
 
 if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCalendarFinalPage) {
-  // Source-inspired tuning values from the provided book/page animation.
   const calendarSweepConfig = {
     easingFactor: 0.5,
     easingFactorFold: 0.3,
@@ -1605,20 +1604,22 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
   };
 
   const getCalendarRestPose = () => (window.innerWidth <= 780
-    ? { rotateX: 10, rotateY: -7, rotateZ: -3.5, yPercent: 0, scale: 0.98 }
-    : { rotateX: 12, rotateY: -12, rotateZ: -6, yPercent: 0, scale: 1 });
+    ? { rotateX: 13, rotateY: -10, rotateZ: -5, yPercent: 0, scale: 0.98 }
+    : { rotateX: 17, rotateY: -18, rotateZ: -8, yPercent: 0, scale: 1 });
 
   const getCalendarEndPose = () => (window.innerWidth <= 780
-    ? { rotateX: 3, rotateY: -2, rotateZ: -1.5, yPercent: -2, scale: 1 }
-    : { rotateX: 4, rotateY: -4, rotateZ: -2, yPercent: -4, scale: 1.02 });
+    ? { rotateX: 6, rotateY: -6, rotateZ: -3, yPercent: -1, scale: 1 }
+    : { rotateX: 10, rotateY: -12, rotateZ: -5, yPercent: -2, scale: 1.01 });
 
   const totalFlipPages = joinCalendarFlipPages.length;
+  const joinTitleLine = joinShowcase
+    ? joinShowcase.querySelector('.section-title-line')
+    : null;
 
   const getPageRestOffset = (index) => {
-    // Ensure deterministic stacking: index 0 is the top-most page.
     const layer = totalFlipPages - index;
     return {
-      y: index * 1.05,
+      y: index * 4,
       z: 0,
       rotateX: 0,
       rotateZ: index * -0.1,
@@ -1652,18 +1653,20 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
       ...restOffset,
       autoAlpha: 1,
       transformOrigin: '50% 0%',
+      backfaceVisibility: 'visible',
       force3D: true
     });
   });
 
-  const calendarTimeline = gsap.timeline({
-    scrollTrigger: {
-      trigger: joinShowcase || joinPanel,
-      start: 'top 94%',
-      end: 'center center',
-      scrub: true,
-      invalidateOnRefresh: true
-    }
+  const calendarTimeline = gsap.timeline({ paused: true });
+
+  ScrollTrigger.create({
+    trigger: joinTitleLine || joinShowcase || joinPanel,
+    start: 'top 63%',
+    end: 'bottom top',
+    animation: calendarTimeline,
+    toggleActions: 'play none reverse reverse',
+    invalidateOnRefresh: true
   });
 
   calendarTimeline.to(joinCalendarShell, {
@@ -1682,10 +1685,14 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
       yPercent: 0,
       duration: 0.32,
       ease: 'sine.out'
-    }, 0.7);
+    }, 0.82);
   }
 
   const totalPages = totalFlipPages;
+  const flipBurstStart = prefersReducedMotion ? 1.12 : 1.2;
+  const flipBurstEnd = prefersReducedMotion ? 2.3 : 3.1;
+  const flipStartSpread = totalPages <= 1 ? 0 : (prefersReducedMotion ? 0.28 : 0.62);
+  const foldWindow = prefersReducedMotion ? 0.3 : 0.55;
 
   joinCalendarFlipPages.forEach((page, index) => {
     const insideCurveIntensity = index < Math.ceil(totalPages * 0.35) ? Math.sin(index * 0.2 + 0.25) : 0;
@@ -1693,44 +1700,27 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
     const turningIntensity = Math.sin(index * Math.PI * (1 / totalPages));
 
     const layer = totalPages - index;
-    const activeLayer = totalPages + 20;
+    const activeLayer = totalPages + 20 + layer;
     const curvedRotation =
-      126
+      166
       + (
         calendarSweepConfig.insideCurveStrength * insideCurveIntensity
         - calendarSweepConfig.outsideCurveStrength * outsideCurveIntensity
         + calendarSweepConfig.turningCurveStrength * turningIntensity
       ) * 24;
 
-    const pageStart = totalPages <= 1 ? 0 : ((index / (totalPages - 1)) * 1.05);
-    const sweepDuration = prefersReducedMotion ? 0.05 : 0.24;
-    const foldDuration = prefersReducedMotion ? 0.035 : 0.165;
-    const lift = 40 + index * 8;
-    const zLift = 10 + index * 1.8;
-    const foldZ = (index % 2 === 0 ? -6 : 6) * calendarSweepConfig.easingFactorFold;
+    const pageStart = flipBurstStart
+      + (totalPages <= 1 ? 0 : ((index / (totalPages - 1)) * flipStartSpread));
+    const foldStart = Math.max(pageStart + 0.02, flipBurstEnd - foldWindow);
+    const sweepDuration = Math.max(0.02, foldStart - pageStart);
 
     calendarTimeline
       .set(page, { zIndex: activeLayer }, pageStart)
       .to(page, {
         rotateX: curvedRotation,
-        y: -lift,
-        z: zLift,
         duration: sweepDuration,
-        ease: `power${Math.max(1, Math.round(2 * calendarSweepConfig.easingFactor))}.in`
+        ease: 'power2.inOut'
       }, pageStart)
-      .to(page, {
-        rotateX: curvedRotation + 8,
-        rotateZ: foldZ,
-        y: -lift - 7,
-        duration: foldDuration,
-        ease: 'sine.inOut'
-      }, pageStart + (sweepDuration * 0.44))
-      .to(page, {
-        autoAlpha: 0,
-        duration: foldDuration,
-        ease: 'power1.out'
-      }, pageStart + (sweepDuration * 0.54))
-      .set(page, { zIndex: layer }, pageStart + sweepDuration + foldDuration + 0.001);
   });
 }
 
