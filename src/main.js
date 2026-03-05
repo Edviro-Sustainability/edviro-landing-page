@@ -185,6 +185,49 @@ const teamProjection = {
   clip: new THREE.Vector3()
 };
 
+function getCalendarQuarterLabel(baseQuarterDate, quarterOffset = 0) {
+  const offsetDate = new Date(
+    baseQuarterDate.getFullYear(),
+    baseQuarterDate.getMonth() - (quarterOffset * 3),
+    1
+  );
+  const quarter = Math.floor(offsetDate.getMonth() / 3) + 1;
+  return `Q${quarter} ${offsetDate.getFullYear()}`;
+}
+
+function ensureCalendarQuarterElement(page) {
+  if (!page) return null;
+  const existingQuarter = page.querySelector('.calendar__quarter');
+  if (existingQuarter) return existingQuarter;
+
+  const quarterElement = document.createElement('p');
+  quarterElement.className = 'calendar__quarter';
+  page.appendChild(quarterElement);
+  return quarterElement;
+}
+
+function applyCalendarQuarterLabels(referenceDate = new Date()) {
+  if (!joinCalendarFinalPage) return;
+
+  const quarterStartMonth = Math.floor(referenceDate.getMonth() / 3) * 3;
+  const baseQuarterDate = new Date(referenceDate.getFullYear(), quarterStartMonth, 1);
+  const finalQuarterElement = joinCalendarQuarter || ensureCalendarQuarterElement(joinCalendarFinalPage);
+  const totalFlipPages = joinCalendarFlipPages.length;
+
+  if (finalQuarterElement) {
+    finalQuarterElement.textContent = getCalendarQuarterLabel(baseQuarterDate, 0);
+  }
+
+  joinCalendarFlipPages.forEach((page, index) => {
+    const quarterElement = ensureCalendarQuarterElement(page);
+    if (!quarterElement) return;
+    const quarterOffset = totalFlipPages - index;
+    quarterElement.textContent = getCalendarQuarterLabel(baseQuarterDate, quarterOffset);
+  });
+}
+
+applyCalendarQuarterLabels();
+
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(themeConfig.light.sceneColor);
 scene.fog = new THREE.FogExp2(themeConfig.light.fogColor, themeConfig.light.fogDensity);
@@ -1612,6 +1655,7 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
     : { rotateX: 10, rotateY: -12, rotateZ: -5, yPercent: -2, scale: 1.01 });
 
   const totalFlipPages = joinCalendarFlipPages.length;
+  const joinCalendarFlipQuarters = joinCalendarFlipPages.map((page) => page.querySelector('.calendar__quarter'));
   const joinTitleLine = joinShowcase
     ? joinShowcase.querySelector('.section-title-line')
     : null;
@@ -1657,6 +1701,7 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
       force3D: true
     });
   });
+  gsap.set(joinCalendarFlipQuarters.filter(Boolean), { opacity: 1 });
 
   const calendarTimeline = gsap.timeline({ paused: true });
 
@@ -1695,6 +1740,7 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
   const foldWindow = prefersReducedMotion ? 0.3 : 0.55;
 
   joinCalendarFlipPages.forEach((page, index) => {
+    const pageQuarter = joinCalendarFlipQuarters[index];
     const insideCurveIntensity = index < Math.ceil(totalPages * 0.35) ? Math.sin(index * 0.2 + 0.25) : 0;
     const outsideCurveIntensity = index >= Math.ceil(totalPages * 0.35) ? Math.cos(index * 0.3 + 0.09) : 0;
     const turningIntensity = Math.sin(index * Math.PI * (1 / totalPages));
@@ -1719,12 +1765,20 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
       .to(page, {
         rotateX: curvedRotation,
         duration: sweepDuration,
-        ease: 'power2.inOut'
-      }, pageStart)
+        ease: 'sine.inOut'
+      }, pageStart);
+
+    if (pageQuarter) {
+      calendarTimeline.to(pageQuarter, {
+        opacity: 0.1,
+        duration: prefersReducedMotion ? 0.08 : 0.14,
+        ease: 'sine.out'
+      }, pageStart + 0.25);
+    }
   });
 }
 
-const scrollHeight = -30; // bigger -> faster, smaller -> slower
+const scrollHeight = -29.5; // bigger -> faster, smaller -> slower
 cameraScrollTimeline.to(scrollState, {
   cameraOffsetX: -44.0, cameraOffsetY: -1.5, cameraOffsetZ: scrollHeight,
   lookAtOffsetX: -36.0, lookAtOffsetY: 0.0, lookAtOffsetZ: scrollHeight + 26.0,
