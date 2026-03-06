@@ -12,10 +12,6 @@
       <span class="site-loader__spinner" aria-hidden="true"></span>
     </div>
     
-    <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">
-      Switch to dark
-    </button>
-    
     <div class="scroll-phrase" aria-hidden="true">
       <p class="scroll-phrase__line">
         <span class="scroll-phrase__row">
@@ -47,6 +43,34 @@
       </button>
     </div>
     
+    <nav class="site-nav" id="site-nav" aria-label="Site navigation">
+      <div class="site-nav__chain" aria-label="Page sections">
+        <button class="nav-dot" data-target="#services-section" data-index="0" type="button" aria-label="Jump to Services">
+          <span class="nav-dot__pip"></span>
+          <span class="nav-dot__label">Services</span>
+        </button>
+        <div class="nav-connector" data-index="0" aria-hidden="true"><span class="nav-connector__pulse"></span></div>
+        <button class="nav-dot" data-target="#about-section" data-index="1" type="button" aria-label="Jump to About">
+          <span class="nav-dot__pip"></span>
+          <span class="nav-dot__label">About</span>
+        </button>
+        <div class="nav-connector" data-index="1" aria-hidden="true"><span class="nav-connector__pulse"></span></div>
+        <button class="nav-dot" data-target="#team-section" data-index="2" type="button" aria-label="Jump to Team">
+          <span class="nav-dot__pip"></span>
+          <span class="nav-dot__label">Team</span>
+        </button>
+        <div class="nav-connector" data-index="2" aria-hidden="true"><span class="nav-connector__pulse"></span></div>
+        <button class="nav-dot" data-target="#contact-section" data-index="3" type="button" aria-label="Jump to Contact">
+          <span class="nav-dot__pip"></span>
+          <span class="nav-dot__label">Contact</span>
+        </button>
+      </div>
+      <div class="site-nav__actions">
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">Switch to dark</button>
+        <a class="nav-login" href="https://edviroenergy.com/auth" target="_blank" rel="noopener noreferrer">Log In</a>
+      </div>
+    </nav>
+
     <main id="content">
       <section class="panel">
         <h1 class="title" aria-label="Edviro Energy Management">
@@ -74,9 +98,9 @@
         </article>
       </div>
       
-      <section class="panel invisible"></section>
+      <section class="panel invisible" id="services-section"></section>
       
-      <section class="panel container panel--stats" aria-label="District footprint summary">
+      <section class="panel container panel--stats" id="about-section" aria-label="District footprint summary">
         <p class="insight-card card-light"> Our pilot program with local school districts uncovered significant billing discrepancies and energy inefficiencies. Using our advanced anomaly detection algorithms, we identified hundreds of thousands in overbilling that schools were able to recover.
         </p>
         <div class="stats-grid" role="list">
@@ -95,14 +119,14 @@
         </div>
       </section>
       
-      <section class="panel container panel--team">
+      <section class="panel container panel--team" id="team-section">
         <div class="team-grid">
           <h2 class="team-grid__title text-gradient section-title-line">Meet The Team</h2>
           <p class="team-grid__subtitle card-light">Edviro Energy is run by two passionate college students who grew fed up with seeing their hometown high schools lose thousands of valuable tax payer money to inefficiences, overbillings, and simple oversights that can be fixed with proper dashboarding and modern day API tools</p>
         </div>
       </section>
       
-      <section class="panel container panel--contact" aria-label="Partnership invitations">
+      <section class="panel container panel--contact" id="contact-section" aria-label="Partnership invitations">
         <div class="contact-showcase">
           <h2 class="contact-showcase__title text-gradient section-title-line">Contact Us</h2>
           

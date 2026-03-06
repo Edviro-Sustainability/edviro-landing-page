@@ -135,30 +135,32 @@ const GREEN_PALETTE = {
 const TEAM_MEMBER_CONFIG = [
   {
     id: 'hursh',
-    basePosition: new THREE.Vector3(-33.6, -3.9, -10.0),
+    basePosition: new THREE.Vector3(-34.3, -3.9, -9.5),
     baseRotationY: -0.28,
     tiltX: 0.1,
+    tiltPhaseOffset: 0,
     phase: 0.2,
     scale: 0.4,
     floatAmplitude: 0.2,
     floatSpeed: 1.35,
-    driftY: 0.05,
-    driftZ: 0.1,
+    driftY: 0.03,
+    driftZ: 0.07,
     rotateSpeed: 0.6,
     labelOffsetX: 220,
     labelOffsetY: -24
   },
   {
     id: 'tanuj',
-    basePosition: new THREE.Vector3(-38.2, -3.9, -7.5),
+    basePosition: new THREE.Vector3(-38.2, -3.9, -7),
     baseRotationY: 0.34,
     tiltX: 0.1,
+    tiltPhaseOffset: 5.2,
     phase: 1.6,
     scale: 0.4,
     floatAmplitude: 0.2,
     floatSpeed: 1.24,
-    driftY: 0.05,
-    driftZ: 0.21,
+    driftY: 0.03,
+    driftZ: 0.14,
     rotateSpeed: -0.6,
     labelOffsetX: 220,
     labelOffsetY: 22
@@ -171,13 +173,12 @@ const teamCardMap = new Map(
     .filter(([id]) => typeof id === 'string' && id.length > 0)
 );
 const teamMembers = [];
-let lastTeamUpdateTime = null;
+let teamImageContainer = null;
 const teamSceneState = {
   panelActive: false,
   overlayVisible: false
 };
 const teamProjection = {
-  world: new THREE.Vector3(),
   clip: new THREE.Vector3()
 };
 
@@ -348,7 +349,6 @@ const greenMeshThemeStyle = {
   light: { color: GREEN_PALETTE.base, emissive: 0x000000, emissiveIntensity: 0.0 },
   dark: { color: 0x000000, emissive: GREEN_PALETTE.base, emissiveIntensity: 1.0 }
 };
-let teamMemberMaterial = null;
 let currentThemeName = getInitialThemeName();
 
 function formatCounterValue(value) {
@@ -390,97 +390,65 @@ function setTeamOverlayVisibility(isVisible) {
   if (!isVisible) resetTeamCards();
 }
 
-function centerObjectPivotToGround(object3D) {
-  const bounds = new THREE.Box3().setFromObject(object3D);
-  if (bounds.isEmpty()) return;
-  const center = bounds.getCenter(new THREE.Vector3());
-  object3D.position.x -= center.x;
-  object3D.position.y -= bounds.min.y;
-  object3D.position.z -= center.z;
-}
-
-function createTeamMembersFromModel(personModel) {
-  if (!personModel) return;
-  if (!teamMemberMaterial) {
-    teamMemberMaterial = new THREE.MeshStandardMaterial({
-      color: greenMeshThemeStyle.light.color,
-      emissive: greenMeshThemeStyle.light.emissive,
-      emissiveIntensity: greenMeshThemeStyle.light.emissiveIntensity,
-      roughness: 0.48,
-      metalness: 0.1
-    });
-    applyGreenMeshTheme(teamMemberMaterial,currentThemeName);
-  }
-
-  for (const existingMember of teamMembers) {
-    subjectGroup.remove(existingMember.group);
+function createTeamImageElements() {
+  if (teamImageContainer) {
+    teamImageContainer.remove();
   }
   teamMembers.length = 0;
-  lastTeamUpdateTime = null;
+
+  teamImageContainer = document.createElement('div');
+  teamImageContainer.className = 'team-image-container';
+  document.body.appendChild(teamImageContainer);
 
   for (const config of TEAM_MEMBER_CONFIG) {
-    const memberGroup = new THREE.Group();
-    const memberMesh = personModel.clone(true);
-    centerObjectPivotToGround(memberMesh);
-    memberMesh.rotation.x = -Math.PI / 2;
-    memberMesh.traverse((child) => {
-      if (!child.isMesh) return;
-      child.material = teamMemberMaterial;
-      child.castShadow = true;
-      child.receiveShadow = true;
-    });
-
-    const memberBounds = new THREE.Box3().setFromObject(memberMesh);
-    const centerY = memberBounds.isEmpty() ? 0 : (memberBounds.min.y + memberBounds.max.y) * 0.5;
-    memberMesh.position.y -= centerY;
-
-    const tiltGroup = new THREE.Group();
-    tiltGroup.rotation.x = config.tiltX ?? 0.2;
-    tiltGroup.rotation.y = config.baseRotationY;
-    tiltGroup.add(memberMesh);
-
-    const spinGroup = new THREE.Group();
-    spinGroup.position.y = centerY;
-    spinGroup.add(tiltGroup);
-
-    memberGroup.add(spinGroup);
-    memberGroup.scale.setScalar(config.scale);
-    memberGroup.position.copy(config.basePosition);
-    memberGroup.visible = false;
-    subjectGroup.add(memberGroup);
+    const img = document.createElement('img');
+    img.src = `/${config.id}.jpg`;
+    img.alt = config.id;
+    img.className = 'team-member-img';
+    teamImageContainer.appendChild(img);
 
     teamMembers.push({
       id: config.id,
-      group: memberGroup,
-      spinGroup,
+      el: img,
       config,
-      rotationZ: config.phase * config.rotateSpeed
+      worldPos: new THREE.Vector3(),
     });
   }
 }
 
 function updateTeamMembers(time) {
   if (teamMembers.length === 0) return;
-  const deltaTime = lastTeamUpdateTime === null ? 0 : Math.max(0, time - lastTeamUpdateTime);
-  lastTeamUpdateTime = time;
 
   for (const member of teamMembers) {
-    const { config, group, spinGroup } = member;
+    const { config, el, worldPos } = member;
     const phaseTime = time + config.phase;
-    group.position.x = config.basePosition.x;
-    group.position.z = config.basePosition.z + Math.cos(phaseTime * 0.55) * config.driftZ;
-    group.position.y = config.basePosition.y
-      + (Math.sin(phaseTime * config.floatSpeed) * config.floatAmplitude)
-      + (Math.sin(phaseTime * 0.7) * config.driftY);
-    member.rotationZ += config.rotateSpeed * deltaTime;
-    spinGroup.rotation.z = member.rotationZ;
+
+    worldPos.set(
+      config.basePosition.x,
+      config.basePosition.y
+        + Math.sin(phaseTime * config.floatSpeed) * config.floatAmplitude
+        + Math.sin(phaseTime * 0.7) * config.driftY,
+      config.basePosition.z + Math.cos(phaseTime * 0.55) * config.driftZ
+    );
+
+    teamProjection.clip.copy(worldPos).project(camera);
+    const screenX = (teamProjection.clip.x * 0.5 + 0.5) * window.innerWidth;
+    const screenY = (-teamProjection.clip.y * 0.5 + 0.5) * window.innerHeight;
+
+    const tiltPhase = phaseTime + (config.tiltPhaseOffset ?? 0);
+    const tiltX = (config.tiltX ?? 0) * (180 / Math.PI) + Math.sin(tiltPhase * 0.3) * 3;
+    const tiltY = Math.sin(tiltPhase * 0.4) * 4.5;
+    const imgOffsetY = window.innerWidth * 0.05;
+
+    el.style.left = `${screenX}px`;
+    el.style.top = `${screenY - imgOffsetY}px`;
+    el.style.transform = `translate(-50%, -50%) perspective(700px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
   }
 }
 
 function setTeamMembersVisibility(isVisible) {
   for (const member of teamMembers) {
-    if (!member?.group) continue;
-    member.group.visible = isVisible;
+    member.el.style.opacity = isVisible ? '1' : '0';
   }
 }
 
@@ -503,8 +471,7 @@ function updateTeamCardAnchors() {
       continue;
     }
 
-    (member.spinGroup ?? member.group).getWorldPosition(teamProjection.world);
-    teamProjection.clip.copy(teamProjection.world).project(camera);
+    teamProjection.clip.copy(member.worldPos).project(camera);
 
     const withinViewport = teamProjection.clip.z > -1 && teamProjection.clip.z < 1
       && Math.abs(teamProjection.clip.x) <= 1.1
@@ -806,7 +773,6 @@ function applyTheme(nextThemeName, options = {}) {
 
   applyMaterialTheme(normalizedThemeName);
   applyGreenMeshTheme(counterMaterial,normalizedThemeName);
-  applyGreenMeshTheme(teamMemberMaterial,normalizedThemeName);
   for (const outlineMaterial of schoolOutlineMaterials) {
     outlineMaterial.color.set(schoolOutlineStyle.color[normalizedThemeName]);
   }
@@ -901,11 +867,7 @@ loader.load('/wiring.obj', (loadedModel) => {
   markLoadComplete('wiringLoaded');
 });
 
-loader.load('/person.obj', (loadedModel) => {
-  createTeamMembersFromModel(loadedModel);
-}, undefined, (error) => {
-  console.error('Failed to load team model:', error);
-});
+createTeamImageElements();
 
 const pointerCurrent = { x: 0, y: 0 };
 const pointerXTo = gsap.quickTo(pointerCurrent, 'x', { duration: 0.6, ease: 'power3.out' });
@@ -1200,6 +1162,75 @@ lenis.stop();
 lenis.scrollTo(0, { immediate: true, force: true });
 bindIntroTextRevealUnlock();
 maybeUnlockScroll();
+
+// ─── Dot-chain navbar ──────────────────────────────────────────────
+(function initSiteNav() {
+  const navDots = Array.from(document.querySelectorAll('.nav-dot'));
+  const navConnectors = Array.from(document.querySelectorAll('.nav-connector'));
+
+  const navTargetIds = ['#services-section', '#about-section', '#team-section', '#contact-section'];
+  const navSections = navTargetIds.map(id => document.querySelector(id));
+
+  let activeNavIndex = -1;
+
+  function setActiveNav(idx) {
+    if (idx === activeNavIndex) return;
+    activeNavIndex = idx;
+    navDots.forEach((dot, i) => dot.classList.toggle('is-active', i === idx));
+  }
+
+  function triggerFlow(fromIdx, toIdx) {
+    if (fromIdx === toIdx) return;
+    if (toIdx > fromIdx) {
+      for (let i = fromIdx; i < toIdx; i++) {
+        const c = navConnectors[i];
+        if (!c) continue;
+        const delay = (i - fromIdx) * 90;
+        setTimeout(() => {
+          c.classList.remove('is-flowing-fwd', 'is-flowing-bwd');
+          void c.offsetWidth;
+          c.classList.add('is-flowing-fwd');
+          c.addEventListener('animationend', () => c.classList.remove('is-flowing-fwd'), { once: true });
+        }, delay);
+      }
+    } else {
+      for (let i = fromIdx - 1; i >= toIdx; i--) {
+        const c = navConnectors[i];
+        if (!c) continue;
+        const delay = (fromIdx - 1 - i) * 90;
+        setTimeout(() => {
+          c.classList.remove('is-flowing-fwd', 'is-flowing-bwd');
+          void c.offsetWidth;
+          c.classList.add('is-flowing-bwd');
+          c.addEventListener('animationend', () => c.classList.remove('is-flowing-bwd'), { once: true });
+        }, delay);
+      }
+    }
+  }
+
+  navDots.forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+      if (document.body.classList.contains('is-scroll-locked')) return;
+      const section = navSections[i];
+      if (!section || !lenis) return;
+      triggerFlow(activeNavIndex >= 0 ? activeNavIndex : i, i);
+      setActiveNav(i);
+      lenis.scrollTo(section, { offset: -58, duration: prefersReducedMotion ? 1.2 : 2.4, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+    });
+  });
+
+  // Track active section via IntersectionObserver
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const idx = navSections.indexOf(entry.target);
+        if (idx >= 0) setActiveNav(idx);
+      }
+    });
+  }, { threshold: 0.35 });
+
+  navSections.forEach(s => s && sectionObserver.observe(s));
+})();
 if (teamOverlay) gsap.set(teamOverlay, { autoAlpha: 0 });
 resetTeamCards();
 
@@ -1651,7 +1682,7 @@ if (joinPanel && energyMeterEl) {
   }
 }
 
-const scrollHeight = -30.5; // bigger -> faster, smaller -> slower
+const scrollHeight = -29.5; // bigger -> faster, smaller -> slower
 cameraScrollTimeline.to(scrollState, {
   cameraOffsetX: -44.0, cameraOffsetY: -1.5, cameraOffsetZ: scrollHeight,
   lookAtOffsetX: -36.0, lookAtOffsetY: 0.0, lookAtOffsetZ: scrollHeight + 26.0,
