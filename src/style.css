@@ -1,8 +1,8 @@
 :root {
-  --bg-base: #f7f7f8;
-  --text-primary: #111417;
-  --glass: rgba(255, 255, 255, 0.78);
-  --border-soft: rgba(17, 20, 23, 0.22);
+  --bg-base: #f7f8f7;
+  --text-primary: #121711;
+  --glass: rgba(255, 255, 255, 0.3);
+  --border-soft: rgba(17, 23, 17, 0.3);
   
   --green-900: #0f8339;
   --green-700: #15803d;
@@ -21,15 +21,36 @@
 }
 
 body[data-theme='dark'] {
-  --bg-base: #050607;
-  --text-primary: #f7f8fa;
-  --glass: rgba(17, 24, 39, 0.7);
-  --border-soft: rgba(148, 163, 184, 0.3);
+  --bg-base: #050705;
+  --text-primary: #f7faf7;
+  --glass: rgba(11, 27, 12, 0.7);
+  --border-soft: rgba(148, 184, 148, 0.3);
   --color-primary: var(--green-400);
 }
 
 * {
   box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--green-rgb-400), 0.5) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 999px;
+  opacity: 0.7;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  opacity: 1;
 }
 
 html, body {
@@ -136,29 +157,26 @@ body.is-site-loading .site-loader { opacity: 1; visibility: visible; }
   animation: site-loader-spin 900ms linear infinite;
 }
 
-/* ─── Site Nav ─────────────────────────────────────────────────────── */
-
 .site-nav {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 3;
-  height: 3.6rem;
+  height: 5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 1.25rem;
+  padding: 0 2rem;
   background: var(--glass);
   border-bottom: 1px solid var(--border-soft);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(3rem);
   -webkit-backdrop-filter: blur(12px);
   transition: opacity 220ms ease, visibility 220ms ease;
 }
 
 body.is-site-loading .site-nav { opacity: 0; visibility: hidden; pointer-events: none; }
 
-/* Dot chain */
 .site-nav__chain {
   display: flex;
   align-items: center;
@@ -173,18 +191,18 @@ body.is-site-loading .site-nav { opacity: 0; visibility: hidden; pointer-events:
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.28rem;
+  gap: 0.42rem;
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.3rem 0.5rem;
+  padding: 0.45rem 0.75rem;
   color: var(--text-primary);
 }
 
 .nav-dot__pip {
   display: block;
-  width: 0.55rem;
-  height: 0.55rem;
+  width: 0.75rem;
+  height: 0.75rem;
   border-radius: 50%;
   border: 1.5px solid rgba(var(--green-rgb-900), 0.5);
   background: transparent;
@@ -192,7 +210,7 @@ body.is-site-loading .site-nav { opacity: 0; visibility: hidden; pointer-events:
 }
 
 .nav-dot__label {
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -229,13 +247,12 @@ body.is-site-loading .site-nav { opacity: 0; visibility: hidden; pointer-events:
 .nav-dot:focus-visible { outline: none; }
 .nav-dot:focus-visible .nav-dot__pip { outline: 2px solid var(--color-primary); outline-offset: 3px; }
 
-/* Connector wire */
 .nav-connector {
-  width: 3.5rem;
+  width: 4.5rem;
   height: 2px;
   position: relative;
   align-self: center;
-  margin-bottom: 1.05rem; /* align vertically with dot pip center */
+  margin-bottom: 1.35rem;
   overflow: hidden;
   border-radius: 1px;
   background: linear-gradient(90deg,
@@ -288,23 +305,22 @@ body.is-site-loading .site-nav { opacity: 0; visibility: hidden; pointer-events:
   100% { background-position: -200% 0; opacity: 0; }
 }
 
-/* Nav actions (theme toggle + login) */
 .site-nav__actions {
   position: absolute;
   right: 1.25rem;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.9rem;
 }
 
 .theme-toggle {
-  padding: 0.4rem 0.75rem;
+  padding: 0.55rem 1rem;
   border-radius: 999px;
   border: 1px solid var(--border-soft);
   background: transparent;
   color: var(--text-primary);
   cursor: pointer;
-  font-size: 0.76rem;
+  font-size: 0.9rem;
   font-weight: 500;
   letter-spacing: 0.04em;
   transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease;
@@ -314,11 +330,11 @@ body.is-site-loading .site-nav { opacity: 0; visibility: hidden; pointer-events:
 .theme-toggle:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
 
 .nav-login {
-  padding: 0.4rem 0.9rem;
+  padding: 0.55rem 1.2rem;
   border-radius: 999px;
   background: linear-gradient(135deg, var(--green-600), var(--green-900));
   color: #fff;
-  font-size: 0.76rem;
+  font-size: 0.9rem;
   font-weight: 650;
   letter-spacing: 0.06em;
   text-decoration: none;
@@ -337,7 +353,7 @@ body.is-site-loading .site-nav { opacity: 0; visibility: hidden; pointer-events:
 .nav-login:focus-visible { outline: 2px solid var(--green-300); outline-offset: 2px; }
 
 .panel:first-child {
-  padding-top: calc(3.6rem + 10vh);
+  padding-top: calc(5rem + 10vh);
   align-items: center;
 }
 
@@ -395,7 +411,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   display: grid;
   justify-items: center;
   gap: clamp(0.24rem, 0.9vw, 0.7rem);
-  font-size: clamp(1.45rem, 5vw, 3.95rem);
+  font-size: clamp(2rem, 7vw, 5.5rem);
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -460,9 +476,9 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 25vw;
-  min-height: 40vh;
-  padding: 4rem;
+  width: clamp(20rem, 26vw, 34rem);
+  min-height: clamp(22rem, 38vh, 44rem);
+  padding: clamp(1.6rem, 2.4vw, 2.8rem);
   transform-origin: left center;
   display: flex;
   flex-direction: column;
@@ -476,7 +492,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 .scene-card__label {
   margin: 0;
-  font-size: 3rem;
+  font-size: clamp(1.6rem, 2.6vw, 2.8rem);
   font-weight: 650;
   line-height: 1.12;
   text-transform: uppercase;
@@ -485,7 +501,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 .scene-card__sublabel {
   margin: 0;
-  font-size: 2rem;
+  font-size: clamp(1rem, 1.6vw, 1.8rem);
   line-height: 1.46;
   letter-spacing: 0.035em;
   color: rgba(var(--green-rgb-200), 0.8);
@@ -500,8 +516,8 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 }
 
 .insight-card {
-  width: 50vw;
-  font-size: 2rem;
+  width: clamp(28rem, 50vw, 56rem);
+  font-size: clamp(1rem, 1.5vw, 1.6rem);
 }
 
 .stats-grid {
@@ -509,8 +525,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(0.9rem, 2vw, 1.5rem);
   width: min(70rem, 100%);
-  margin-inline: auto;
-  align-items: stretch;
+  margin-bottom: 8rem;
 }
 
 .stats-card {
@@ -566,7 +581,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 .team-grid__subtitle {
   max-width: 48ch !important;
-  font-size: 2rem;
+  font-size: clamp(1rem, 1.4vw, 1.6rem);
   line-height: 1.52;
   grid-column: 7 / -1;
   grid-row: 3;
@@ -679,15 +694,16 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 .panel--contact {
   height: 100vh;
-  padding-block: clamp(3.2rem, 9vh, 7rem);
+  padding: clamp(3.2rem, 9vh, 7rem) clamp(2rem, 7vw, 8rem);
   align-items: center;
   justify-content: center;
   text-align: left;
 }
 
 .contact-showcase {
-  margin: 16rem;
-  min-height: clamp(34rem, 74vh, 50rem);
+  width: 100%;
+  max-width: 88rem;
+  min-height: clamp(28rem, 70vh, 48rem);
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
   grid-template-rows: auto 1fr;
@@ -695,7 +711,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
     'energy title'
     'energy card';
   align-items: stretch;
-  gap: 8rem;
+  gap: clamp(2rem, 4vw, 5rem);
   position: relative;
 }
 
@@ -849,14 +865,15 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   text-align: center;
   width: 100%;
   height: 100%;
-  padding: 4rem;
-  font-size: 2rem;
+  padding: clamp(1.5rem, 2.6vw, 2.8rem);
+  font-size: clamp(0.95rem, 1.3vw, 1.5rem);
   display: grid;
   align-content: space-between;
   gap: clamp(0.82rem, 1.5vw, 1.2rem);
 }
 
 .contact-card__eyebrow {
+  font-size: clamp(0.68rem, 0.9vw, 0.82rem);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   font-weight: 650;
@@ -864,7 +881,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 }
 
 .contact-card__desc {
-  font-size: 1.6rem;
+  font-size: clamp(0.9rem, 1.2vw, 1.3rem);
   color: rgba(17, 20, 23, 0.84);
 }
 
@@ -876,11 +893,11 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 .contact-card__email-btn {
   display: block;
   width: 100%;
-  padding: 1rem 1.5rem;
+  padding: clamp(0.7rem, 1.1vw, 1rem) clamp(1rem, 1.5vw, 1.5rem);
   border-radius: 0.75rem;
   background: linear-gradient(135deg, var(--green-600), var(--green-900));
   color: #fff;
-  font-size: 1.5rem;
+  font-size: clamp(0.82rem, 1.05vw, 1.1rem);
   font-weight: 650;
   letter-spacing: 0.04em;
   text-decoration: none;
@@ -960,7 +977,7 @@ body[data-theme='dark'] .contact-card__desc--strong { color: rgba(var(--green-rg
 }
 
 .nav-brand {
-  font-size: 1.05rem;
+  font-size: 1.3rem;
   font-weight: 750;
   letter-spacing: 0.08em;
   background-image: linear-gradient(90deg, var(--color-primary) 0%, var(--green-900) 100%);
@@ -1023,7 +1040,6 @@ body[data-theme='dark'] .insight-card.card-light {
   left: 160%;
 }
 
-/* Pulsing glow on the email button at rest to draw attention */
 @keyframes btn-glow-pulse {
   0%, 100% { box-shadow: 0 4px 16px rgba(var(--green-rgb-600), 0.4); }
   50%       { box-shadow: 0 4px 24px rgba(var(--green-rgb-600), 0.62), 0 0 0 3px rgba(var(--green-rgb-400), 0.14); }
@@ -1037,7 +1053,6 @@ body[data-theme='dark'] .insight-card.card-light {
   animation: none;
 }
 
-/* Nav login — shimmer on hover */
 .nav-login {
   position: relative;
   overflow: hidden;
@@ -1060,7 +1075,6 @@ body[data-theme='dark'] .insight-card.card-light {
   left: 160%;
 }
 
-/* Contact eyebrow — badge treatment */
 .contact-card__eyebrow {
   display: inline-block;
   padding: 0.28em 0.9em;
@@ -1075,13 +1089,11 @@ body[data-theme='dark'] .contact-card__eyebrow {
   border-color: rgba(var(--green-rgb-400), 0.22);
 }
 
-/* Footer — glassmorphism blur */
 .site-footer {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 
-/* Theme toggle — subtle shimmer track on hover */
 .theme-toggle {
   position: relative;
   overflow: hidden;

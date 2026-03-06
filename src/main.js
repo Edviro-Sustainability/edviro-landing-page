@@ -1211,11 +1211,19 @@ maybeUnlockScroll();
   navDots.forEach((dot, i) => {
     dot.addEventListener('click', () => {
       if (document.body.classList.contains('is-scroll-locked')) return;
-      const section = navSections[i];
-      if (!section || !lenis) return;
       triggerFlow(activeNavIndex >= 0 ? activeNavIndex : i, i);
       setActiveNav(i);
-      lenis.scrollTo(section, { offset: -58, duration: prefersReducedMotion ? 1.2 : 2.4, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+      if (i === 0) {
+        // Scroll to the point where the first scene card is at its mid keyframe (timeline position 0.62s)
+        const st = cameraScrollTimeline.scrollTrigger;
+        const scrollProgress = 0.62 / cameraScrollTimeline.totalDuration();
+        const target = st.start + scrollProgress * (st.end - st.start);
+        lenis.scrollTo(target, { duration: prefersReducedMotion ? 1.2 : 2.4, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+      } else {
+        const section = navSections[i];
+        if (!section || !lenis) return;
+        lenis.scrollTo(section, { offset: -58, duration: prefersReducedMotion ? 1.2 : 2.4, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+      }
     });
   });
 
@@ -1350,13 +1358,15 @@ if (sceneCards.length === 3) {
 
   const getCardPassStyle = () => {
     const compact = window.innerWidth <= 768;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
     const baseStyle = {
-      startX: [-600, -580, -560],
-      startY: [-250, -250, -250],
-      midX: [-360, -360, -360],
-      midY: [-150, -150, -150],
-      endX: [100, 100, 100],
-      endY: [50, 50, 50],
+      startX: [w * -0.416, w * -0.402, w * -0.389],
+      startY: [h * -0.278, h * -0.278, h * -0.278],
+      midX: [w * -0.25, w * -0.25, w * -0.25],
+      midY: [h * -0.167, h * -0.167, h * -0.167],
+      endX: [w * 0.069, w * 0.069, w * 0.069],
+      endY: [h * 0.056, h * 0.056, h * 0.056],
       startScale: [0.5, 0.5, 0.5],
       midScale: [1.0, 1.0, 1.0],
       endScale: [2.5, 2.5, 2.5]
@@ -1699,6 +1709,7 @@ window.addEventListener('resize', () => {
   composer.setPixelRatio(pixelRatio);
   composer.setSize(window.innerWidth, window.innerHeight);
   dofPass.setSize(window.innerWidth, window.innerHeight);
+  wireBloomPass.setSize(window.innerWidth, window.innerHeight);
   fxaaPass.material.uniforms.resolution.value.set(1 / (window.innerWidth * pixelRatio), 1 / (window.innerHeight * pixelRatio));
   for (const outlineMaterial of schoolOutlineMaterials) {
     outlineMaterial.resolution.set(window.innerWidth, window.innerHeight);
