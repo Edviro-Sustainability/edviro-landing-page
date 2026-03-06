@@ -1192,7 +1192,7 @@ function updateTitleIntroTransform(progress) {
 updateTitleIntroTransform(titleIntroAnimState.progress);
 
 lenis = new Lenis({
-  duration: prefersReducedMotion ? 0.8 : 1.15, smoothWheel: !prefersReducedMotion, smoothTouch: false
+  duration: prefersReducedMotion ? 1.1 : 3.0, smoothWheel: true, smoothTouch: true
 });
 
 lenis.on('scroll', ScrollTrigger.update);
