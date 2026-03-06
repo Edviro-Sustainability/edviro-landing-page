@@ -472,7 +472,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 }
 
 .panel--contact {
-  min-height: max(126vh, 62rem);
+  height: 100vh;
   padding-block: clamp(3.2rem, 9vh, 7rem);
   align-items: center;
   justify-content: center;
@@ -486,8 +486,8 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
   grid-template-rows: auto 1fr;
   grid-template-areas:
-    'blank title'
-    'calendar card';
+    'energy title'
+    'energy card';
   align-items: stretch;
   gap: 8rem;
   position: relative;
@@ -504,74 +504,136 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   z-index: 3;
 }
 
-.calendar-tilt-wrapper {
-  grid-area: calendar;
-  justify-self: stretch;
-  align-self: start;
+.energy-meter-wrapper {
+  grid-area: energy;
+  align-content: center;
   will-change: transform;
 }
 
-.calendar-shell {
+.energy-meter {
   position: relative;
   z-index: 1;
-  margin-top: 8rem;
   width: 100%;
-  height: 32rem;
+  padding: clamp(1.4rem, 3vw, 2rem);
   display: flex;
   flex-direction: column;
-  padding: clamp(1.15rem, 2.8vw, 1.6rem) clamp(1rem, 2.5vw, 1.55rem) clamp(1.35rem, 3.2vw, 1.95rem);
-  perspective: 1400px;
+  gap: 1rem;
+  user-select: none;
+  cursor: default;
 }
 
-.calendar__binder {
-  position: absolute;
-  top: clamp(0.46rem, 1.2vw, 0.72rem);
-  left: 50%;
-  width: min(80%, 36rem);
-  transform: translateX(-50%);
-  display: flex;
-  justify-content: space-between;
-}
-
-.calendar__ring {
-  width: clamp(2.9rem, 8.8vw, 4.4rem);
-  height: clamp(0.72rem, 1.8vw, 1rem);
-  border-radius: 999px;
-  background: var(--green-400);
-}
-
-.calendar__stack {
-  position: relative;
-  margin-top: clamp(1rem, 2.4vw, 1.5rem);
-  flex: 1 1 auto;
-  transform-style: preserve-3d;
-}
-
-.calendar__page {
-  position: absolute;
-  inset: 0;
-  border-radius: 0.7rem;
-  color: var(--green-900);
-  border: 1px solid rgba(var(--green-rgb-600), 0.24);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(236, 250, 242, 0.8));
-  box-shadow: 0 0 0 1px rgba(var(--green-rgb-300), 0.15) inset, 0 0.6rem 1.3rem rgba(5, 24, 11, 0.12);
-  filter: blur(1px);
-  transform-origin: 50% 0%;
-  backface-visibility: hidden;
-}
-
-.calendar__page--final,
-.calendar__page--flip {
-  display: grid;
-  place-items: center;
-}
-
-.calendar__date {
-  font-size: clamp(2.8rem, 6.5vw, 5.2rem);
-  font-weight: 700;
+.energy-meter__eyebrow {
+  margin: 0;
+  font-size: clamp(0.66rem, 0.96vw, 0.8rem);
+  letter-spacing: 0.14em;
   text-transform: uppercase;
+  color: rgba(var(--green-rgb-200), 0.72);
+}
+
+.energy-chart-wrap {
+  width: 100%;
+  aspect-ratio: 400 / 240;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid rgba(var(--green-rgb-600), 0.2);
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.energy-chart {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.chart-grid {
+  stroke: rgba(var(--green-rgb-600), 0.14);
+  stroke-width: 0.5;
+}
+
+.chart-grid--v {
+  stroke: rgba(var(--green-rgb-600), 0.08);
+}
+
+.chart-curve {
+  stroke-width: 1.6;
+  opacity: 0.6;
+  transition: opacity 220ms ease, stroke-width 220ms ease;
+}
+
+.chart-curve--hvac { stroke: var(--green-400); }
+.chart-curve--lighting { stroke: var(--green-200); }
+.chart-curve--equipment { stroke: var(--green-600); }
+
+.chart-area {
+  opacity: 0.55;
+  transition: opacity 220ms ease;
+}
+
+.chart-curve--active {
+  opacity: 1;
+  stroke-width: 2.4;
+}
+
+.chart-curve--hvac.chart-curve--active { filter: url(#glow-hvac); }
+.chart-curve--lighting.chart-curve--active { filter: url(#glow-lighting); }
+.chart-curve--equipment.chart-curve--active { filter: url(#glow-equipment); }
+
+.chart-area--active { opacity: 0.9; }
+.chart-curve--dimmed { opacity: 0.1; stroke-width: 1; }
+.chart-area--dimmed { opacity: 0.08; }
+
+.energy-legend {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.energy-legend-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 0.45rem;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 180ms ease, background-color 180ms ease;
+}
+
+.energy-legend-item:hover,
+.energy-legend-item.is-active {
+  background: rgba(var(--green-rgb-600), 0.14);
+  border-color: rgba(var(--green-rgb-400), 0.36);
+}
+
+.energy-legend-item__swatch {
+  width: 1.5rem;
+  height: 2px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.energy-legend-item__swatch--hvac { background: var(--green-400); }
+.energy-legend-item__swatch--lighting { background: var(--green-200); }
+.energy-legend-item__swatch--equipment { background: var(--green-600); }
+
+.energy-legend-item__name {
+  font-size: clamp(0.66rem, 0.92vw, 0.76rem);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(var(--green-rgb-200), 0.82);
+}
+
+.energy-meter__hint {
+  margin: 0.1rem 0 0;
+  font-size: clamp(0.6rem, 0.85vw, 0.7rem);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(var(--green-rgb-200), 0.34);
   text-align: center;
-  line-height: 1.1;
 }
 
 .contact-card {
@@ -632,12 +694,6 @@ body[data-theme='dark'] .contact-card__eyebrow { color: rgba(var(--green-rgb-300
 body[data-theme='dark'] .contact-card__desc { color: rgba(247, 248, 250, 0.82); }
 body[data-theme='dark'] .contact-card__desc--strong { color: rgba(var(--green-rgb-200), 0.92); }
 
-body[data-theme='dark'] .calendar__page {
-  color: #000;
-  border: 1px solid rgba(var(--green-rgb-600), 0.24);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(236, 250, 242, 0.5));
-  box-shadow: 0 0 0 1px rgba(var(--green-rgb-300), 0.15) inset, 0 0.6rem 1.3rem rgba(5, 24, 11, 0.12);
-}
 
 @keyframes site-loader-spin {
   from { transform: rotate(0deg); }

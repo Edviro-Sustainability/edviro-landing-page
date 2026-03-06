@@ -39,11 +39,8 @@ const statsCards = statsPanel ? Array.from(statsPanel.querySelectorAll('.stats-c
 const teamPanel = document.querySelector('.panel--team');
 const joinPanel = document.querySelector('.panel--contact');
 const joinShowcase = joinPanel ? joinPanel.querySelector('.contact-showcase') : null;
-const joinCalendarShell = joinPanel ? joinPanel.querySelector('.calendar-shell') : null;
-const joinCalendarStack = joinCalendarShell ? joinCalendarShell.querySelector('.calendar__stack') : null;
-const joinCalendarFlipPages = joinCalendarStack ? Array.from(joinCalendarStack.querySelectorAll('.calendar__page--flip')) : [];
-const joinCalendarFinalPage = joinCalendarStack ? joinCalendarStack.querySelector('.calendar__page--final') : null;
-const joinCalendarDate = joinCalendarFinalPage ? joinCalendarFinalPage.querySelector('.calendar__date') : null;
+const energyMeterEl = joinPanel ? joinPanel.querySelector('#energy-meter') : null;
+const energyMeterWrapper = joinPanel ? joinPanel.querySelector('#energy-meter-wrapper') : null;
 const sectionTitleLines = Array.from(document.querySelectorAll('.section-title-line'));
 const teamOverlay = document.querySelector('.team-overlay');
 const teamCards = teamOverlay ? Array.from(teamOverlay.querySelectorAll('.team-card')) : [];
@@ -153,7 +150,7 @@ const TEAM_MEMBER_CONFIG = [
   },
   {
     id: 'tanuj',
-    basePosition: new THREE.Vector3(-38.2, -3.9, -8.0),
+    basePosition: new THREE.Vector3(-38.2, -3.9, -7.5),
     baseRotationY: 0.34,
     tiltX: 0.1,
     phase: 1.6,
@@ -184,47 +181,6 @@ const teamProjection = {
   clip: new THREE.Vector3()
 };
 
-function getCalendarMonthLabel(baseDate, monthOffset = 0) {
-  const offsetDate = new Date(
-    baseDate.getFullYear(),
-    baseDate.getMonth() - monthOffset,
-    1
-  );
-  const monthName = offsetDate.toLocaleString('en-US', { month: 'long' });
-  return `${monthName}<br>${offsetDate.getFullYear()}`;
-}
-
-function ensureCalendarDateElement(page) {
-  if (!page) return null;
-  const existingDate = page.querySelector('.calendar__date');
-  if (existingDate) return existingDate;
-
-  const dateElement = document.createElement('p');
-  dateElement.className = 'calendar__date';
-  page.appendChild(dateElement);
-  return dateElement;
-}
-
-function applyCalendarMonthLabels(referenceDate = new Date()) {
-  if (!joinCalendarFinalPage) return;
-
-  const baseDate = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), 1);
-  const finalDateElement = joinCalendarDate || ensureCalendarDateElement(joinCalendarFinalPage);
-  const totalFlipPages = joinCalendarFlipPages.length;
-
-  if (finalDateElement) {
-    finalDateElement.innerHTML = getCalendarMonthLabel(baseDate, 0);
-  }
-
-  joinCalendarFlipPages.forEach((page, index) => {
-    const dateElement = ensureCalendarDateElement(page);
-    if (!dateElement) return;
-    const monthOffset = totalFlipPages - index;
-    dateElement.innerHTML = getCalendarMonthLabel(baseDate, monthOffset);
-  });
-}
-
-applyCalendarMonthLabels();
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(themeConfig.light.sceneColor);
@@ -1538,176 +1494,133 @@ if (teamPanel) {
   });
 }
 
-if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCalendarFinalPage) {
-  const calendarSweepConfig = {
-    easingFactor: 0.5,
-    easingFactorFold: 0.3,
-    insideCurveStrength: 0.18,
-    outsideCurveStrength: 0.05,
-    turningCurveStrength: 0.09
-  };
+if (joinPanel && energyMeterEl) {
+  const chartClipRect = energyMeterEl.querySelector('#chart-clip-rect');
+  const curveHvac = energyMeterEl.querySelector('#curve-hvac');
+  const curveLighting = energyMeterEl.querySelector('#curve-lighting');
+  const curveEquipment = energyMeterEl.querySelector('#curve-equipment');
+  const areaHvac = energyMeterEl.querySelector('#area-hvac');
+  const areaLighting = energyMeterEl.querySelector('#area-lighting');
+  const areaEquipment = energyMeterEl.querySelector('#area-equipment');
+  const legendItems = Array.from(energyMeterEl.querySelectorAll('.energy-legend-item'));
+  const joinTitleLine = joinShowcase ? joinShowcase.querySelector('.section-title-line') : null;
 
-  const getCalendarRestPose = () => (window.innerWidth <= 780
-    ? { rotateX: 13, rotateY: -10, rotateZ: -5, yPercent: 0, scale: 0.98 }
-    : { rotateX: 17, rotateY: -18, rotateZ: -8, yPercent: 0, scale: 1 });
+  const CHART_W = 400, CHART_BOTTOM = 160;
+  const chartState = { revealed: false, activeCurve: null };
 
-  const getCalendarEndPose = () => (window.innerWidth <= 780
-    ? { rotateX: 6, rotateY: -6, rotateZ: -3, yPercent: -1, scale: 1 }
-    : { rotateX: 10, rotateY: -12, rotateZ: -5, yPercent: -2, scale: 1.01 });
-
-  const totalFlipPages = joinCalendarFlipPages.length;
-  const joinCalendarFlipDates = joinCalendarFlipPages.map((page) => page.querySelector('.calendar__date'));
-  const joinTitleLine = joinShowcase
-    ? joinShowcase.querySelector('.section-title-line')
-    : null;
-
-  const getPageRestOffset = (index) => {
-    const layer = totalFlipPages - index;
-    return {
-      y: index * 4,
-      z: 0,
-      rotateX: 0,
-      rotateZ: index * -0.1,
-      zIndex: layer + 2
-    };
-  };
-
-  gsap.set(joinCalendarShell, {
-    ...getCalendarRestPose(),
-    transformOrigin: '50% 0%',
-    force3D: true
-  });
-  gsap.set(joinCalendarStack, { transformStyle: 'preserve-3d' });
-  gsap.set(joinCalendarFinalPage, {
-    z: -1,
-    zIndex: 1,
-    transformOrigin: '50% 0%',
-    force3D: true,
-    autoAlpha: 1
-  });
-  if (joinCalendarDate) {
-    gsap.set(joinCalendarDate, {
-      autoAlpha: prefersReducedMotion ? 1 : 0.78,
-      yPercent: prefersReducedMotion ? 0 : 10
-    });
+  function hvacY(x, t) {
+    const p = x / CHART_W;
+    return 75
+      + 28 * Math.sin(p * Math.PI * 3.6 + t * 0.7)
+      + 14 * Math.sin(p * Math.PI * 7.2 + t * 1.1)
+      + 7  * Math.cos(p * Math.PI * 1.8 + t * 0.4);
   }
 
-  joinCalendarFlipPages.forEach((page, index) => {
-    const restOffset = getPageRestOffset(index);
-    gsap.set(page, {
-      ...restOffset,
-      autoAlpha: 1,
-      transformOrigin: '50% 0%',
-      backfaceVisibility: 'visible',
-      force3D: true
-    });
-  });
-  gsap.set(joinCalendarFlipDates.filter(Boolean), { opacity: 1 });
+  function lightingY(x, t) {
+    const p = x / CHART_W;
+    return 75
+      + 20 * Math.sin(p * Math.PI * 2.4 + t * 0.5)
+      + 10 * Math.cos(p * Math.PI * 5.1 + t * 0.8)
+      + 5  * Math.sin(p * Math.PI * 8.4 + t * 1.3);
+  }
 
-  const calendarTimeline = gsap.timeline({ paused: true });
+  function equipmentY(x, t) {
+    const p = x / CHART_W;
+    return 75
+      + 15 * Math.sin(p * Math.PI * 4.8 + t * 0.9)
+      + 8  * Math.sin(p * Math.PI * 9.6 + t * 1.4)
+      + 4  * Math.cos(p * Math.PI * 2.7 + t * 0.6);
+  }
+
+  function buildPaths(fn, t) {
+    const N = 60;
+    const pts = [];
+    for (let i = 0; i <= N; i++) {
+      pts.push({ x: (i / N) * CHART_W, y: fn((i / N) * CHART_W, t) });
+    }
+    let curve = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+    for (let i = 1; i < pts.length - 1; i++) {
+      const xc = ((pts[i].x + pts[i + 1].x) / 2).toFixed(1);
+      const yc = ((pts[i].y + pts[i + 1].y) / 2).toFixed(1);
+      curve += ` Q ${pts[i].x.toFixed(1)} ${pts[i].y.toFixed(1)} ${xc} ${yc}`;
+    }
+    curve += ` T ${pts[N].x.toFixed(1)} ${pts[N].y.toFixed(1)}`;
+    return { curve, area: `${curve} L ${CHART_W} ${CHART_BOTTOM} L 0 ${CHART_BOTTOM} Z` };
+  }
+
+  function updateChart(t) {
+    const h  = buildPaths(hvacY, t);
+    const l  = buildPaths(lightingY, t);
+    const eq = buildPaths(equipmentY, t);
+    curveHvac.setAttribute('d', h.curve);
+    curveLighting.setAttribute('d', l.curve);
+    curveEquipment.setAttribute('d', eq.curve);
+    areaHvac.setAttribute('d', h.area);
+    areaLighting.setAttribute('d', l.area);
+    areaEquipment.setAttribute('d', eq.area);
+  }
+
+  function setCurveState(activeCurve) {
+    const curveMap = { hvac: curveHvac, lighting: curveLighting, equipment: curveEquipment };
+    const areaMap  = { hvac: areaHvac,  lighting: areaLighting,  equipment: areaEquipment  };
+    for (const key of Object.keys(curveMap)) {
+      const isActive = key === activeCurve;
+      const isDimmed = activeCurve !== null && !isActive;
+      curveMap[key].classList.toggle('chart-curve--active', isActive);
+      curveMap[key].classList.toggle('chart-curve--dimmed', isDimmed);
+      areaMap[key].classList.toggle('chart-area--active', isActive);
+      areaMap[key].classList.toggle('chart-area--dimmed', isDimmed);
+    }
+    legendItems.forEach((item) => item.classList.toggle('is-active', item.dataset.curve === activeCurve));
+  }
+
+  updateChart(0);
 
   ScrollTrigger.create({
     trigger: joinTitleLine || joinShowcase || joinPanel,
     start: 'top 63%',
-    end: 'bottom top',
-    animation: calendarTimeline,
-    toggleActions: 'play none reverse reverse',
-    invalidateOnRefresh: true
+    toggleActions: 'play none none reverse',
+    onEnter: () => {
+      chartState.revealed = true;
+      if (chartClipRect) {
+        gsap.fromTo(chartClipRect, { attr: { width: 0 } }, { attr: { width: CHART_W }, duration: 1.2, ease: 'power2.inOut' });
+      }
+    },
+    onLeaveBack: () => {
+      chartState.revealed = false;
+      if (chartClipRect) {
+        gsap.to(chartClipRect, { attr: { width: 0 }, duration: 0.4, ease: 'power2.in' });
+      }
+    }
   });
 
-  calendarTimeline.to(joinCalendarShell, {
-    rotateX: () => getCalendarEndPose().rotateX,
-    rotateY: () => getCalendarEndPose().rotateY,
-    rotateZ: () => getCalendarEndPose().rotateZ,
-    yPercent: () => getCalendarEndPose().yPercent,
-    scale: () => getCalendarEndPose().scale,
-    duration: 1,
-    ease: 'none'
-  }, 0);
-
-  if (joinCalendarDate) {
-    calendarTimeline.to(joinCalendarDate, {
-      autoAlpha: 1,
-      yPercent: 0,
-      duration: 0.32,
-      ease: 'sine.out'
-    }, 0.82);
-  }
-
-  const flipBurstStart = prefersReducedMotion ? 1.12 : 1.2;
-  const flipBurstEnd = prefersReducedMotion ? 2.3 : 3.1;
-  const flipStartSpread = totalFlipPages <= 1 ? 0 : (prefersReducedMotion ? 0.28 : 0.62);
-  const foldWindow = prefersReducedMotion ? 0.3 : 0.55;
-
-  const pageStartOffsets = [0];
-  if (totalFlipPages > 1) {
-    const minSpeed = 0.15;
-    const gaps = Array.from({ length: totalFlipPages - 1 }, (_, i) => {
-      const t = totalFlipPages <= 2 ? 0.5 : i / (totalFlipPages - 2);
-      const speed = minSpeed + (1 - minSpeed) * t;
-      return 1 / speed;
+  legendItems.forEach((item) => {
+    item.addEventListener('mouseenter', () => {
+      chartState.activeCurve = item.dataset.curve;
+      setCurveState(item.dataset.curve);
     });
-    const totalGapWeight = gaps.reduce((sum, g) => sum + g, 0);
-    let cumulative = 0;
-    for (const gap of gaps) {
-      cumulative += (gap / totalGapWeight) * flipStartSpread;
-      pageStartOffsets.push(cumulative);
-    }
-  }
-
-  joinCalendarFlipPages.forEach((page, index) => {
-    const pageDate = joinCalendarFlipDates[index];
-    const insideCurveIntensity = index < Math.ceil(totalFlipPages * 0.35) ? Math.sin(index * 0.2 + 0.25) : 0;
-    const outsideCurveIntensity = index >= Math.ceil(totalFlipPages * 0.35) ? Math.cos(index * 0.3 + 0.09) : 0;
-    const turningIntensity = Math.sin(index * Math.PI * (1 / totalFlipPages));
-
-    const layer = totalFlipPages - index;
-    const activeLayer = totalFlipPages + 20 + layer;
-    const curvedRotation =
-      166
-      + (
-        calendarSweepConfig.insideCurveStrength * insideCurveIntensity
-        - calendarSweepConfig.outsideCurveStrength * outsideCurveIntensity
-        + calendarSweepConfig.turningCurveStrength * turningIntensity
-      ) * 24;
-
-    const pageStart = flipBurstStart + pageStartOffsets[index];
-    const foldStart = Math.max(pageStart + 0.02, flipBurstEnd - foldWindow);
-    const sweepDuration = Math.max(0.02, foldStart - pageStart);
-
-    calendarTimeline
-      .set(page, { zIndex: activeLayer }, pageStart)
-      .to(page, {
-        rotateX: curvedRotation,
-        duration: sweepDuration,
-        ease: 'sine.inOut'
-      }, pageStart);
-
-    if (pageDate) {
-      calendarTimeline.to(pageDate, {
-        opacity: 0.1,
-        duration: prefersReducedMotion ? 0.08 : 0.14,
-        ease: 'sine.out'
-      }, pageStart + 0.25);
-    }
+    item.addEventListener('mouseleave', () => {
+      chartState.activeCurve = null;
+      setCurveState(null);
+    });
   });
 
-  if (!prefersReducedMotion) {
-    const calendarTiltWrapper = joinCalendarShell.parentElement;
-    let tiltBounds = joinCalendarShell.getBoundingClientRect();
+  gsap.ticker.add((time) => {
+    if (chartState.revealed) updateChart(prefersReducedMotion ? 0 : time);
+  });
+
+  if (!prefersReducedMotion && energyMeterWrapper) {
+    let tiltBounds = energyMeterEl.getBoundingClientRect();
     const tiltCenter = { x: 0, y: 0, scale: 1.0 };
 
-    function updateTiltTransform() {
+    function updateMeterTilt() {
       const nx = Math.max(-1, Math.min(1, tiltCenter.x / (tiltBounds.width / 2)));
       const ny = Math.max(-1, Math.min(1, tiltCenter.y / (tiltBounds.height / 2)));
-      const rx = -ny * 10;
-      const ry = nx * 10;
-      const s = tiltCenter.scale;
-      calendarTiltWrapper.style.transform = `perspective(900px) scale3d(${s}, ${s}, ${s}) rotateX(${rx}deg) rotateY(${ry}deg)`;
+      energyMeterWrapper.style.transform = `perspective(900px) scale3d(${tiltCenter.scale}, ${tiltCenter.scale}, ${tiltCenter.scale}) rotateX(${-ny * 10}deg) rotateY(${nx * 10}deg)`;
     }
 
-    function applyCalendarTilt(e) {
-      tiltBounds = joinCalendarShell.getBoundingClientRect();
+    function applyMeterTilt(e) {
+      tiltBounds = energyMeterEl.getBoundingClientRect();
       gsap.to(tiltCenter, {
         x: e.clientX - tiltBounds.x - tiltBounds.width / 2,
         y: e.clientY - tiltBounds.y - tiltBounds.height / 2,
@@ -1715,32 +1628,30 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
         duration: 0.35,
         ease: 'power2.out',
         overwrite: true,
-        onUpdate: updateTiltTransform
+        onUpdate: updateMeterTilt
       });
     }
 
-    joinCalendarShell.addEventListener('mouseenter', () => {
-      tiltBounds = joinCalendarShell.getBoundingClientRect();
-      document.addEventListener('mousemove', applyCalendarTilt);
+    energyMeterEl.addEventListener('mouseenter', () => {
+      tiltBounds = energyMeterEl.getBoundingClientRect();
+      document.addEventListener('mousemove', applyMeterTilt);
     });
 
-    joinCalendarShell.addEventListener('mouseleave', () => {
-      document.removeEventListener('mousemove', applyCalendarTilt);
+    energyMeterEl.addEventListener('mouseleave', () => {
+      document.removeEventListener('mousemove', applyMeterTilt);
       gsap.to(tiltCenter, {
-        x: 0,
-        y: 0,
-        scale: 1.0,
+        x: 0, y: 0, scale: 1.0,
         duration: 0.55,
         ease: 'power2.out',
         overwrite: true,
-        onUpdate: updateTiltTransform,
-        onComplete: () => { calendarTiltWrapper.style.transform = ''; }
+        onUpdate: updateMeterTilt,
+        onComplete: () => { energyMeterWrapper.style.transform = ''; }
       });
     });
   }
 }
 
-const scrollHeight = -29.5; // bigger -> faster, smaller -> slower
+const scrollHeight = -30.5; // bigger -> faster, smaller -> slower
 cameraScrollTimeline.to(scrollState, {
   cameraOffsetX: -44.0, cameraOffsetY: -1.5, cameraOffsetZ: scrollHeight,
   lookAtOffsetX: -36.0, lookAtOffsetY: 0.0, lookAtOffsetZ: scrollHeight + 26.0,
