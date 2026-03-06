@@ -40,6 +40,8 @@ html, body {
   font-family: "Avenir Next", Avenir, "Segoe UI", Roboto, Arial, sans-serif;
   overscroll-behavior: none;
   transition: background-color 220ms ease, color 220ms ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body.is-scroll-locked {
@@ -494,8 +496,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   min-height: max(92vh, 42rem);
   padding-block: clamp(3.6rem, 8vh, 6rem);
   align-items: center;
-  justify-content: center;
-  gap: clamp(1.35rem, 3.4vh, 2.85rem);
+  justify-content: end;
 }
 
 .insight-card {
@@ -950,4 +951,154 @@ body[data-theme='dark'] .contact-card__desc--strong { color: rgba(var(--green-rg
 @keyframes reveal-up {
   from { transform: translateY(115%); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+.site-nav__brand {
+  position: absolute;
+  left: 1.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.nav-brand {
+  font-size: 1.05rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  background-image: linear-gradient(90deg, var(--color-primary) 0%, var(--green-900) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  user-select: none;
+}
+
+.stats-card {
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 0 0 1px rgba(var(--green-rgb-300), 0.26) inset,
+    0 1.6rem 3rem rgba(4, 24, 12, 0.52),
+    0 0 2.8rem rgba(var(--green-rgb-400), 0.3);
+}
+
+.stats-card__value {
+  background-image: linear-gradient(145deg, #fff 10%, var(--green-300) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+body[data-theme='dark'] .insight-card.card-light {
+  border-left-color: var(--green-400);
+}
+
+.insight-card.card-light:hover {
+  box-shadow:
+    0 0 0 1px rgba(var(--green-rgb-300), 0.24) inset,
+    0 1.2rem 2.4rem rgba(4, 24, 12, 0.18);
+  transition: box-shadow 260ms ease;
+}
+
+.contact-card__email-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-card__email-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -120%;
+  width: 55%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  transform: skewX(-18deg);
+  transition: left 500ms ease;
+  pointer-events: none;
+}
+
+.contact-card__email-btn:hover::after {
+  left: 160%;
+}
+
+/* Pulsing glow on the email button at rest to draw attention */
+@keyframes btn-glow-pulse {
+  0%, 100% { box-shadow: 0 4px 16px rgba(var(--green-rgb-600), 0.4); }
+  50%       { box-shadow: 0 4px 24px rgba(var(--green-rgb-600), 0.62), 0 0 0 3px rgba(var(--green-rgb-400), 0.14); }
+}
+
+.contact-card__email-btn {
+  animation: btn-glow-pulse 2.8s ease-in-out infinite;
+}
+
+.contact-card__email-btn:hover {
+  animation: none;
+}
+
+/* Nav login — shimmer on hover */
+.nav-login {
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-login::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -120%;
+  width: 55%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+  transform: skewX(-18deg);
+  transition: left 420ms ease;
+  pointer-events: none;
+}
+
+.nav-login:hover::after {
+  left: 160%;
+}
+
+/* Contact eyebrow — badge treatment */
+.contact-card__eyebrow {
+  display: inline-block;
+  padding: 0.28em 0.9em;
+  background: rgba(var(--green-rgb-600), 0.08);
+  border: 1px solid rgba(var(--green-rgb-600), 0.2);
+  border-radius: 999px;
+  margin: 0;
+}
+
+body[data-theme='dark'] .contact-card__eyebrow {
+  background: rgba(var(--green-rgb-400), 0.1);
+  border-color: rgba(var(--green-rgb-400), 0.22);
+}
+
+/* Footer — glassmorphism blur */
+.site-footer {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Theme toggle — subtle shimmer track on hover */
+.theme-toggle {
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-toggle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  left: -120%;
+  width: 55%;
+  background: linear-gradient(90deg, transparent, rgba(var(--green-rgb-400), 0.14), transparent);
+  transform: skewX(-18deg);
+  transition: left 400ms ease;
+  pointer-events: none;
+}
+
+.theme-toggle:hover::after {
+  left: 160%;
 }
