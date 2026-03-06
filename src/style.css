@@ -354,30 +354,6 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   line-height: 0.88;
 }
 
-@media (max-width: 980px) {
-  .scene-card {
-    width: clamp(16.8rem, 78vw, 23rem);
-    min-height: clamp(13.2rem, 33vh, 18rem);
-  }
-
-  .panel--stats {
-    min-height: max(102vh, 44rem);
-  }
-
-  .insight-card {
-    width: min(38rem, 100%);
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr;
-    width: min(26rem, 100%);
-  }
-
-  .stats-card {
-    min-height: clamp(9.8rem, 20vh, 11.4rem);
-  }
-}
-
 .panel--team {
   min-height: 100vh !important;
   padding-block: clamp(3rem, 9vh, 7rem);
@@ -528,10 +504,14 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   z-index: 3;
 }
 
-.calendar-shell {
+.calendar-tilt-wrapper {
   grid-area: calendar;
   justify-self: stretch;
-  align-self: stretch;
+  align-self: start;
+  will-change: transform;
+}
+
+.calendar-shell {
   position: relative;
   z-index: 1;
   margin-top: 8rem;
@@ -586,10 +566,12 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   place-items: center;
 }
 
-.calendar__quarter {
-  font-size: 8rem;
+.calendar__date {
+  font-size: clamp(2.8rem, 6.5vw, 5.2rem);
   font-weight: 700;
   text-transform: uppercase;
+  text-align: center;
+  line-height: 1.1;
 }
 
 .contact-card {
@@ -655,38 +637,6 @@ body[data-theme='dark'] .calendar__page {
   border: 1px solid rgba(var(--green-rgb-600), 0.24);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(236, 250, 242, 0.5));
   box-shadow: 0 0 0 1px rgba(var(--green-rgb-300), 0.15) inset, 0 0.6rem 1.3rem rgba(5, 24, 11, 0.12);
-}
-
-@media (max-width: 980px) {
-  .team-grid__subtitle {
-    transform: none;
-  }
-
-  .contact-showcase {
-    width: min(42rem, 96vw);
-    min-height: 0;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-    grid-template-areas:
-      'calendar'
-      'title'
-      'card';
-    justify-items: center;
-    row-gap: clamp(1.6rem, 6vw, 2.8rem);
-  }
-
-  .contact-showcase__title {
-    justify-self: center;
-    text-align: center;
-  }
-
-  .calendar-shell {
-    max-width: min(40rem, 96vw);
-  }
-
-  .contact-card {
-    height: auto;
-  }
 }
 
 @keyframes site-loader-spin {

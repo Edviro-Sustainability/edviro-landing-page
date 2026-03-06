@@ -43,7 +43,7 @@ const joinCalendarShell = joinPanel ? joinPanel.querySelector('.calendar-shell')
 const joinCalendarStack = joinCalendarShell ? joinCalendarShell.querySelector('.calendar__stack') : null;
 const joinCalendarFlipPages = joinCalendarStack ? Array.from(joinCalendarStack.querySelectorAll('.calendar__page--flip')) : [];
 const joinCalendarFinalPage = joinCalendarStack ? joinCalendarStack.querySelector('.calendar__page--final') : null;
-const joinCalendarQuarter = joinCalendarFinalPage ? joinCalendarFinalPage.querySelector('.calendar__quarter') : null;
+const joinCalendarDate = joinCalendarFinalPage ? joinCalendarFinalPage.querySelector('.calendar__date') : null;
 const sectionTitleLines = Array.from(document.querySelectorAll('.section-title-line'));
 const teamOverlay = document.querySelector('.team-overlay');
 const teamCards = teamOverlay ? Array.from(teamOverlay.querySelectorAll('.team-card')) : [];
@@ -58,8 +58,7 @@ const STREET_LAMP_POSITIONS = [
   new THREE.Vector3(66.38, 15.5, 72)
 ];
 
-document.body.classList.add('is-site-loading');
-document.body.classList.add('is-scroll-locked');
+document.body.classList.add('is-site-loading', 'is-scroll-locked');
 
 function resetScrollPosition() {
   window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -185,48 +184,47 @@ const teamProjection = {
   clip: new THREE.Vector3()
 };
 
-function getCalendarQuarterLabel(baseQuarterDate, quarterOffset = 0) {
+function getCalendarMonthLabel(baseDate, monthOffset = 0) {
   const offsetDate = new Date(
-    baseQuarterDate.getFullYear(),
-    baseQuarterDate.getMonth() - (quarterOffset * 3),
+    baseDate.getFullYear(),
+    baseDate.getMonth() - monthOffset,
     1
   );
-  const quarter = Math.floor(offsetDate.getMonth() / 3) + 1;
-  return `Q${quarter} ${offsetDate.getFullYear()}`;
+  const monthName = offsetDate.toLocaleString('en-US', { month: 'long' });
+  return `${monthName}<br>${offsetDate.getFullYear()}`;
 }
 
-function ensureCalendarQuarterElement(page) {
+function ensureCalendarDateElement(page) {
   if (!page) return null;
-  const existingQuarter = page.querySelector('.calendar__quarter');
-  if (existingQuarter) return existingQuarter;
+  const existingDate = page.querySelector('.calendar__date');
+  if (existingDate) return existingDate;
 
-  const quarterElement = document.createElement('p');
-  quarterElement.className = 'calendar__quarter';
-  page.appendChild(quarterElement);
-  return quarterElement;
+  const dateElement = document.createElement('p');
+  dateElement.className = 'calendar__date';
+  page.appendChild(dateElement);
+  return dateElement;
 }
 
-function applyCalendarQuarterLabels(referenceDate = new Date()) {
+function applyCalendarMonthLabels(referenceDate = new Date()) {
   if (!joinCalendarFinalPage) return;
 
-  const quarterStartMonth = Math.floor(referenceDate.getMonth() / 3) * 3;
-  const baseQuarterDate = new Date(referenceDate.getFullYear(), quarterStartMonth, 1);
-  const finalQuarterElement = joinCalendarQuarter || ensureCalendarQuarterElement(joinCalendarFinalPage);
+  const baseDate = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), 1);
+  const finalDateElement = joinCalendarDate || ensureCalendarDateElement(joinCalendarFinalPage);
   const totalFlipPages = joinCalendarFlipPages.length;
 
-  if (finalQuarterElement) {
-    finalQuarterElement.textContent = getCalendarQuarterLabel(baseQuarterDate, 0);
+  if (finalDateElement) {
+    finalDateElement.innerHTML = getCalendarMonthLabel(baseDate, 0);
   }
 
   joinCalendarFlipPages.forEach((page, index) => {
-    const quarterElement = ensureCalendarQuarterElement(page);
-    if (!quarterElement) return;
-    const quarterOffset = totalFlipPages - index;
-    quarterElement.textContent = getCalendarQuarterLabel(baseQuarterDate, quarterOffset);
+    const dateElement = ensureCalendarDateElement(page);
+    if (!dateElement) return;
+    const monthOffset = totalFlipPages - index;
+    dateElement.innerHTML = getCalendarMonthLabel(baseDate, monthOffset);
   });
 }
 
-applyCalendarQuarterLabels();
+applyCalendarMonthLabels();
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(themeConfig.light.sceneColor);
@@ -301,10 +299,9 @@ scene.add(hemiLight, dirLight);
 const subjectGroup = new THREE.Group();
 scene.add(subjectGroup);
 
-let floor = null;
 const floorMaterial = new THREE.MeshStandardMaterial({ color: themeConfig.light.floorColor });
 const floorGeometry = new THREE.PlaneGeometry(164, 164);
-floor = new THREE.Mesh(floorGeometry, floorMaterial);
+const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 floor.rotation.x = -Math.PI / 2;
 floor.position.set(0, -4, 0);
 floor.receiveShadow = true;
@@ -391,11 +388,7 @@ const counterValueState = {
   displayValue: 400000,
   lastRenderedValue: null
 };
-const counterThemeStyle = {
-  light: { color: GREEN_PALETTE.base, emissive: 0x000000, emissiveIntensity: 0.0 },
-  dark: { color: 0x000000, emissive: GREEN_PALETTE.base, emissiveIntensity: 1.0 }
-};
-const teamMemberThemeStyle = {
+const greenMeshThemeStyle = {
   light: { color: GREEN_PALETTE.base, emissive: 0x000000, emissiveIntensity: 0.0 },
   dark: { color: 0x000000, emissive: GREEN_PALETTE.base, emissiveIntensity: 1.0 }
 };
@@ -406,20 +399,12 @@ function formatCounterValue(value) {
   return `$${Math.round(value).toLocaleString('en-US')}`;
 }
 
-function applyCounterMaterialTheme(themeName) {
-  if (!counterMaterial) return;
-  const style = counterThemeStyle[themeName] ?? counterThemeStyle.light;
-  counterMaterial.color.set(style.color);
-  counterMaterial.emissive.set(style.emissive);
-  counterMaterial.emissiveIntensity = style.emissiveIntensity;
-}
-
-function applyTeamMaterialTheme(themeName) {
-  if (!teamMemberMaterial) return;
-  const style = teamMemberThemeStyle[themeName] ?? teamMemberThemeStyle.light;
-  teamMemberMaterial.color.set(style.color);
-  teamMemberMaterial.emissive.set(style.emissive);
-  teamMemberMaterial.emissiveIntensity = style.emissiveIntensity;
+function applyGreenMeshTheme(material, themeName) {
+  if (!material) return;
+  const style = greenMeshThemeStyle[themeName] ?? greenMeshThemeStyle.light;
+  material.color.set(style.color);
+  material.emissive.set(style.emissive);
+  material.emissiveIntensity = style.emissiveIntensity;
 }
 
 function resetTeamCards() {
@@ -462,13 +447,13 @@ function createTeamMembersFromModel(personModel) {
   if (!personModel) return;
   if (!teamMemberMaterial) {
     teamMemberMaterial = new THREE.MeshStandardMaterial({
-      color: teamMemberThemeStyle.light.color,
-      emissive: teamMemberThemeStyle.light.emissive,
-      emissiveIntensity: teamMemberThemeStyle.light.emissiveIntensity,
+      color: greenMeshThemeStyle.light.color,
+      emissive: greenMeshThemeStyle.light.emissive,
+      emissiveIntensity: greenMeshThemeStyle.light.emissiveIntensity,
       roughness: 0.48,
       metalness: 0.1
     });
-    applyTeamMaterialTheme(currentThemeName);
+    applyGreenMeshTheme(teamMemberMaterial,currentThemeName);
   }
 
   for (const existingMember of teamMembers) {
@@ -705,13 +690,13 @@ window.sceneCounter = {
 
 function addCounter() {
   const textMaterial = new THREE.MeshStandardMaterial({
-    color: counterThemeStyle.light.color,
-    emissive: counterThemeStyle.light.emissive,
-    emissiveIntensity: counterThemeStyle.light.emissiveIntensity,
+    color: greenMeshThemeStyle.light.color,
+    emissive: greenMeshThemeStyle.light.emissive,
+    emissiveIntensity: greenMeshThemeStyle.light.emissiveIntensity,
     side: THREE.DoubleSide
   });
   counterMaterial = textMaterial;
-  applyCounterMaterialTheme(currentThemeName);
+  applyGreenMeshTheme(counterMaterial,currentThemeName);
 
   counterMesh = buildCounterTextMesh(formatCounterValue(counterValueState.displayValue), 1.0, textMaterial);
   counterTopContextMesh = buildCounterTextMesh('OVER', 0.32, textMaterial);
@@ -770,7 +755,7 @@ function getInitialThemeName() {
 function createStreetLampLights(lightsMesh) {
   if (!lightsMesh || streetLampPointLights.length > 0) return;
 
-  const centers = (STREET_LAMP_POSITIONS).map((center) => center.clone());
+  const centers = STREET_LAMP_POSITIONS.map((center) => center.clone());
 
   for (const center of centers) {
     const pointLight = new THREE.PointLight(themeConfig.dark.streetLampColor, 0, themeConfig.dark.streetLampDistance, 2);
@@ -864,8 +849,8 @@ function applyTheme(nextThemeName, options = {}) {
   wireBloomPass.strength = theme.wireBloomStrength;
 
   applyMaterialTheme(normalizedThemeName);
-  applyCounterMaterialTheme(normalizedThemeName);
-  applyTeamMaterialTheme(normalizedThemeName);
+  applyGreenMeshTheme(counterMaterial,normalizedThemeName);
+  applyGreenMeshTheme(teamMemberMaterial,normalizedThemeName);
   for (const outlineMaterial of schoolOutlineMaterials) {
     outlineMaterial.color.set(schoolOutlineStyle.color[normalizedThemeName]);
   }
@@ -983,7 +968,7 @@ window.addEventListener('pointerleave', () => {
   pointerStrengthTo(0.0);
 });
 
-const parallaxSettings = { cameraX: 0.9, cameraY: 0.9, lookAtX: 0, lookAtY: 0, groupX: 0.08, groupY: 0.05 };
+const parallaxSettings = { cameraX: 0.9, cameraY: 0.9, groupX: 0.08, groupY: 0.05 };
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 const NORTH = new THREE.Vector3(0, 0, -1);
 const maskBackground = new THREE.Color(0x000000);
@@ -1356,9 +1341,7 @@ if (scrollPhraseWords.length > 0) {
 
 if (sceneCards.length === 3) {
   const cardOverlayStart = 0.25;
-  const cardOneStart = 0.52;
-  const cardTwoStart = 0.62;
-  const cardThreeStart = 0.72;
+  const cardStarts = [0.52, 0.62, 0.72];
 
   const getRootFontSize = () => {
     const rootFontSize = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize);
@@ -1410,117 +1393,35 @@ if (sceneCards.length === 3) {
     willChange: 'transform, opacity, filter'
   });
 
-  cameraScrollTimeline
-    .to(sceneCardsOverlay, { autoAlpha: 1, duration: 0.06 }, cardOverlayStart)
-    .to(sceneCards[0], {
-      keyframes: [
-        {
-          x: () => getCardPassStyle().startX[0],
-          y: () => getCardPassStyle().startY[0],
-          scale: () => getCardPassStyle().startScale[0],
-          duration: 0
-        },
-        {
-          x: () => getCardPassStyle().midX[0],
-          y: () => getCardPassStyle().midY[0],
-          scale: () => getCardPassStyle().midScale[0],
-          duration: 0.1
-        },
-        {
-          x: () => getCardPassStyle().endX[0],
-          y: () => getCardPassStyle().endY[0],
-          scale: () => getCardPassStyle().endScale[0],
-          duration: 0.1
-        }
-      ]
-    }, cardOneStart)
-    .to(sceneCards[0], {
-      keyframes: [
-        { autoAlpha: 1, duration: 0.04 },
-        { autoAlpha: 1, duration: 0.08 },
-        { autoAlpha: 0, duration: 0.06 }
-      ]
-    }, cardOneStart)
-    .to(sceneCards[0], {
-      keyframes: [
-        { filter: 'blur(0px)', duration: 0.04 },
-        { filter: 'blur(0px)', duration: 0.08 },
-        { filter: 'blur(6px)', duration: 0.06 }
-      ]
-    }, cardOneStart)
-    .to(sceneCards[1], {
-      keyframes: [
-        {
-          x: () => getCardPassStyle().startX[1],
-          y: () => getCardPassStyle().startY[1],
-          scale: () => getCardPassStyle().startScale[1],
-          duration: 0
-        },
-        {
-          x: () => getCardPassStyle().midX[1],
-          y: () => getCardPassStyle().midY[1],
-          scale: () => getCardPassStyle().midScale[1],
-          duration: 0.1
-        },
-        {
-          x: () => getCardPassStyle().endX[1],
-          y: () => getCardPassStyle().endY[1],
-          scale: () => getCardPassStyle().endScale[1],
-          duration: 0.1
-        }
-      ]
-    }, cardTwoStart)
-    .to(sceneCards[1], {
-      keyframes: [
-        { autoAlpha: 1, duration: 0.04 },
-        { autoAlpha: 1, duration: 0.08 },
-        { autoAlpha: 0, duration: 0.06 }
-      ]
-    }, cardTwoStart)
-    .to(sceneCards[1], {
-      keyframes: [
-        { filter: 'blur(0px)', duration: 0.04 },
-        { filter: 'blur(0px)', duration: 0.08 },
-        { filter: 'blur(6px)', duration: 0.06 }
-      ]
-    }, cardTwoStart)
-    .to(sceneCards[2], {
-      keyframes: [
-        {
-          x: () => getCardPassStyle().startX[2],
-          y: () => getCardPassStyle().startY[2],
-          scale: () => getCardPassStyle().startScale[2],
-          duration: 0
-        },
-        {
-          x: () => getCardPassStyle().midX[2],
-          y: () => getCardPassStyle().midY[2],
-          scale: () => getCardPassStyle().midScale[2],
-          duration: 0.1
-        },
-        {
-          x: () => getCardPassStyle().endX[2],
-          y: () => getCardPassStyle().endY[2],
-          scale: () => getCardPassStyle().endScale[2],
-          duration: 0.1
-        }
-      ]
-    }, cardThreeStart)
-    .to(sceneCards[2], {
-      keyframes: [
-        { autoAlpha: 1, duration: 0.04 },
-        { autoAlpha: 1, duration: 0.08 },
-        { autoAlpha: 0, duration: 0.06 }
-      ]
-    }, cardThreeStart)
-    .to(sceneCards[2], {
-      keyframes: [
-        { filter: 'blur(0px)', duration: 0.04 },
-        { filter: 'blur(0px)', duration: 0.08 },
-        { filter: 'blur(6px)', duration: 0.06 }
-      ]
-    }, cardThreeStart)
-    .to(sceneCardsOverlay, { autoAlpha: 0, duration: 0.06 }, 0.94);
+  cameraScrollTimeline.to(sceneCardsOverlay, { autoAlpha: 1, duration: 0.06 }, cardOverlayStart);
+
+  sceneCards.forEach((card, i) => {
+    const start = cardStarts[i];
+    cameraScrollTimeline
+      .to(card, {
+        keyframes: [
+          { x: () => getCardPassStyle().startX[i], y: () => getCardPassStyle().startY[i], scale: () => getCardPassStyle().startScale[i], duration: 0 },
+          { x: () => getCardPassStyle().midX[i], y: () => getCardPassStyle().midY[i], scale: () => getCardPassStyle().midScale[i], duration: 0.1 },
+          { x: () => getCardPassStyle().endX[i], y: () => getCardPassStyle().endY[i], scale: () => getCardPassStyle().endScale[i], duration: 0.1 }
+        ]
+      }, start)
+      .to(card, {
+        keyframes: [
+          { autoAlpha: 1, duration: 0.04 },
+          { autoAlpha: 1, duration: 0.08 },
+          { autoAlpha: 0, duration: 0.06 }
+        ]
+      }, start)
+      .to(card, {
+        keyframes: [
+          { filter: 'blur(0px)', duration: 0.04 },
+          { filter: 'blur(0px)', duration: 0.08 },
+          { filter: 'blur(6px)', duration: 0.06 }
+        ]
+      }, start);
+  });
+
+  cameraScrollTimeline.to(sceneCardsOverlay, { autoAlpha: 0, duration: 0.06 }, 0.94);
   }
 
 if (sectionTitleLines.length > 0) {
@@ -1655,7 +1556,7 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
     : { rotateX: 10, rotateY: -12, rotateZ: -5, yPercent: -2, scale: 1.01 });
 
   const totalFlipPages = joinCalendarFlipPages.length;
-  const joinCalendarFlipQuarters = joinCalendarFlipPages.map((page) => page.querySelector('.calendar__quarter'));
+  const joinCalendarFlipDates = joinCalendarFlipPages.map((page) => page.querySelector('.calendar__date'));
   const joinTitleLine = joinShowcase
     ? joinShowcase.querySelector('.section-title-line')
     : null;
@@ -1684,8 +1585,8 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
     force3D: true,
     autoAlpha: 1
   });
-  if (joinCalendarQuarter) {
-    gsap.set(joinCalendarQuarter, {
+  if (joinCalendarDate) {
+    gsap.set(joinCalendarDate, {
       autoAlpha: prefersReducedMotion ? 1 : 0.78,
       yPercent: prefersReducedMotion ? 0 : 10
     });
@@ -1701,7 +1602,7 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
       force3D: true
     });
   });
-  gsap.set(joinCalendarFlipQuarters.filter(Boolean), { opacity: 1 });
+  gsap.set(joinCalendarFlipDates.filter(Boolean), { opacity: 1 });
 
   const calendarTimeline = gsap.timeline({ paused: true });
 
@@ -1724,8 +1625,8 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
     ease: 'none'
   }, 0);
 
-  if (joinCalendarQuarter) {
-    calendarTimeline.to(joinCalendarQuarter, {
+  if (joinCalendarDate) {
+    calendarTimeline.to(joinCalendarDate, {
       autoAlpha: 1,
       yPercent: 0,
       duration: 0.32,
@@ -1733,20 +1634,35 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
     }, 0.82);
   }
 
-  const totalPages = totalFlipPages;
   const flipBurstStart = prefersReducedMotion ? 1.12 : 1.2;
   const flipBurstEnd = prefersReducedMotion ? 2.3 : 3.1;
-  const flipStartSpread = totalPages <= 1 ? 0 : (prefersReducedMotion ? 0.28 : 0.62);
+  const flipStartSpread = totalFlipPages <= 1 ? 0 : (prefersReducedMotion ? 0.28 : 0.62);
   const foldWindow = prefersReducedMotion ? 0.3 : 0.55;
 
-  joinCalendarFlipPages.forEach((page, index) => {
-    const pageQuarter = joinCalendarFlipQuarters[index];
-    const insideCurveIntensity = index < Math.ceil(totalPages * 0.35) ? Math.sin(index * 0.2 + 0.25) : 0;
-    const outsideCurveIntensity = index >= Math.ceil(totalPages * 0.35) ? Math.cos(index * 0.3 + 0.09) : 0;
-    const turningIntensity = Math.sin(index * Math.PI * (1 / totalPages));
+  const pageStartOffsets = [0];
+  if (totalFlipPages > 1) {
+    const minSpeed = 0.15;
+    const gaps = Array.from({ length: totalFlipPages - 1 }, (_, i) => {
+      const t = totalFlipPages <= 2 ? 0.5 : i / (totalFlipPages - 2);
+      const speed = minSpeed + (1 - minSpeed) * t;
+      return 1 / speed;
+    });
+    const totalGapWeight = gaps.reduce((sum, g) => sum + g, 0);
+    let cumulative = 0;
+    for (const gap of gaps) {
+      cumulative += (gap / totalGapWeight) * flipStartSpread;
+      pageStartOffsets.push(cumulative);
+    }
+  }
 
-    const layer = totalPages - index;
-    const activeLayer = totalPages + 20 + layer;
+  joinCalendarFlipPages.forEach((page, index) => {
+    const pageDate = joinCalendarFlipDates[index];
+    const insideCurveIntensity = index < Math.ceil(totalFlipPages * 0.35) ? Math.sin(index * 0.2 + 0.25) : 0;
+    const outsideCurveIntensity = index >= Math.ceil(totalFlipPages * 0.35) ? Math.cos(index * 0.3 + 0.09) : 0;
+    const turningIntensity = Math.sin(index * Math.PI * (1 / totalFlipPages));
+
+    const layer = totalFlipPages - index;
+    const activeLayer = totalFlipPages + 20 + layer;
     const curvedRotation =
       166
       + (
@@ -1755,8 +1671,7 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
         + calendarSweepConfig.turningCurveStrength * turningIntensity
       ) * 24;
 
-    const pageStart = flipBurstStart
-      + (totalPages <= 1 ? 0 : ((index / (totalPages - 1)) * flipStartSpread));
+    const pageStart = flipBurstStart + pageStartOffsets[index];
     const foldStart = Math.max(pageStart + 0.02, flipBurstEnd - foldWindow);
     const sweepDuration = Math.max(0.02, foldStart - pageStart);
 
@@ -1768,14 +1683,61 @@ if (joinPanel && joinCalendarShell && joinCalendarFlipPages.length > 0 && joinCa
         ease: 'sine.inOut'
       }, pageStart);
 
-    if (pageQuarter) {
-      calendarTimeline.to(pageQuarter, {
+    if (pageDate) {
+      calendarTimeline.to(pageDate, {
         opacity: 0.1,
         duration: prefersReducedMotion ? 0.08 : 0.14,
         ease: 'sine.out'
       }, pageStart + 0.25);
     }
   });
+
+  if (!prefersReducedMotion) {
+    const calendarTiltWrapper = joinCalendarShell.parentElement;
+    let tiltBounds = joinCalendarShell.getBoundingClientRect();
+    const tiltCenter = { x: 0, y: 0, scale: 1.0 };
+
+    function updateTiltTransform() {
+      const nx = Math.max(-1, Math.min(1, tiltCenter.x / (tiltBounds.width / 2)));
+      const ny = Math.max(-1, Math.min(1, tiltCenter.y / (tiltBounds.height / 2)));
+      const rx = -ny * 10;
+      const ry = nx * 10;
+      const s = tiltCenter.scale;
+      calendarTiltWrapper.style.transform = `perspective(900px) scale3d(${s}, ${s}, ${s}) rotateX(${rx}deg) rotateY(${ry}deg)`;
+    }
+
+    function applyCalendarTilt(e) {
+      tiltBounds = joinCalendarShell.getBoundingClientRect();
+      gsap.to(tiltCenter, {
+        x: e.clientX - tiltBounds.x - tiltBounds.width / 2,
+        y: e.clientY - tiltBounds.y - tiltBounds.height / 2,
+        scale: 1.04,
+        duration: 0.35,
+        ease: 'power2.out',
+        overwrite: true,
+        onUpdate: updateTiltTransform
+      });
+    }
+
+    joinCalendarShell.addEventListener('mouseenter', () => {
+      tiltBounds = joinCalendarShell.getBoundingClientRect();
+      document.addEventListener('mousemove', applyCalendarTilt);
+    });
+
+    joinCalendarShell.addEventListener('mouseleave', () => {
+      document.removeEventListener('mousemove', applyCalendarTilt);
+      gsap.to(tiltCenter, {
+        x: 0,
+        y: 0,
+        scale: 1.0,
+        duration: 0.55,
+        ease: 'power2.out',
+        overwrite: true,
+        onUpdate: updateTiltTransform,
+        onComplete: () => { calendarTiltWrapper.style.transform = ''; }
+      });
+    });
+  }
 }
 
 const scrollHeight = -29.5; // bigger -> faster, smaller -> slower
@@ -1822,8 +1784,6 @@ gsap.ticker.add((time) => {
   const parallaxY = pointerCurrent.y * parallaxScrollState.multiplier;
   const cameraParallaxX = parallaxX * parallaxSettings.cameraX;
   const cameraParallaxY = parallaxY * parallaxSettings.cameraY;
-  const lookAtParallaxX = parallaxX * parallaxSettings.lookAtX;
-  const lookAtParallaxY = parallaxY * parallaxSettings.lookAtY;
   const counterAndTeamVisible = scrollState.cameraOffsetX <= -32.5;
 
   updateTeamMembers(time);
@@ -1846,8 +1806,8 @@ gsap.ticker.add((time) => {
     const cameraWorldX = introCamera.x + (scrollState.cameraOffsetX * scrollInfluence) + cameraParallaxX;
     const cameraWorldY = introCamera.y + (scrollState.cameraOffsetY * scrollInfluence) + cameraParallaxY;
     const cameraWorldZ = introCamera.z + (scrollState.cameraOffsetZ * scrollInfluence);
-    const lookAtWorldX = introLookAt.x + (scrollState.lookAtOffsetX * scrollInfluence) + lookAtParallaxX;
-    const lookAtWorldY = introLookAt.y + (scrollState.lookAtOffsetY * scrollInfluence) + lookAtParallaxY;
+    const lookAtWorldX = introLookAt.x + (scrollState.lookAtOffsetX * scrollInfluence);
+    const lookAtWorldY = introLookAt.y + (scrollState.lookAtOffsetY * scrollInfluence);
     const lookAtWorldZ = introLookAt.z + (scrollState.lookAtOffsetZ * scrollInfluence);
 
     camera.up.copy(WORLD_UP).lerp(NORTH, scrollState.gridDownLock).normalize();
@@ -1861,8 +1821,8 @@ gsap.ticker.add((time) => {
       mapScrollToZ(scrollState.progress)
     );
     camera.lookAt(
-      introState.endLookAt.x + lookAtParallaxX,
-      introState.endLookAt.y + lookAtParallaxY,
+      introState.endLookAt.x,
+      introState.endLookAt.y,
       introState.endLookAt.z
     );
   }
