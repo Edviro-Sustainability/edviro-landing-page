@@ -38,6 +38,8 @@ const statsInsightCard = statsPanel ? statsPanel.querySelector('.insight-card') 
 const statsCards = statsPanel ? Array.from(statsPanel.querySelectorAll('.stats-card')) : [];
 const teamPanel = document.querySelector('.panel--team');
 const joinPanel = document.querySelector('.panel--contact');
+const invisiblePanel = document.querySelector('.panel.invisible');
+const firstPanel = document.querySelector('#content > .panel:first-child');
 const joinShowcase = joinPanel ? joinPanel.querySelector('.contact-showcase') : null;
 const energyMeterEl = joinPanel ? joinPanel.querySelector('#energy-meter') : null;
 const energyMeterWrapper = joinPanel ? joinPanel.querySelector('#energy-meter-wrapper') : null;
@@ -173,13 +175,9 @@ const teamCardMap = new Map(
     .filter(([id]) => typeof id === 'string' && id.length > 0)
 );
 const teamMembers = [];
-let teamImageContainer = null;
 const teamSceneState = {
   panelActive: false,
   overlayVisible: false
-};
-const teamProjection = {
-  clip: new THREE.Vector3()
 };
 
 
@@ -275,8 +273,8 @@ const schoolOutlineMaterials = [];
 const streetLampPointLights = [];
 const schoolOutlineStyle = {
   thresholdAngle: 36,
-  linewidth: 1.4,
-  color: { light: 0x000000, dark: 0x333333 }
+  linewidth: 1,
+  color: { light: 0x777777, dark: 0x333333 }
 };
 
 class ConditionalEdgesGeometry extends THREE.EdgesGeometry {
@@ -391,25 +389,25 @@ function setTeamOverlayVisibility(isVisible) {
 }
 
 function createTeamImageElements() {
-  if (teamImageContainer) {
-    teamImageContainer.remove();
+  for (const member of teamMembers) {
+    member.el.remove();
   }
   teamMembers.length = 0;
 
-  teamImageContainer = document.createElement('div');
-  teamImageContainer.className = 'team-image-container';
-  document.body.appendChild(teamImageContainer);
-
   for (const config of TEAM_MEMBER_CONFIG) {
+    const card = document.querySelector(`.team-grid__card[data-member="${config.id}"]`);
+    if (!card) continue;
+
     const img = document.createElement('img');
     img.src = `/${config.id}.jpg`;
     img.alt = config.id;
     img.className = 'team-member-img';
-    teamImageContainer.appendChild(img);
+    card.appendChild(img);
 
     teamMembers.push({
       id: config.id,
       el: img,
+      card,
       config,
       worldPos: new THREE.Vector3(),
     });
@@ -420,7 +418,7 @@ function updateTeamMembers(time) {
   if (teamMembers.length === 0) return;
 
   for (const member of teamMembers) {
-    const { config, el, worldPos } = member;
+    const { config, worldPos } = member;
     const phaseTime = time + config.phase;
 
     worldPos.set(
@@ -431,24 +429,17 @@ function updateTeamMembers(time) {
       config.basePosition.z + Math.cos(phaseTime * 0.55) * config.driftZ
     );
 
-    teamProjection.clip.copy(worldPos).project(camera);
-    const screenX = (teamProjection.clip.x * 0.5 + 0.5) * window.innerWidth;
-    const screenY = (-teamProjection.clip.y * 0.5 + 0.5) * window.innerHeight;
-
     const tiltPhase = phaseTime + (config.tiltPhaseOffset ?? 0);
     const tiltX = (config.tiltX ?? 0) * (180 / Math.PI) + Math.sin(tiltPhase * 0.3) * 3;
     const tiltY = Math.sin(tiltPhase * 0.4) * 4.5;
-    const imgOffsetY = window.innerWidth * 0.05;
 
-    el.style.left = `${screenX}px`;
-    el.style.top = `${screenY - imgOffsetY}px`;
-    el.style.transform = `translate(-50%, -50%) perspective(700px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+    member.card.style.transform = `perspective(700px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
   }
 }
 
 function setTeamMembersVisibility(isVisible) {
   for (const member of teamMembers) {
-    member.el.style.opacity = isVisible ? '1' : '0';
+    member.card.style.opacity = isVisible ? '1' : '0';
   }
 }
 
@@ -471,13 +462,11 @@ function updateTeamCardAnchors() {
       continue;
     }
 
-    teamProjection.clip.copy(member.worldPos).project(camera);
+    // Lock dot to the DOM position of the team-grid image card
+    const imageCard = member.card;
+    const rect = imageCard.getBoundingClientRect();
 
-    const withinViewport = teamProjection.clip.z > -1 && teamProjection.clip.z < 1
-      && Math.abs(teamProjection.clip.x) <= 1.1
-      && Math.abs(teamProjection.clip.y) <= 1.1;
-
-    if (!withinViewport) {
+    if (rect.width === 0 || rect.bottom < 0 || rect.top > window.innerHeight) {
       card.style.opacity = '0';
       card.style.visibility = 'hidden';
       if (line) line.style.opacity = '0';
@@ -485,10 +474,13 @@ function updateTeamCardAnchors() {
       continue;
     }
 
-    const meshX = (teamProjection.clip.x * 0.5 + 0.5) * window.innerWidth;
-    const meshY = (-teamProjection.clip.y * 0.5 + 0.5) * window.innerHeight;
+    // Dot target: horizontally centered, slightly below the vertical center of the image
+    const meshX = rect.left + rect.width * 0.5;
+    const meshY = rect.top + rect.height * 0.6;
     const inwardSign = meshX < window.innerWidth * 0.5 ? 1 : -1;
-    const labelOffsetX = Number.isFinite(member.config.labelOffsetX) ? member.config.labelOffsetX : 200;
+    // Scale labelOffsetX with viewport width so the label stays proportional on smaller screens
+    const rawOffsetX = Number.isFinite(member.config.labelOffsetX) ? member.config.labelOffsetX : 200;
+    const labelOffsetX = Math.min(rawOffsetX, window.innerWidth * 0.22);
     const labelOffsetY = Number.isFinite(member.config.labelOffsetY) ? member.config.labelOffsetY : 0;
     const labelX = clampValue(meshX + (inwardSign * labelOffsetX), 130, window.innerWidth - 130);
     const labelY = clampValue(meshY + labelOffsetY, 90, window.innerHeight - 90);
@@ -939,6 +931,7 @@ function maybeUnlockScroll() {
   resetScrollPosition();
   lenis.start();
   lenis.scrollTo(0, { immediate: true, force: true });
+  syncInvisiblePanelHeight();
   ScrollTrigger.refresh();
 }
 
@@ -1097,6 +1090,7 @@ if (document.fonts?.ready) {
   document.fonts.ready.then(() => {
     computeTitleIntroStartTransform();
     updateTitleIntroTransform(titleIntroAnimState.progress);
+    syncInvisiblePanelHeight();
     ScrollTrigger.refresh();
   });
 }
@@ -1250,6 +1244,24 @@ const postSecondPanelDuration = (() => {
   );
   return weightedDuration > 0 ? weightedDuration : Math.max(gsap.utils.toArray('.panel').length - 2, 0);
 })();
+
+// Dynamically size the invisible spacer panel so the stats panel always enters
+// the viewport at the exact scroll position where the camera's counter-reveal
+// keyframe completes, regardless of browser zoom or font scaling.
+// Derived from: scrollProgress(counter reveal) = 1 / (1 + postSecondPanelDuration)
+// Solving for Hi: Hi = (Hs + Ht + Hc) / postSecondPanelDuration + vh - H1
+function syncInvisiblePanelHeight() {
+  if (!invisiblePanel || postSecondPanelDuration <= 0) return;
+  const vh = window.innerHeight;
+  const H1 = firstPanel ? firstPanel.offsetHeight : 0;
+  const Hs = statsPanel ? statsPanel.offsetHeight : 0;
+  const Ht = teamPanel ? teamPanel.offsetHeight : 0;
+  const Hc = joinPanel ? joinPanel.offsetHeight : 0;
+  const Hi = Math.max(0, (Hs + Ht + Hc) / postSecondPanelDuration + vh - H1);
+  invisiblePanel.style.height = `${Hi}px`;
+}
+
+syncInvisiblePanelHeight();
 
 const cameraScrollTimeline = gsap.timeline({
   defaults: { ease: 'none' },
@@ -1718,6 +1730,7 @@ window.addEventListener('resize', () => {
   updateRenderResolution();
   computeTitleIntroStartTransform();
   updateTitleIntroTransform(titleIntroAnimState.progress);
+  syncInvisiblePanelHeight();
   ScrollTrigger.refresh();
 });
 
