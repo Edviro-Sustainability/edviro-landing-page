@@ -269,13 +269,9 @@ body.is-site-loading .site-nav { opacity: 0; visibility: hidden; pointer-events:
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg,
-    transparent 0%,
-    var(--green-900) 15%,
-    var(--green-600) 35%,
+    var(--green-900) 0%,
     var(--green-300) 50%,
-    var(--green-600) 65%,
-    var(--green-900) 85%,
-    transparent 100%
+    var(--green-900) 100%
   );
   background-size: 300% 100%;
   background-position: -200% 0;
@@ -285,11 +281,11 @@ body.is-site-loading .site-nav { opacity: 0; visibility: hidden; pointer-events:
 }
 
 .nav-connector.is-flowing-fwd .nav-connector__pulse {
-  animation: wire-flow-fwd 0.52s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: wire-flow-fwd 0.8s cubic-bezier(0.2, 0, 0.8, 1) forwards;
 }
 
 .nav-connector.is-flowing-bwd .nav-connector__pulse {
-  animation: wire-flow-bwd 0.52s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: wire-flow-bwd 0.8s cubic-bezier(0.2, 0, 0.8, 1) forwards;
 }
 
 @keyframes wire-flow-fwd {
@@ -315,20 +311,25 @@ body.is-site-loading .site-nav { opacity: 0; visibility: hidden; pointer-events:
 }
 
 .theme-toggle {
-  padding: 0.55rem 1rem;
+  padding: 0.55rem 0.65rem;
   border-radius: 999px;
   border: 1px solid var(--border-soft);
   background: transparent;
   color: var(--text-primary);
   cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease;
 }
 
 .theme-toggle:hover { transform: translateY(-1px); border-color: var(--color-primary); }
 .theme-toggle:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+.theme-toggle .icon-sun { display: block; }
+.theme-toggle .icon-moon { display: none; }
+body[data-theme="dark"] .theme-toggle .icon-sun { display: none; }
+body[data-theme="dark"] .theme-toggle .icon-moon { display: block; }
 
 .nav-login {
   padding: 0.55rem 1.2rem;
@@ -513,12 +514,11 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   min-height: clamp(36rem, 80vh, 56rem);
   padding-block: clamp(3.6rem, 8vh, 6rem);
   align-items: center;
-  justify-content: end;
 }
 
 .insight-card {
-  width: min(clamp(28rem, 50vw, 56rem), 92%);
-  font-size: clamp(1rem, 1.5vw, 1.6rem);
+  width: 50vw;
+  font-size: 2rem;
 }
 
 .stats-grid {
@@ -572,6 +572,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 .team-grid__title,
 .contact-showcase__title {
   font-size: clamp(3rem, 7.4vw, 6.4rem);
+  white-space: nowrap;
 }
 
 .team-grid__title {
@@ -597,7 +598,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   background-position: center 15%;
   background-repeat: no-repeat;
   transform-style: preserve-3d;
-  width: 20vw;
+  width: clamp(16rem, 36vh, 28rem);
 }
 
 .team-grid__card[data-member="hursh"] {
@@ -705,10 +706,11 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 .team-card__line {
   position: absolute;
   height: 1px;
-  background: rgb(0,0,0);
+  background: rgb(0, 0, 0);
   transform-origin: left center;
   pointer-events: none;
   opacity: 0;
+  transition: opacity 180ms ease;
 }
 
 .team-card__dot {
@@ -716,10 +718,11 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   width: 0.44rem;
   height: 0.44rem;
   border-radius: 50%;
-  background: rgb(0,0,0);
+  background: rgb(0, 0, 0);
   transform: translate(-50%, -50%);
   pointer-events: none;
   opacity: 0;
+  transition: opacity 180ms ease;
 }
 
 .panel--contact {
@@ -742,7 +745,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
     'energy title'
     'energy card';
   align-items: stretch;
-  gap: clamp(2rem, 4vw, 5rem);
+  gap: clamp(2rem, 12vw, 8rem);
   position: relative;
 }
 
@@ -753,6 +756,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   text-align: center;
   line-height: 0.98;
   white-space: nowrap;
+  font-size: clamp(2.8rem, 5vw, 5.5rem);
   position: relative;
   z-index: 3;
 }
@@ -1163,7 +1167,6 @@ body[data-theme='dark'] .contact-card__eyebrow {
   }
 
   .contact-showcase__title {
-    white-space: normal;
     text-align: center;
   }
 
@@ -1262,7 +1265,7 @@ body[data-theme='dark'] .contact-card__eyebrow {
   }
 
   .insight-card {
-    width: min(clamp(24rem, 80%, 56rem), 90%);
+    width: 80vw;
   }
 
   .contact-showcase {
@@ -1351,10 +1354,6 @@ body[data-theme='dark'] .contact-card__eyebrow {
     width: min(70rem, 88%);
   }
 
-  .insight-card {
-    width: 88%;
-  }
-
   .panel--stats {
     padding-block: clamp(2rem, 5vh, 3.5rem);
   }
@@ -1383,7 +1382,7 @@ body[data-theme='dark'] .contact-card__eyebrow {
 
   .team-grid__title,
   .contact-showcase__title {
-    font-size: clamp(2.2rem, 8vw, 4.5rem);
+    font-size: clamp(1.5rem, 6.5vw, 4.5rem);
   }
 
   .scene-card {
@@ -1433,10 +1432,6 @@ body[data-theme='dark'] .contact-card__eyebrow {
   }
 
   .stats-grid {
-    width: 86%;
-  }
-
-  .insight-card {
     width: 86%;
   }
 

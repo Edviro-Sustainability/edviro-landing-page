@@ -44,6 +44,11 @@ const joinShowcase = joinPanel ? joinPanel.querySelector('.contact-showcase') : 
 const energyMeterEl = joinPanel ? joinPanel.querySelector('#energy-meter') : null;
 const energyMeterWrapper = joinPanel ? joinPanel.querySelector('#energy-meter-wrapper') : null;
 const sectionTitleLines = Array.from(document.querySelectorAll('.section-title-line'));
+const teamOverlay = document.querySelector('.team-overlay');
+const teamCards = teamOverlay ? Array.from(teamOverlay.querySelectorAll('.team-card')) : [];
+const teamCardMap = new Map(
+  teamCards.map(c => [c.dataset.member, c]).filter(([id]) => id)
+);
 const STORAGE_THEME_KEY = 'edviro-theme';
 const DEFAULT_THEME_NAME = 'light';
 const STREET_LAMP_POSITIONS = [
@@ -132,7 +137,94 @@ const GREEN_PALETTE = {
   soft: 0x86efac
 };
 
+const TEAM_MEMBER_CONFIG = [
+  { id: 'hursh', labelOffsetX: 220, labelOffsetY: -24 },
+  { id: 'tanuj', labelOffsetX: 220, labelOffsetY: 22 },
+];
 
+let teamOverlayVisible = false;
+
+function resetTeamCards() {
+  for (const card of teamCards) {
+    card.style.left = '-200vw';
+    card.style.top = '-200vh';
+    card.style.opacity = '0';
+    card.style.visibility = 'hidden';
+    const line = card.querySelector('.team-card__line');
+    const dot = card.querySelector('.team-card__dot');
+    if (line) line.style.opacity = '0';
+    if (dot) dot.style.opacity = '0';
+  }
+}
+
+function setTeamOverlayVisible(isVisible) {
+  if (!teamOverlay || teamOverlayVisible === isVisible) return;
+  teamOverlayVisible = isVisible;
+  teamOverlay.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+  gsap.to(teamOverlay, {
+    autoAlpha: isVisible ? 1 : 0,
+    duration: prefersReducedMotion ? 0.08 : 0.22,
+    ease: 'power2.out',
+    overwrite: 'auto'
+  });
+  if (!isVisible) resetTeamCards();
+}
+
+function updateTeamCardAnchors() {
+  if (!teamOverlayVisible || teamCards.length === 0) return;
+  const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
+
+  for (const config of TEAM_MEMBER_CONFIG) {
+    const card = teamCardMap.get(config.id);
+    const gridCard = document.querySelector(`.team-grid__card[data-member="${config.id}"]`);
+    if (!card || !gridCard) continue;
+
+    const rect = gridCard.getBoundingClientRect();
+    const dotX = rect.left + rect.width * 0.5;
+    const dotY = rect.top + rect.height * 0.6;
+
+    const inwardSign = dotX < window.innerWidth * 0.5 ? 1 : -1;
+    const labelX = clamp(dotX + inwardSign * config.labelOffsetX, 130, window.innerWidth - 130);
+    const labelY = clamp(dotY + config.labelOffsetY, 90, window.innerHeight - 90);
+
+    card.style.left = `${labelX}px`;
+    card.style.top = `${labelY}px`;
+    card.style.opacity = '1';
+    card.style.visibility = 'visible';
+
+    const line = card.querySelector('.team-card__line');
+    const dot = card.querySelector('.team-card__dot');
+    if (!line || !dot) continue;
+
+    const cardWidth = card.offsetWidth;
+    const cardHeight = card.offsetHeight;
+    const cardLeft = labelX - cardWidth * 0.5;
+    const cardTop = labelY - cardHeight * 0.5;
+    const localStartX = dotX >= labelX ? cardWidth : 0;
+    const localStartY = clamp(dotY - cardTop, 8, cardHeight - 8);
+    const startX = cardLeft + localStartX;
+    const startY = cardTop + localStartY;
+    const dx = dotX - startX;
+    const dy = dotY - startY;
+    const lineLength = Math.hypot(dx, dy);
+
+    if (lineLength < 2) {
+      line.style.opacity = '0';
+      dot.style.opacity = '0';
+      continue;
+    }
+
+    line.style.left = `${localStartX}px`;
+    line.style.top = `${localStartY}px`;
+    line.style.width = `${lineLength}px`;
+    line.style.transform = `translateY(-50%) rotate(${Math.atan2(dy, dx)}rad)`;
+    line.style.opacity = '1';
+
+    dot.style.left = `${localStartX + dx}px`;
+    dot.style.top = `${localStartY + dy}px`;
+    dot.style.opacity = '1';
+  }
+}
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(themeConfig.light.sceneColor);
@@ -226,7 +318,7 @@ const schoolOutlineMaterials = [];
 const streetLampPointLights = [];
 const schoolOutlineStyle = {
   thresholdAngle: 36,
-  linewidth: 1,
+  linewidth: 3,
   color: { light: 0x777777, dark: 0x333333 }
 };
 
@@ -529,7 +621,6 @@ function applyMaterialTheme(themeName) {
 function updateThemeToggleButton(themeName) {
   if (!themeToggleButton) return;
   const nextThemeName = themeName === 'dark' ? 'light' : 'dark';
-  themeToggleButton.textContent = `Switch to ${nextThemeName}`;
   themeToggleButton.setAttribute('aria-label', `Switch to ${nextThemeName} mode`);
   themeToggleButton.setAttribute('aria-pressed', themeName === 'dark' ? 'true' : 'false');
 }
@@ -948,7 +1039,6 @@ lenis.scrollTo(0, { immediate: true, force: true });
 bindIntroTextRevealUnlock();
 maybeUnlockScroll();
 
-// ─── Dot-chain navbar ──────────────────────────────────────────────
 (function initSiteNav() {
   const navDots = Array.from(document.querySelectorAll('.nav-dot'));
   const navConnectors = Array.from(document.querySelectorAll('.nav-connector'));
@@ -999,7 +1089,6 @@ maybeUnlockScroll();
       triggerFlow(activeNavIndex >= 0 ? activeNavIndex : i, i);
       setActiveNav(i);
       if (i === 0) {
-        // Scroll to the point where the first scene card is at its mid keyframe (timeline position 0.62s)
         const st = cameraScrollTimeline.scrollTrigger;
         const scrollProgress = 0.62 / cameraScrollTimeline.totalDuration();
         const target = st.start + scrollProgress * (st.end - st.start);
@@ -1012,7 +1101,6 @@ maybeUnlockScroll();
     });
   });
 
-  // Track active section via IntersectionObserver
   const sectionObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -1024,6 +1112,8 @@ maybeUnlockScroll();
 
   navSections.forEach(s => s && sectionObserver.observe(s));
 })();
+if (teamOverlay) gsap.set(teamOverlay, { autoAlpha: 0 });
+resetTeamCards();
 const postSecondPanelDuration = (() => {
   const weightedDuration = (prefersReducedMotion ? 0.8 : 1.25) * (
     (statsPanel ? 1.0 : 0)
@@ -1033,11 +1123,6 @@ const postSecondPanelDuration = (() => {
   return weightedDuration > 0 ? weightedDuration : Math.max(gsap.utils.toArray('.panel').length - 2, 0);
 })();
 
-// Dynamically size the invisible spacer panel so the stats panel always enters
-// the viewport at the exact scroll position where the camera's counter-reveal
-// keyframe completes, regardless of browser zoom or font scaling.
-// Derived from: scrollProgress(counter reveal) = 1 / (1 + postSecondPanelDuration)
-// Solving for Hi: Hi = (Hs + Ht + Hc) / postSecondPanelDuration + vh - H1
 function syncInvisiblePanelHeight() {
   if (!invisiblePanel || postSecondPanelDuration <= 0) return;
   const vh = window.innerHeight;
@@ -1161,16 +1246,17 @@ if (sceneCards.length === 3) {
     const w = window.innerWidth;
     const h = window.innerHeight;
     const baseStyle = {
-      startX: [w * -0.416, w * -0.402, w * -0.389],
-      startY: [h * -0.278, h * -0.278, h * -0.278],
-      midX: [w * -0.25, w * -0.25, w * -0.25],
+      startX: [w * -0.255, w * -0.25, w * -0.24],
+      startY: [h * -0.23, h * -0.23, h * -0.23],
+      midX: [w * -0.16, w * -0.16, w * -0.155],
       midY: [h * -0.167, h * -0.167, h * -0.167],
-      endX: [w * 0.069, w * 0.069, w * 0.069],
+      endX: [w * 0.1, w * 0.1, w * 0.1],
       endY: [h * 0.056, h * 0.056, h * 0.056],
       startScale: [0.5, 0.5, 0.5],
       midScale: [1.0, 1.0, 1.0],
-      endScale: [2.5, 2.5, 2.5]
+      endScale: [2.5, 2.8, 3.2]
     };
+    console.log(baseStyle);
 
     const legacyCardWidth = getLegacyCardWidth(compact);
 
@@ -1321,6 +1407,15 @@ if (statsPanel && statsCards.length === 3) {
       },
       statsCardsStartOffset + (index * (prefersReducedMotion ? 0.02 : 0.09))
     );
+  });
+}
+
+if (teamPanel) {
+  ScrollTrigger.create({
+    trigger: teamPanel,
+    start: 'top 76%',
+    end: 'bottom 18%',
+    onToggle: (self) => setTeamOverlayVisible(self.isActive)
   });
 }
 
@@ -1511,9 +1606,8 @@ window.addEventListener('resize', () => {
   ScrollTrigger.refresh();
 });
 
-// ─── Team card sinusoidal drift ─────────────────────────────────────────────
 const teamDriftCards = Array.from(document.querySelectorAll('.team-grid__card[data-member]'));
-const teamDriftPhases = [0.0, 2.1]; // offset by ~120° so cards never sync
+const teamDriftPhases = [0.0, 2.1];
 
 gsap.ticker.lagSmoothing(0);
 gsap.ticker.add((time) => {
@@ -1522,8 +1616,8 @@ gsap.ticker.add((time) => {
   if (!prefersReducedMotion) {
     teamDriftCards.forEach((card, i) => {
       const t = time + teamDriftPhases[i];
-      const tiltX = Math.sin(t * 0.3) * 3;
-      const tiltY = Math.sin(t * 0.4) * 4.5;
+      const tiltX = Math.sin(t * 0.6) * 3;
+      const tiltY = Math.sin(t * 0.8) * 4.5;
       card.style.transform = `perspective(700px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
     });
   }
@@ -1574,7 +1668,9 @@ gsap.ticker.add((time) => {
     );
   }
 
+  updateTeamCardAnchors();
+
   if (schoolNoiseOverlays.length > 0) renderWireMask();
-  
+
   composer.render();
 });
