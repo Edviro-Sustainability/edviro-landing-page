@@ -406,7 +406,6 @@ function applyGreenMeshTheme(material, themeName) {
   material.emissiveIntensity = style.emissiveIntensity;
 }
 
-
 function buildCounterTextMesh(label, fontSize, material, options = {}) {
   const textMesh = new Text();
   textMesh.font = counterFontUrl;
@@ -459,6 +458,8 @@ function setCounterValue(nextValue, options = {}) {
 function incrementCounterValue(delta, options = {}) {
   setCounterValue(counterValueState.targetValue + delta, options);
 }
+
+// TODO: Hook up counter API
 
 function applyCounterApiPayload(payload, options = {}) {
   const apiValue = Number(payload?.total ?? payload?.count ?? payload?.value);
@@ -1123,10 +1124,6 @@ const postSecondPanelDuration = (() => {
   return weightedDuration > 0 ? weightedDuration : Math.max(gsap.utils.toArray('.panel').length - 2, 0);
 })();
 
-// Scale factor for the camera-animation scroll section (0 → 1 in the GSAP
-// timeline).  Values > 1 give the intro animations more scroll distance so
-// they feel slower and more deliberate before reaching the counter/stats
-// section.  Increase to slow down; decrease to speed up.
 const CAMERA_SECTION_SCALE = 3.5;
 
 function syncInvisiblePanelHeight() {
