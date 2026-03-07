@@ -187,9 +187,11 @@ function updateTeamCardAnchors() {
     const labelX = clamp(dotX + inwardSign * config.labelOffsetX, 130, window.innerWidth - 130);
     const labelY = clamp(dotY + config.labelOffsetY, 90, window.innerHeight - 90);
 
+    const isInView = rect.bottom > 0 && rect.top < window.innerHeight && rect.right > 0 && rect.left < window.innerWidth;
+
     card.style.left = `${labelX}px`;
     card.style.top = `${labelY}px`;
-    card.style.opacity = '1';
+    card.style.opacity = isInView ? '1' : '0';
     card.style.visibility = 'visible';
 
     const line = card.querySelector('.team-card__line');
@@ -1091,7 +1093,7 @@ maybeUnlockScroll();
       setActiveNav(i);
       if (i === 0) {
         const st = cameraScrollTimeline.scrollTrigger;
-        const scrollProgress = 0.62 / cameraScrollTimeline.totalDuration();
+        const scrollProgress = 2.2 / cameraScrollTimeline.totalDuration();
         const target = st.start + scrollProgress * (st.end - st.start);
         lenis.scrollTo(target, { duration: prefersReducedMotion ? 1.2 : 2.4, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
       } else {
