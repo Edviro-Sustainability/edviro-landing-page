@@ -589,10 +589,23 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   box-shadow: 0 0 0 1px rgba(var(--green-rgb-300), 0.16) inset, 0 0.85rem 1.95rem rgba(4, 24, 12, 0.12);
   will-change: transform;
   transform-origin: center center;
-  opacity: 0;
-  transition: opacity 0.22s ease;
+  opacity: 1;
   aspect-ratio: 3 / 4;
   max-height: clamp(22rem, 48vh, 40rem);
+  place-self: center;
+  background-size: cover;
+  background-position: center 15%;
+  background-repeat: no-repeat;
+  transform-style: preserve-3d;
+  width: 20vw;
+}
+
+.team-grid__card[data-member="hursh"] {
+  background-image: url('/hursh.jpg');
+}
+
+.team-grid__card[data-member="tanuj"] {
+  background-image: url('/tanuj.jpg');
 }
 
 .team-grid__card[data-member="hursh"] {

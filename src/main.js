@@ -44,8 +44,6 @@ const joinShowcase = joinPanel ? joinPanel.querySelector('.contact-showcase') : 
 const energyMeterEl = joinPanel ? joinPanel.querySelector('#energy-meter') : null;
 const energyMeterWrapper = joinPanel ? joinPanel.querySelector('#energy-meter-wrapper') : null;
 const sectionTitleLines = Array.from(document.querySelectorAll('.section-title-line'));
-const teamOverlay = document.querySelector('.team-overlay');
-const teamCards = teamOverlay ? Array.from(teamOverlay.querySelectorAll('.team-card')) : [];
 const STORAGE_THEME_KEY = 'edviro-theme';
 const DEFAULT_THEME_NAME = 'light';
 const STREET_LAMP_POSITIONS = [
@@ -134,51 +132,6 @@ const GREEN_PALETTE = {
   soft: 0x86efac
 };
 
-const TEAM_MEMBER_CONFIG = [
-  {
-    id: 'hursh',
-    basePosition: new THREE.Vector3(-34.3, -3.9, -9.5),
-    baseRotationY: -0.28,
-    tiltX: 0.1,
-    tiltPhaseOffset: 0,
-    phase: 0.2,
-    scale: 0.4,
-    floatAmplitude: 0.2,
-    floatSpeed: 1.35,
-    driftY: 0.03,
-    driftZ: 0.07,
-    rotateSpeed: 0.6,
-    labelOffsetX: 220,
-    labelOffsetY: -24
-  },
-  {
-    id: 'tanuj',
-    basePosition: new THREE.Vector3(-38.2, -3.9, -7),
-    baseRotationY: 0.34,
-    tiltX: 0.1,
-    tiltPhaseOffset: 5.2,
-    phase: 1.6,
-    scale: 0.4,
-    floatAmplitude: 0.2,
-    floatSpeed: 1.24,
-    driftY: 0.03,
-    driftZ: 0.14,
-    rotateSpeed: -0.6,
-    labelOffsetX: 220,
-    labelOffsetY: 22
-  }
-];
-
-const teamCardMap = new Map(
-  teamCards
-    .map((card) => [card.dataset.member, card])
-    .filter(([id]) => typeof id === 'string' && id.length > 0)
-);
-const teamMembers = [];
-const teamSceneState = {
-  panelActive: false,
-  overlayVisible: false
-};
 
 
 const scene = new THREE.Scene();
@@ -361,166 +314,6 @@ function applyGreenMeshTheme(material, themeName) {
   material.emissiveIntensity = style.emissiveIntensity;
 }
 
-function resetTeamCards() {
-  for (const card of teamCards) {
-    const line = card.querySelector('.team-card__line');
-    const dot = card.querySelector('.team-card__dot');
-    card.style.left = '-200vw';
-    card.style.top = '-200vh';
-    card.style.opacity = '0';
-    card.style.visibility = 'hidden';
-    if (line) line.style.opacity = '0';
-    if (dot) dot.style.opacity = '0';
-  }
-}
-
-function setTeamOverlayVisibility(isVisible) {
-  if (!teamOverlay) return;
-  if (teamSceneState.overlayVisible === isVisible) return;
-  teamSceneState.overlayVisible = isVisible;
-  teamOverlay.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
-  gsap.to(teamOverlay, {
-    autoAlpha: isVisible ? 1 : 0,
-    duration: prefersReducedMotion ? 0.08 : 0.22,
-    ease: 'power2.out',
-    overwrite: 'auto'
-  });
-  if (!isVisible) resetTeamCards();
-}
-
-function createTeamImageElements() {
-  for (const member of teamMembers) {
-    member.el.remove();
-  }
-  teamMembers.length = 0;
-
-  for (const config of TEAM_MEMBER_CONFIG) {
-    const card = document.querySelector(`.team-grid__card[data-member="${config.id}"]`);
-    if (!card) continue;
-
-    const img = document.createElement('img');
-    img.src = `/${config.id}.jpg`;
-    img.alt = config.id;
-    img.className = 'team-member-img';
-    card.appendChild(img);
-
-    teamMembers.push({
-      id: config.id,
-      el: img,
-      card,
-      config,
-      worldPos: new THREE.Vector3(),
-    });
-  }
-}
-
-function updateTeamMembers(time) {
-  if (teamMembers.length === 0) return;
-
-  for (const member of teamMembers) {
-    const { config, worldPos } = member;
-    const phaseTime = time + config.phase;
-
-    worldPos.set(
-      config.basePosition.x,
-      config.basePosition.y
-        + Math.sin(phaseTime * config.floatSpeed) * config.floatAmplitude
-        + Math.sin(phaseTime * 0.7) * config.driftY,
-      config.basePosition.z + Math.cos(phaseTime * 0.55) * config.driftZ
-    );
-
-    const tiltPhase = phaseTime + (config.tiltPhaseOffset ?? 0);
-    const tiltX = (config.tiltX ?? 0) * (180 / Math.PI) + Math.sin(tiltPhase * 0.3) * 3;
-    const tiltY = Math.sin(tiltPhase * 0.4) * 4.5;
-
-    member.card.style.transform = `perspective(700px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
-  }
-}
-
-function setTeamMembersVisibility(isVisible) {
-  for (const member of teamMembers) {
-    member.card.style.opacity = isVisible ? '1' : '0';
-  }
-}
-
-function updateTeamCardAnchors() {
-  if (teamCards.length === 0 || teamMembers.length === 0) return;
-  const shouldShowCards = teamSceneState.overlayVisible && introCameraStarted;
-  const clampValue = (value, min, max) => Math.min(Math.max(value, min), max);
-
-  for (const member of teamMembers) {
-    const card = teamCardMap.get(member.id);
-    if (!card) continue;
-    const line = card.querySelector('.team-card__line');
-    const dot = card.querySelector('.team-card__dot');
-
-    if (!shouldShowCards) {
-      card.style.opacity = '0';
-      card.style.visibility = 'hidden';
-      if (line) line.style.opacity = '0';
-      if (dot) dot.style.opacity = '0';
-      continue;
-    }
-
-    // Lock dot to the DOM position of the team-grid image card
-    const imageCard = member.card;
-    const rect = imageCard.getBoundingClientRect();
-
-    if (rect.width === 0 || rect.bottom < 0 || rect.top > window.innerHeight) {
-      card.style.opacity = '0';
-      card.style.visibility = 'hidden';
-      if (line) line.style.opacity = '0';
-      if (dot) dot.style.opacity = '0';
-      continue;
-    }
-
-    // Dot target: horizontally centered, slightly below the vertical center of the image
-    const meshX = rect.left + rect.width * 0.5;
-    const meshY = rect.top + rect.height * 0.6;
-    const inwardSign = meshX < window.innerWidth * 0.5 ? 1 : -1;
-    // Scale labelOffsetX with viewport width so the label stays proportional on smaller screens
-    const rawOffsetX = Number.isFinite(member.config.labelOffsetX) ? member.config.labelOffsetX : 200;
-    const labelOffsetX = Math.min(rawOffsetX, window.innerWidth * 0.22);
-    const labelOffsetY = Number.isFinite(member.config.labelOffsetY) ? member.config.labelOffsetY : 0;
-    const labelX = clampValue(meshX + (inwardSign * labelOffsetX), 130, window.innerWidth - 130);
-    const labelY = clampValue(meshY + labelOffsetY, 90, window.innerHeight - 90);
-
-    card.style.left = `${labelX}px`;
-    card.style.top = `${labelY}px`;
-    card.style.opacity = '1';
-    card.style.visibility = 'visible';
-
-    if (!line || !dot) continue;
-
-    const cardWidth = card.offsetWidth;
-    const cardHeight = card.offsetHeight;
-    const cardLeft = labelX - (cardWidth * 0.5);
-    const cardTop = labelY - (cardHeight * 0.5);
-    const localStartX = meshX >= labelX ? cardWidth : 0;
-    const localStartY = clampValue(meshY - cardTop, 8, cardHeight - 8);
-    const startX = cardLeft + localStartX;
-    const startY = cardTop + localStartY;
-    const dx = meshX - startX;
-    const dy = meshY - startY;
-    const lineLength = Math.hypot(dx, dy);
-
-    if (lineLength < 2) {
-      line.style.opacity = '0';
-      dot.style.opacity = '0';
-      continue;
-    }
-
-    line.style.left = `${localStartX}px`;
-    line.style.top = `${localStartY}px`;
-    line.style.width = `${lineLength}px`;
-    line.style.transform = `translateY(-50%) rotate(${Math.atan2(dy, dx)}rad)`;
-    line.style.opacity = '1';
-
-    dot.style.left = `${localStartX + dx}px`;
-    dot.style.top = `${localStartY + dy}px`;
-    dot.style.opacity = '1';
-  }
-}
 
 function buildCounterTextMesh(label, fontSize, material, options = {}) {
   const textMesh = new Text();
@@ -858,8 +651,6 @@ loader.load('/wiring.obj', (loadedModel) => {
   console.error('Failed to load wiring:', error);
   markLoadComplete('wiringLoaded');
 });
-
-createTeamImageElements();
 
 const pointerCurrent = { x: 0, y: 0 };
 const pointerXTo = gsap.quickTo(pointerCurrent, 'x', { duration: 0.6, ease: 'power3.out' });
@@ -1233,9 +1024,6 @@ maybeUnlockScroll();
 
   navSections.forEach(s => s && sectionObserver.observe(s));
 })();
-if (teamOverlay) gsap.set(teamOverlay, { autoAlpha: 0 });
-resetTeamCards();
-
 const postSecondPanelDuration = (() => {
   const weightedDuration = (prefersReducedMotion ? 0.8 : 1.25) * (
     (statsPanel ? 1.0 : 0)
@@ -1536,17 +1324,6 @@ if (statsPanel && statsCards.length === 3) {
   });
 }
 
-if (teamPanel) {
-  ScrollTrigger.create({
-    trigger: teamPanel,
-    start: 'top 76%',
-    end: 'bottom 18%',
-    onToggle: (self) => {
-      teamSceneState.panelActive = self.isActive;
-    }
-  });
-}
-
 if (joinPanel && energyMeterEl) {
   const chartClipRect = energyMeterEl.querySelector('#chart-clip-rect');
   const curveHvac = energyMeterEl.querySelector('#curve-hvac');
@@ -1734,9 +1511,22 @@ window.addEventListener('resize', () => {
   ScrollTrigger.refresh();
 });
 
+// ─── Team card sinusoidal drift ─────────────────────────────────────────────
+const teamDriftCards = Array.from(document.querySelectorAll('.team-grid__card[data-member]'));
+const teamDriftPhases = [0.0, 2.1]; // offset by ~120° so cards never sync
+
 gsap.ticker.lagSmoothing(0);
 gsap.ticker.add((time) => {
-  lenis.raf(time * 1000); 
+  lenis.raf(time * 1000);
+
+  if (!prefersReducedMotion) {
+    teamDriftCards.forEach((card, i) => {
+      const t = time + teamDriftPhases[i];
+      const tiltX = Math.sin(t * 0.3) * 3;
+      const tiltY = Math.sin(t * 0.4) * 4.5;
+      card.style.transform = `perspective(700px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+    });
+  }
 
   wiringElectricMaterial.uniforms.uTime.value = time;
   schoolNoiseUniforms.uTime.value = time;
@@ -1751,15 +1541,6 @@ gsap.ticker.add((time) => {
   const cameraParallaxX = parallaxX * parallaxSettings.cameraX;
   const cameraParallaxY = parallaxY * parallaxSettings.cameraY;
   const counterAndTeamVisible = scrollState.cameraOffsetX <= -32.5;
-
-  updateTeamMembers(time);
-  setTeamMembersVisibility(counterAndTeamVisible);
-  setTeamOverlayVisibility(
-    teamSceneState.panelActive
-    && teamMembers.length === TEAM_MEMBER_CONFIG.length
-    && introCameraStarted
-    && counterAndTeamVisible
-  );
 
   subjectGroup.position.x = -parallaxX * parallaxSettings.groupX;
   subjectGroup.position.y = -parallaxY * parallaxSettings.groupY;
@@ -1792,8 +1573,6 @@ gsap.ticker.add((time) => {
       introState.endLookAt.z
     );
   }
-
-  updateTeamCardAnchors();
 
   if (schoolNoiseOverlays.length > 0) renderWireMask();
   
