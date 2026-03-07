@@ -1123,6 +1123,12 @@ const postSecondPanelDuration = (() => {
   return weightedDuration > 0 ? weightedDuration : Math.max(gsap.utils.toArray('.panel').length - 2, 0);
 })();
 
+// Scale factor for the camera-animation scroll section (0 → 1 in the GSAP
+// timeline).  Values > 1 give the intro animations more scroll distance so
+// they feel slower and more deliberate before reaching the counter/stats
+// section.  Increase to slow down; decrease to speed up.
+const CAMERA_SECTION_SCALE = 3.5;
+
 function syncInvisiblePanelHeight() {
   if (!invisiblePanel || postSecondPanelDuration <= 0) return;
   const vh = window.innerHeight;
@@ -1130,7 +1136,7 @@ function syncInvisiblePanelHeight() {
   const Hs = statsPanel ? statsPanel.offsetHeight : 0;
   const Ht = teamPanel ? teamPanel.offsetHeight : 0;
   const Hc = joinPanel ? joinPanel.offsetHeight : 0;
-  const Hi = Math.max(0, (Hs + Ht + Hc) / postSecondPanelDuration + vh - H1);
+  const Hi = Math.max(0, CAMERA_SECTION_SCALE * (Hs + Ht + Hc) / postSecondPanelDuration + vh - H1);
   invisiblePanel.style.height = `${Hi}px`;
 }
 
@@ -1148,8 +1154,8 @@ if (title) {
   gsap.set(title, { autoAlpha: 1 });
   cameraScrollTimeline.to(title, {
     autoAlpha: 0,
-    duration: prefersReducedMotion ? 0.03 : 0.06
-  }, 0.02);
+    duration: (prefersReducedMotion ? 0.03 : 0.06) * CAMERA_SECTION_SCALE
+  }, 0.02 * CAMERA_SECTION_SCALE);
 }
 
 cameraScrollTimeline.to(scrollState, {
@@ -1157,13 +1163,13 @@ cameraScrollTimeline.to(scrollState, {
     {
       cameraOffsetX: -32.8, cameraOffsetY: -1.64, cameraOffsetZ: -34.44,
       lookAtOffsetX: -42.64, lookAtOffsetY: 0, lookAtOffsetZ: -42.64, gridDownLock: 0,
-      duration: 0.82,
+      duration: 0.82 * CAMERA_SECTION_SCALE,
       ease: 'none'
     },
     {
       cameraOffsetX: -44.0, cameraOffsetY: -1.5, cameraOffsetZ: -42.0,
       lookAtOffsetX: -36.0, lookAtOffsetY: -18.0, lookAtOffsetZ: -16.0, gridDownLock: 1,
-      duration: 0.18,
+      duration: 0.18 * CAMERA_SECTION_SCALE,
       ease: 'sine.out'
     }
   ]
@@ -1171,13 +1177,13 @@ cameraScrollTimeline.to(scrollState, {
 
 cameraScrollTimeline.to(parallaxScrollState, {
   multiplier: 0,
-  duration: 0.4
+  duration: 0.4 * CAMERA_SECTION_SCALE
 }, 0);
 
 if (scrollPhraseWords.length > 0) {
-  const phraseWordsStart = 0.05;
-  const phraseExitStart = 0.4;
-  const phraseOverlayExitStart = 0.5;
+  const phraseWordsStart = 0.05 * CAMERA_SECTION_SCALE;
+  const phraseExitStart = 0.4 * CAMERA_SECTION_SCALE;
+  const phraseOverlayExitStart = 0.5 * CAMERA_SECTION_SCALE;
   const getPhraseStartYOffset = () => -window.innerHeight * 0.36;
 
   gsap.set(scrollPhraseOverlay, { autoAlpha: 0 });
@@ -1192,16 +1198,16 @@ if (scrollPhraseWords.length > 0) {
   cameraScrollTimeline
     .to(scrollPhraseOverlay, {
       autoAlpha: 1,
-      duration: prefersReducedMotion ? 0.02 : 0.04
+      duration: (prefersReducedMotion ? 0.02 : 0.04) * CAMERA_SECTION_SCALE
     }, 0.0)
     .to(scrollPhraseWords, {
       autoAlpha: 1,
       y: 0,
       scale: 1,
       rotateZ: 0,
-      duration: prefersReducedMotion ? 0.045 : 0.075,
+      duration: (prefersReducedMotion ? 0.045 : 0.075) * CAMERA_SECTION_SCALE,
       ease: 'power3.out',
-      stagger: prefersReducedMotion ? 0.015 : 0.03
+      stagger: (prefersReducedMotion ? 0.015 : 0.03) * CAMERA_SECTION_SCALE
     }, phraseWordsStart);
 
   cameraScrollTimeline
@@ -1209,19 +1215,19 @@ if (scrollPhraseWords.length > 0) {
       autoAlpha: 0,
       yPercent: -45,
       scale: prefersReducedMotion ? 1 : 0.95,
-      duration: prefersReducedMotion ? 0.05 : 0.09,
+      duration: (prefersReducedMotion ? 0.05 : 0.09) * CAMERA_SECTION_SCALE,
       ease: 'power2.in',
-      stagger: { each: prefersReducedMotion ? 0.01 : 0.016, from: 'end' }
+      stagger: { each: (prefersReducedMotion ? 0.01 : 0.016) * CAMERA_SECTION_SCALE, from: 'end' }
     }, phraseExitStart)
     .to(scrollPhraseOverlay, {
       autoAlpha: 0,
-      duration: prefersReducedMotion ? 0.03 : 0.05
+      duration: (prefersReducedMotion ? 0.03 : 0.05) * CAMERA_SECTION_SCALE
     }, phraseOverlayExitStart);
 }
 
 if (sceneCards.length === 3) {
-  const cardOverlayStart = 0.25;
-  const cardStarts = [0.52, 0.62, 0.72];
+  const cardOverlayStart = 0.25 * CAMERA_SECTION_SCALE;
+  const cardStarts = [0.52, 0.62, 0.72].map(v => v * CAMERA_SECTION_SCALE);
 
   const getRootFontSize = () => {
     const rootFontSize = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize);
@@ -1276,7 +1282,7 @@ if (sceneCards.length === 3) {
     willChange: 'transform, opacity, filter'
   });
 
-  cameraScrollTimeline.to(sceneCardsOverlay, { autoAlpha: 1, duration: 0.06 }, cardOverlayStart);
+  cameraScrollTimeline.to(sceneCardsOverlay, { autoAlpha: 1, duration: 0.06 * CAMERA_SECTION_SCALE }, cardOverlayStart);
 
   sceneCards.forEach((card, i) => {
     const start = cardStarts[i];
@@ -1284,27 +1290,27 @@ if (sceneCards.length === 3) {
       .to(card, {
         keyframes: [
           { x: () => getCardPassStyle().startX[i], y: () => getCardPassStyle().startY[i], scale: () => getCardPassStyle().startScale[i], duration: 0 },
-          { x: () => getCardPassStyle().midX[i], y: () => getCardPassStyle().midY[i], scale: () => getCardPassStyle().midScale[i], duration: 0.1 },
-          { x: () => getCardPassStyle().endX[i], y: () => getCardPassStyle().endY[i], scale: () => getCardPassStyle().endScale[i], duration: 0.1 }
+          { x: () => getCardPassStyle().midX[i], y: () => getCardPassStyle().midY[i], scale: () => getCardPassStyle().midScale[i], duration: 0.1 * CAMERA_SECTION_SCALE },
+          { x: () => getCardPassStyle().endX[i], y: () => getCardPassStyle().endY[i], scale: () => getCardPassStyle().endScale[i], duration: 0.1 * CAMERA_SECTION_SCALE }
         ]
       }, start)
       .to(card, {
         keyframes: [
-          { autoAlpha: 1, duration: 0.04 },
-          { autoAlpha: 1, duration: 0.08 },
-          { autoAlpha: 0, duration: 0.06 }
+          { autoAlpha: 1, duration: 0.04 * CAMERA_SECTION_SCALE },
+          { autoAlpha: 1, duration: 0.08 * CAMERA_SECTION_SCALE },
+          { autoAlpha: 0, duration: 0.06 * CAMERA_SECTION_SCALE }
         ]
       }, start)
       .to(card, {
         keyframes: [
-          { filter: 'blur(0px)', duration: 0.04 },
-          { filter: 'blur(0px)', duration: 0.08 },
-          { filter: 'blur(6px)', duration: 0.06 }
+          { filter: 'blur(0px)', duration: 0.04 * CAMERA_SECTION_SCALE },
+          { filter: 'blur(0px)', duration: 0.08 * CAMERA_SECTION_SCALE },
+          { filter: 'blur(6px)', duration: 0.06 * CAMERA_SECTION_SCALE }
         ]
       }, start);
   });
 
-  cameraScrollTimeline.to(sceneCardsOverlay, { autoAlpha: 0, duration: 0.06 }, 0.94);
+  cameraScrollTimeline.to(sceneCardsOverlay, { autoAlpha: 0, duration: 0.06 * CAMERA_SECTION_SCALE }, 0.94 * CAMERA_SECTION_SCALE);
   }
 
 if (sectionTitleLines.length > 0) {
