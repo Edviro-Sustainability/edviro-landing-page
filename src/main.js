@@ -21,6 +21,10 @@ import wiringFragmentShader from './wiringfragment.glsl?raw';
 import maskVertexShader from './maskvertex.glsl?raw';
 import maskFragmentShader from './maskfragment.glsl?raw';
 
+if (window.matchMedia('(max-width: 768px)').matches) {
+  document.body.classList.remove('is-site-loading');
+} else {
+
 gsap.registerPlugin(ScrollTrigger);
 
 const MASK_LAYER = 1;
@@ -28,7 +32,7 @@ const MASK_LAYER = 1;
 const canvas = document.querySelector('#webgl');
 const title = document.querySelector('.title');
 const siteLoader = document.querySelector('#site-loader');
-const themeToggleButton = document.querySelector('#theme-toggle');
+
 const sceneCardsOverlay = document.querySelector('.scene-cards-overlay');
 const sceneCards = sceneCardsOverlay ? Array.from(sceneCardsOverlay.querySelectorAll('.scene-card')) : [];
 const scrollPhraseOverlay = document.querySelector('.scroll-phrase');
@@ -49,8 +53,7 @@ const teamCards = teamOverlay ? Array.from(teamOverlay.querySelectorAll('.team-c
 const teamCardMap = new Map(
   teamCards.map(c => [c.dataset.member, c]).filter(([id]) => id)
 );
-const STORAGE_THEME_KEY = 'edviro-theme';
-const DEFAULT_THEME_NAME = 'light';
+const THEME_NAME = 'light';
 const STREET_LAMP_POSITIONS = [
   new THREE.Vector3(-67.31, 15.5, 72),
   new THREE.Vector3(-44.8, 15.5, 72),
@@ -122,11 +125,6 @@ const themeConfig = {
     sceneColor: 0xffffff, fogColor: 0xf2fff9, fogDensity: 0.012, floorColor: 0xf9f0f9,
     hemiColor: 0xffffff, hemiGroundColor: 0xcfd8dc, hemiIntensity: 2.0, dirColor: 0xffffff, dirIntensity: 1.9, exposure: 1.0, wireBloomStrength: 0.2,
     streetLampIntensity: 0.0, streetLampColor: 0x000000, streetLampDistance: 0
-  },
-  dark: {
-    sceneColor: 0x050608, fogColor: 0x050608, fogDensity: 0.016, floorColor: 0x3b413d,
-    hemiColor: 0x7b899c, hemiGroundColor: 0x020304, hemiIntensity: 0.4, dirColor: 0xffffff, dirIntensity: 0.4, exposure: 1.0, wireBloomStrength: 0.24,
-    streetLampIntensity: 0.8, streetLampColor: 0xffd8aa, streetLampDistance: 16
   }
 };
 
@@ -321,7 +319,7 @@ const streetLampPointLights = [];
 const schoolOutlineStyle = {
   thresholdAngle: 36,
   linewidth: 3,
-  color: { light: 0x777777, dark: 0x333333 }
+  color: { light: 0x777777 }
 };
 
 class ConditionalEdgesGeometry extends THREE.EdgesGeometry {
@@ -383,18 +381,18 @@ let counterMaterial = null;
 let counterMesh = null;
 let counterTopContextMesh = null;
 let counterBottomContextMesh = null;
-let counterDemoIntervalId = null;
 const counterValueState = {
-  value: 400000,
-  targetValue: 400000,
-  displayValue: 400000,
-  lastRenderedValue: null
+  value: 0,
+  targetValue: 0,
+  displayValue: 0,
+  lastRenderedValue: null,
+  pendingTarget: null,
+  hasAnimatedToTarget: false
 };
 const greenMeshThemeStyle = {
-  light: { color: GREEN_PALETTE.base, emissive: 0x000000, emissiveIntensity: 0.0 },
-  dark: { color: 0x000000, emissive: GREEN_PALETTE.base, emissiveIntensity: 1.0 }
+  light: { color: GREEN_PALETTE.base, emissive: 0x000000, emissiveIntensity: 0.0 }
 };
-let currentThemeName = getInitialThemeName();
+let currentThemeName = THEME_NAME;
 
 function formatCounterValue(value) {
   return `$${Math.round(value).toLocaleString('en-US')}`;
@@ -441,55 +439,25 @@ function renderCounterValue() {
   counterMesh.sync();
 }
 
-function setCounterValue(nextValue, options = {}) {
-  const safeValue = Number.isFinite(nextValue) ? Math.max(0, nextValue) : counterValueState.targetValue;
-  const duration = Number.isFinite(options.duration) ? options.duration : 0.82;
+function animateCounterToTarget(target, options = {}) {
+  const safeTarget = Number.isFinite(target) ? Math.max(0, target) : 0;
+  const duration = Number.isFinite(options.duration) ? options.duration : 2.4;
   const ease = options.ease ?? 'power2.out';
 
-  counterValueState.value = safeValue;
-  counterValueState.targetValue = safeValue;
+  counterValueState.targetValue = safeTarget;
+  counterValueState.hasAnimatedToTarget = true;
   gsap.killTweensOf(counterValueState, 'displayValue');
   gsap.to(counterValueState, {
-    displayValue: safeValue,
+    displayValue: safeTarget,
     duration,
     ease,
-    onUpdate: renderCounterValue
+    onUpdate: renderCounterValue,
+    onComplete() {
+      counterValueState.value = safeTarget;
+      renderCounterValue();
+    }
   });
 }
-
-function incrementCounterValue(delta, options = {}) {
-  setCounterValue(counterValueState.targetValue + delta, options);
-}
-
-// TODO: Hook up counter API
-
-function applyCounterApiPayload(payload, options = {}) {
-  const apiValue = Number(payload?.total ?? payload?.count ?? payload?.value);
-  if (!Number.isFinite(apiValue)) return;
-  setCounterValue(apiValue, options);
-}
-
-function startCounterDemo() {
-  if (counterDemoIntervalId) return;
-  counterDemoIntervalId = window.setInterval(() => {
-    const randomIncrement = Math.floor(100 + Math.random() * 100);
-    incrementCounterValue(randomIncrement, { duration: 0.74, ease: 'power2.out' });
-  }, 1000);
-}
-
-function stopCounterDemo() {
-  if (!counterDemoIntervalId) return;
-  window.clearInterval(counterDemoIntervalId);
-  counterDemoIntervalId = null;
-}
-
-window.sceneCounter = {
-  setValue: setCounterValue,
-  increment: incrementCounterValue,
-  applyApiPayload: applyCounterApiPayload,
-  startDemo: startCounterDemo,
-  stopDemo: stopCounterDemo
-};
 
 function addCounter() {
   const textMaterial = new THREE.MeshStandardMaterial({
@@ -527,10 +495,33 @@ function addCounter() {
   subjectGroup.add(counterTopContextMesh);
   subjectGroup.add(counterBottomContextMesh);
   renderCounterValue();
-  startCounterDemo();
 }
 
 addCounter();
+
+function applySiteConfig(config) {
+  const stats = config?.stats;
+  if (!stats) return;
+
+  const statMap = { schools: stats.schools, districts: stats.districts, usagePoints: stats.usagePoints };
+  for (const [key, value] of Object.entries(statMap)) {
+    if (value == null) continue;
+    const card = document.querySelector(`.stats-card[data-stat="${key}"]`);
+    if (card) {
+      const valueEl = card.querySelector('.stats-card__value');
+      if (valueEl) valueEl.textContent = String(value);
+    }
+  }
+
+  if (Number.isFinite(stats.dollarsSaved) && stats.dollarsSaved > 0) {
+    counterValueState.pendingTarget = stats.dollarsSaved;
+  }
+}
+
+fetch('/site-config.json')
+  .then(res => res.json())
+  .then(applySiteConfig)
+  .catch(err => console.warn('Failed to load site config:', err));
 
 const schoolMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });
 const windowMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });
@@ -539,21 +530,13 @@ const poleMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });
 const woodMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });
 const rimMaterial = new THREE.MeshStandardMaterial({ color: '#000000' });
 const materialThemeColors = {
-  school: { light: 0xffffff, dark: 0xcbcfcb }, windows: { light: 0x71c1cf, dark: 0xfffcc9 },
-  tree: { light: GREEN_PALETTE.base, dark: GREEN_PALETTE.bright }, pole: { light: 0xc7c7c7, dark: 0xbbc4cd },
-  wood: { light: 0xa38764, dark: 0x987a5d }, rim: { light: 0x898f89, dark: 0x8c8e8c }
+  school: { light: 0xffffff }, windows: { light: 0x71c1cf },
+  tree: { light: GREEN_PALETTE.base }, pole: { light: 0xc7c7c7 },
+  wood: { light: 0xa38764 }, rim: { light: 0x898f89 }
 };
 const windowEmission = {
-  light: { color: 0x000000, intensity: 0.0 }, dark: { color: 0xffe2b7, intensity: 0.7 }
+  light: { color: 0x000000, intensity: 0.0 }
 };
-
-function getInitialThemeName() {
-  try {
-    const storedTheme = window.localStorage.getItem(STORAGE_THEME_KEY);
-    if (storedTheme === 'light' || storedTheme === 'dark') return storedTheme;
-  } catch {}
-  return DEFAULT_THEME_NAME;
-}
 
 function createStreetLampLights(lightsMesh) {
   if (!lightsMesh || streetLampPointLights.length > 0) return;
@@ -561,7 +544,7 @@ function createStreetLampLights(lightsMesh) {
   const centers = STREET_LAMP_POSITIONS.map((center) => center.clone());
 
   for (const center of centers) {
-    const pointLight = new THREE.PointLight(themeConfig.dark.streetLampColor, 0, themeConfig.dark.streetLampDistance, 2);
+    const pointLight = new THREE.PointLight(0x000000, 0, 0, 2);
     pointLight.position.copy(center);
     pointLight.position.y -= 2.0;
     pointLight.visible = false;
@@ -621,20 +604,11 @@ function applyMaterialTheme(themeName) {
   rimMaterial.color.set(materialThemeColors.rim[themeName]);
 }
 
-function updateThemeToggleButton(themeName) {
-  if (!themeToggleButton) return;
-  const nextThemeName = themeName === 'dark' ? 'light' : 'dark';
-  themeToggleButton.setAttribute('aria-label', `Switch to ${nextThemeName} mode`);
-  themeToggleButton.setAttribute('aria-pressed', themeName === 'dark' ? 'true' : 'false');
-}
+function applyTheme() {
+  const theme = themeConfig.light;
 
-function applyTheme(nextThemeName, options = {}) {
-  const normalizedThemeName = nextThemeName === 'dark' ? 'dark' : 'light';
-  const shouldPersist = options.persist !== false;
-  const theme = themeConfig[normalizedThemeName];
-
-  currentThemeName = normalizedThemeName;
-  document.body.dataset.theme = normalizedThemeName;
+  currentThemeName = 'light';
+  document.body.dataset.theme = 'light';
   scene.background = new THREE.Color(theme.sceneColor);
   if (scene.fog) {
     scene.fog.color.set(theme.fogColor);
@@ -646,36 +620,22 @@ function applyTheme(nextThemeName, options = {}) {
   hemiLight.intensity = theme.hemiIntensity;
   dirLight.color.set(theme.dirColor);
   dirLight.intensity = theme.dirIntensity;
-  dirLight.position.z = normalizedThemeName === 'dark' ? 12 : 6;
+  dirLight.position.z = 6;
   renderer.toneMappingExposure = theme.exposure;
   wireBloomPass.strength = theme.wireBloomStrength;
 
-  applyMaterialTheme(normalizedThemeName);
-  applyGreenMeshTheme(counterMaterial,normalizedThemeName);
+  applyMaterialTheme('light');
+  applyGreenMeshTheme(counterMaterial, 'light');
   for (const outlineMaterial of schoolOutlineMaterials) {
-    outlineMaterial.color.set(schoolOutlineStyle.color[normalizedThemeName]);
+    outlineMaterial.color.set(schoolOutlineStyle.color.light);
   }
 
   for (const pointLight of streetLampPointLights) {
-    pointLight.color.set(theme.streetLampColor);
-    pointLight.intensity = theme.streetLampIntensity;
-    pointLight.distance = theme.streetLampDistance;
-    pointLight.visible = normalizedThemeName === 'dark';
-  }
-
-  updateThemeToggleButton(normalizedThemeName);
-
-  if (shouldPersist) {
-    try { window.localStorage.setItem(STORAGE_THEME_KEY, normalizedThemeName); } catch (e) { console.warn(e); }
+    pointLight.visible = false;
   }
 }
 
-if (themeToggleButton) {
-  themeToggleButton.addEventListener('click', () => {
-    applyTheme(currentThemeName === 'dark' ? 'light' : 'dark');
-  });
-}
-applyTheme(currentThemeName, { persist: false });
+applyTheme();
 
 loader.load('/school.obj', (loadedModel) => {
   schoolModel = loadedModel;
@@ -1645,6 +1605,10 @@ gsap.ticker.add((time) => {
   subjectGroup.position.y = -parallaxY * parallaxSettings.groupY;
   setCounterTextVisibility(counterAndTeamVisible);
 
+  if (counterAndTeamVisible && !counterValueState.hasAnimatedToTarget && counterValueState.pendingTarget != null) {
+    animateCounterToTarget(counterValueState.pendingTarget, { duration: 2.4, ease: 'power2.out' });
+  }
+
   if (schoolModel) {
     schoolModel.visible = introCameraStarted;
     const scrollInfluence = introAnimState.progress;
@@ -1679,3 +1643,5 @@ gsap.ticker.add((time) => {
 
   composer.render();
 });
+
+} // end desktop-only guard
