@@ -318,8 +318,8 @@ const schoolOutlineMaterials = [];
 const streetLampPointLights = [];
 const schoolOutlineStyle = {
   thresholdAngle: 36,
-  linewidth: 3,
-  color: { light: 0x777777 }
+  linewidth: 2,
+  color: { light: 0x666666 }
 };
 
 class ConditionalEdgesGeometry extends THREE.EdgesGeometry {
