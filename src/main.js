@@ -54,14 +54,6 @@ const teamCardMap = new Map(
   teamCards.map(c => [c.dataset.member, c]).filter(([id]) => id)
 );
 const THEME_NAME = 'light';
-const STREET_LAMP_POSITIONS = [
-  new THREE.Vector3(-67.31, 15.5, 72),
-  new THREE.Vector3(-44.8, 15.5, 72),
-  new THREE.Vector3(-20.78, 15.5, 72),
-  new THREE.Vector3(19.85, 15.5, 72),
-  new THREE.Vector3(43.87, 15.5, 72),
-  new THREE.Vector3(66.38, 15.5, 72)
-];
 
 document.body.classList.add('is-site-loading', 'is-scroll-locked');
 
@@ -123,8 +115,7 @@ if (!loadingState.windowLoaded) {
 const themeConfig = {
   light: {
     sceneColor: 0xffffff, fogColor: 0xf2fff9, fogDensity: 0.012, floorColor: 0xf9f0f9,
-    hemiColor: 0xffffff, hemiGroundColor: 0xcfd8dc, hemiIntensity: 2.0, dirColor: 0xffffff, dirIntensity: 1.9, exposure: 1.0, wireBloomStrength: 0.2,
-    streetLampIntensity: 0.0, streetLampColor: 0x000000, streetLampDistance: 0
+    hemiColor: 0xffffff, hemiGroundColor: 0xcfd8dc, hemiIntensity: 2.0, dirColor: 0xffffff, dirIntensity: 1.9, exposure: 1.0, wireBloomStrength: 0.2
   }
 };
 
@@ -136,8 +127,8 @@ const GREEN_PALETTE = {
 };
 
 const TEAM_MEMBER_CONFIG = [
-  { id: 'hursh', labelOffsetX: 220, labelOffsetY: -24 },
-  { id: 'tanuj', labelOffsetX: 220, labelOffsetY: 22 },
+  { id: 'hursh', labelOffsetX: 220, labelOffsetY: -24, dotOffsetY: 120 },
+  { id: 'tanuj', labelOffsetX: 220, labelOffsetY: 22, dotOffsetY: 0 },
 ];
 
 let teamOverlayVisible = false;
@@ -179,7 +170,7 @@ function updateTeamCardAnchors() {
 
     const rect = gridCard.getBoundingClientRect();
     const dotX = rect.left + rect.width * 0.5;
-    const dotY = rect.top + rect.height * 0.6;
+    const dotY = rect.top + rect.height * 0.6 + (config.dotOffsetY || 0);
 
     const inwardSign = dotX < window.innerWidth * 0.5 ? 1 : -1;
     const labelX = clamp(dotX + inwardSign * config.labelOffsetX, 130, window.innerWidth - 130);
@@ -315,7 +306,6 @@ let wiringModel = null;
 const schoolMeshes = [];
 const schoolNoiseOverlays = [];
 const schoolOutlineMaterials = [];
-const streetLampPointLights = [];
 const schoolOutlineStyle = {
   thresholdAngle: 36,
   linewidth: 2,
@@ -538,22 +528,6 @@ const windowEmission = {
   light: { color: 0x000000, intensity: 0.0 }
 };
 
-function createStreetLampLights(lightsMesh) {
-  if (!lightsMesh || streetLampPointLights.length > 0) return;
-
-  const centers = STREET_LAMP_POSITIONS.map((center) => center.clone());
-
-  for (const center of centers) {
-    const pointLight = new THREE.PointLight(0x000000, 0, 0, 2);
-    pointLight.position.copy(center);
-    pointLight.position.y -= 2.0;
-    pointLight.visible = false;
-    pointLight.castShadow = true;
-    lightsMesh.add(pointLight);
-    streetLampPointLights.push(pointLight);
-  }
-}
-
 function createSchoolMeshOutline(mesh) {
   if (!mesh?.isMesh || !mesh.geometry) return null;
 
@@ -629,10 +603,6 @@ function applyTheme() {
   for (const outlineMaterial of schoolOutlineMaterials) {
     outlineMaterial.color.set(schoolOutlineStyle.color.light);
   }
-
-  for (const pointLight of streetLampPointLights) {
-    pointLight.visible = false;
-  }
 }
 
 applyTheme();
@@ -640,7 +610,6 @@ applyTheme();
 loader.load('/school.obj', (loadedModel) => {
   schoolModel = loadedModel;
   const modelMeshes = [];
-  let lightsMesh = null;
   schoolModel.traverse((child) => {
     if (child.isMesh) modelMeshes.push(child);
   });
@@ -651,7 +620,6 @@ loader.load('/school.obj', (loadedModel) => {
     const isPoleMesh = mesh.name.startsWith("Pole");
     const isTrunkMesh = mesh.name.startsWith("Trunk");
     const isTreeOrPoleMesh = isTreeMesh || isPoleMesh || isTrunkMesh;
-    if (mesh.name === 'Lights') lightsMesh = mesh;
 
     const materialMap = {
       Windows: windowMaterial, School: schoolMaterial, Lights: poleMaterial,
@@ -675,8 +643,6 @@ loader.load('/school.obj', (loadedModel) => {
     }
     schoolMeshes.push(mesh);
   }
-  createStreetLampLights(lightsMesh);
-
   schoolModel.scale.setScalar(0.12);
   schoolModel.position.set(0, -4, 0);
 
