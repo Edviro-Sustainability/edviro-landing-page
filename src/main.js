@@ -21,10 +21,6 @@ import wiringFragmentShader from './wiringfragment.glsl?raw';
 import maskVertexShader from './maskvertex.glsl?raw';
 import maskFragmentShader from './maskfragment.glsl?raw';
 
-if (window.matchMedia('(max-width: 768px)').matches) {
-  document.body.classList.remove('is-site-loading');
-} else {
-
 gsap.registerPlugin(ScrollTrigger);
 
 const MASK_LAYER = 1;
@@ -371,6 +367,13 @@ let counterMaterial = null;
 let counterMesh = null;
 let counterTopContextMesh = null;
 let counterBottomContextMesh = null;
+let counterGroup = null;
+
+function getCounterTextScale() {
+  const referenceAspect = 4 / 3;
+  const aspect = window.innerWidth / window.innerHeight;
+  return Math.min(1, aspect / referenceAspect);
+}
 const counterValueState = {
   value: 0,
   targetValue: 0,
@@ -481,9 +484,12 @@ function addCounter() {
 
   setCounterTextVisibility(false);
 
-  subjectGroup.add(counterMesh);
-  subjectGroup.add(counterTopContextMesh);
-  subjectGroup.add(counterBottomContextMesh);
+  counterGroup = new THREE.Group();
+  counterGroup.add(counterMesh);
+  counterGroup.add(counterTopContextMesh);
+  counterGroup.add(counterBottomContextMesh);
+  counterGroup.scale.setScalar(getCounterTextScale());
+  subjectGroup.add(counterGroup);
   renderCounterValue();
 }
 
@@ -1173,9 +1179,29 @@ if (sceneCards.length === 3) {
   };
 
   const getCardPassStyle = () => {
-    const compact = window.innerWidth <= 768;
     const w = window.innerWidth;
     const h = window.innerHeight;
+    const isPortrait = h > w;
+    if (isPortrait) {
+      // The card CSS anchors top-left at (left:50%, top:50%).
+      // To center the card visually, offset by -cardWidth/2 and -cardHeight/2.
+      const rem = getRootFontSize();
+      const cardW = w <= 540
+        ? clampValue(w * 0.88, 15 * rem, 28 * rem)
+        : clampValue(w * 0.80, 17 * rem, 34 * rem);
+      const cardH = w <= 540
+        ? clampValue(h * 0.32, 18 * rem, 36 * rem)
+        : clampValue(h * 0.38, 22 * rem, 44 * rem);
+      const cx = -cardW / 2;
+      const cy = -cardH / 2;
+      return {
+        startX: [cx, cx, cx], startY: [cy, cy, cy],
+        midX: [cx, cx, cx],   midY: [cy, cy, cy],
+        endX: [cx, cx, cx],   endY: [cy, cy, cy],
+        startScale: [1, 1, 1], midScale: [1, 1, 1], endScale: [1, 1, 1]
+      };
+    }
+    const compact = w <= 768;
     const baseStyle = {
       startX: [w * -0.255, w * -0.25, w * -0.24],
       startY: [h * -0.23, h * -0.23, h * -0.23],
@@ -1187,7 +1213,6 @@ if (sceneCards.length === 3) {
       midScale: [1.0, 1.0, 1.0],
       endScale: [2.5, 2.8, 3.2]
     };
-    console.log(baseStyle);
 
     const legacyCardWidth = getLegacyCardWidth(compact);
 
@@ -1530,6 +1555,8 @@ window.addEventListener('resize', () => {
     outlineMaterial.resolution.set(window.innerWidth, window.innerHeight);
   }
 
+  if (counterGroup) counterGroup.scale.setScalar(getCounterTextScale());
+
   updateRenderResolution();
   computeTitleIntroStartTransform();
   updateTitleIntroTransform(titleIntroAnimState.progress);
@@ -1610,4 +1637,3 @@ gsap.ticker.add((time) => {
   composer.render();
 });
 
-} // end desktop-only guard

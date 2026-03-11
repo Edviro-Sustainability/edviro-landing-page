@@ -1362,7 +1362,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   }
 
   .scroll-phrase__line {
-    font-size: clamp(1.6rem, 7vw, 3rem);
+    font-size: clamp(3.5rem, 13vw, 6rem);
   }
 
   .team-grid__card {
@@ -1379,136 +1379,37 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   }
 }
 
-/* ── Mobile fallback ── */
+/* ============================================================
+   Mobile-specific overrides
+   ============================================================ */
 
-.mobile-fallback {
-  display: none;
-}
-
+/* 2. Scroll phrase: much larger text + vertical word stack on mobile. */
 @media (max-width: 768px) {
-  .mobile-fallback {
+  .scroll-phrase {
+    padding: clamp(4rem, 10vh, 5rem) clamp(0.5rem, 3vw, 1rem) 0;
+  }
+
+  .scroll-phrase__line {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-height: 100dvh;
-    padding: 1.5rem;
-    background: linear-gradient(160deg, #f4fbf6 0%, #e8f5ec 50%, #f0faf3 100%);
+    gap: 0.35rem;
+    font-size: clamp(3.5rem, 13vw, 6rem);
   }
 
-  #webgl,
-  .site-loader,
-  .scroll-phrase,
-  .team-overlay,
-  .site-nav,
-  #content,
-  .scene-cards-overlay,
-  .site-footer {
-    display: none !important;
+  .scroll-phrase__row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
   }
 
-  body.is-site-loading {
-    overflow: auto;
+  /* 3. Edviro title and subtitle larger on mobile. */
+  .title .text-gradient {
+    font-size: clamp(5.5rem, 18vw, 8rem);
   }
 
-  .mobile-fallback__card {
-    width: 100%;
-    max-width: 400px;
-    background: rgba(255, 255, 255, 0.88);
-    border: 1px solid rgba(var(--green-rgb-400), 0.22);
-    border-radius: 1.25rem;
-    padding: 2.5rem 2rem;
-    text-align: center;
-    box-shadow:
-      0 4px 24px rgba(0, 0, 0, 0.06),
-      0 1px 4px rgba(0, 0, 0, 0.04);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
-
-  .mobile-fallback__brand {
-    font-size: 2.4rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    background-image: linear-gradient(135deg, var(--green-600), var(--green-900));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    margin: 0 0 0.15rem;
-    line-height: 1.1;
-  }
-
-  .mobile-fallback__subtitle {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--green-600);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin: 0 0 1.4rem;
-    opacity: 0.8;
-  }
-
-  .mobile-fallback__desc {
-    font-size: 0.92rem;
-    line-height: 1.6;
-    color: var(--text-primary);
-    opacity: 0.78;
-    margin: 0 0 1.5rem;
-  }
-
-  .mobile-fallback__divider {
-    width: 3rem;
-    height: 2px;
-    background: linear-gradient(90deg, var(--green-400), var(--green-600));
-    border-radius: 999px;
-    margin: 0 auto 1.5rem;
-  }
-
-  .mobile-fallback__email {
-    font-size: 0.85rem;
-    color: var(--text-primary);
-    opacity: 0.6;
-    letter-spacing: 0.02em;
-    margin: 0 0 1rem;
-  }
-
-  .mobile-fallback__btn {
-    display: block;
-    width: 100%;
-    padding: 0.85rem 1.5rem;
-    border-radius: 0.75rem;
-    background: linear-gradient(135deg, var(--green-600), var(--green-900));
-    color: #fff;
-    font-size: 0.95rem;
-    font-weight: 650;
-    letter-spacing: 0.04em;
-    text-decoration: none;
-    text-align: center;
-    box-shadow: 0 4px 16px rgba(var(--green-rgb-600), 0.35);
-    transition: transform 180ms ease, box-shadow 180ms ease;
-    margin: 0 0 0.75rem;
-  }
-
-  .mobile-fallback__btn:active {
-    transform: scale(0.97);
-  }
-
-  .mobile-fallback__link {
-    display: block;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--green-600);
-    text-decoration: none;
-    letter-spacing: 0.03em;
-    opacity: 0.8;
-    padding: 0.5rem;
-  }
-
-  .mobile-fallback__footer {
-    margin-top: 2rem;
-    font-size: 0.75rem;
-    color: var(--text-primary);
-    opacity: 0.4;
+  .text-reveal-line--subtitle {
+    font-size: clamp(1.5rem, 5.5vw, 2rem);
   }
 }
