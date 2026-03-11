@@ -2,7 +2,8 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   server: {
-    proxy: {}
+    proxy: {},
+    allowedHosts: ['unofficially-unincinerated-bethany.ngrok-free.dev']
   },
   plugins: [
     {

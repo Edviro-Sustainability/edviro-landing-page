@@ -1446,3 +1446,26 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
     font-size: 1.5rem;
   }
 }
+
+.is-mobile-view .scroll-phrase {
+  align-items: flex-end;
+  padding-top: 0;
+  padding-bottom: clamp(2rem, 5vh, 3.5rem);
+}
+
+.is-mobile-view .scroll-phrase__line {
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+  max-width: 72vw;
+  font-size: 1.5rem;
+  line-height: 1.5;
+  gap: 0.25em 0.4em;
+}
+
+.is-mobile-view .scroll-phrase__row {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 0.25em 0.4em;
+}
