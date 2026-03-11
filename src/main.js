@@ -50,6 +50,8 @@ const teamCardMap = new Map(
   teamCards.map(c => [c.dataset.member, c]).filter(([id]) => id)
 );
 const THEME_NAME = 'light';
+const isMobile = window.matchMedia('(max-width: 768px)').matches;
+const mobileCounterEl = document.querySelector('#mobile-counter');
 
 document.body.classList.add('is-site-loading', 'is-scroll-locked');
 
@@ -493,7 +495,7 @@ function addCounter() {
   renderCounterValue();
 }
 
-addCounter();
+if (!isMobile) addCounter();
 
 function applySiteConfig(config) {
   const stats = config?.stats;
@@ -1158,7 +1160,11 @@ if (scrollPhraseWords.length > 0) {
 
 if (sceneCards.length === 3) {
   const cardOverlayStart = 0.25 * CAMERA_SECTION_SCALE;
-  const cardStarts = [0.52, 0.62, 0.72].map(v => v * CAMERA_SECTION_SCALE);
+  console.log(isMobile);
+  const cardStarts = (isMobile
+    ? [0.52, 0.555, 0.59]
+    : [0.52, 0.62, 0.72]
+  ).map(v => v * CAMERA_SECTION_SCALE);
 
   const getRootFontSize = () => {
     const rootFontSize = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize);
@@ -1182,22 +1188,24 @@ if (sceneCards.length === 3) {
     const w = window.innerWidth;
     const h = window.innerHeight;
     const isPortrait = h > w;
-    if (isPortrait) {
-      // The card CSS anchors top-left at (left:50%, top:50%).
-      // To center the card visually, offset by -cardWidth/2 and -cardHeight/2.
+    if (isPortrait && isMobile) {
       const rem = getRootFontSize();
       const cardW = w <= 540
         ? clampValue(w * 0.88, 15 * rem, 28 * rem)
         : clampValue(w * 0.80, 17 * rem, 34 * rem);
-      const cardH = w <= 540
-        ? clampValue(h * 0.32, 18 * rem, 36 * rem)
-        : clampValue(h * 0.38, 22 * rem, 44 * rem);
+      const cardH = clampValue(h * 0.25, 10 * rem, 16 * rem);
+      const gap = rem;
+      const navH = 4 * rem;
+      const totalH = 3 * cardH + 2 * gap;
+      const groupTop = navH + (h - navH - totalH) / 2;
       const cx = -cardW / 2;
-      const cy = -cardH / 2;
+      const cy0 = groupTop - h / 2;
+      const cy1 = groupTop + (cardH + gap) - h / 2;
+      const cy2 = groupTop + 2 * (cardH + gap) - h / 2;
       return {
-        startX: [cx, cx, cx], startY: [cy, cy, cy],
-        midX: [cx, cx, cx],   midY: [cy, cy, cy],
-        endX: [cx, cx, cx],   endY: [cy, cy, cy],
+        startX: [cx, cx, cx], startY: [cy0, cy1, cy2],
+        midX: [cx, cx, cx],   midY: [cy0, cy1, cy2],
+        endX: [cx, cx, cx],   endY: [cy0, cy1, cy2],
         startScale: [1, 1, 1], midScale: [1, 1, 1], endScale: [1, 1, 1]
       };
     }
@@ -1247,15 +1255,17 @@ if (sceneCards.length === 3) {
       .to(card, {
         keyframes: [
           { autoAlpha: 1, duration: 0.04 * CAMERA_SECTION_SCALE },
-          { autoAlpha: 1, duration: 0.08 * CAMERA_SECTION_SCALE },
-          { autoAlpha: 0, duration: 0.06 * CAMERA_SECTION_SCALE }
+          // Mobile: hold long so all 3 are visible together; overlay fades them out.
+          // Desktop: short hold then individual fade-out (original behaviour).
+          { autoAlpha: 1, duration: (isMobile ? 0.3 : 0.08) * CAMERA_SECTION_SCALE },
+          { autoAlpha: isMobile ? 1 : 0, duration: 0.06 * CAMERA_SECTION_SCALE }
         ]
       }, start)
       .to(card, {
         keyframes: [
           { filter: 'blur(0px)', duration: 0.04 * CAMERA_SECTION_SCALE },
-          { filter: 'blur(0px)', duration: 0.08 * CAMERA_SECTION_SCALE },
-          { filter: 'blur(6px)', duration: 0.06 * CAMERA_SECTION_SCALE }
+          { filter: 'blur(0px)', duration: (isMobile ? 0.3 : 0.08) * CAMERA_SECTION_SCALE },
+          { filter: isMobile ? 'blur(0px)' : 'blur(6px)', duration: 0.06 * CAMERA_SECTION_SCALE }
         ]
       }, start);
   });
@@ -1596,10 +1606,13 @@ gsap.ticker.add((time) => {
 
   subjectGroup.position.x = -parallaxX * parallaxSettings.groupX;
   subjectGroup.position.y = -parallaxY * parallaxSettings.groupY;
-  setCounterTextVisibility(counterAndTeamVisible);
-
-  if (counterAndTeamVisible && !counterValueState.hasAnimatedToTarget && counterValueState.pendingTarget != null) {
-    animateCounterToTarget(counterValueState.pendingTarget, { duration: 2.4, ease: 'power2.out' });
+  if (isMobile) {
+    if (mobileCounterEl) mobileCounterEl.classList.toggle('is-visible', counterAndTeamVisible);
+  } else {
+    setCounterTextVisibility(counterAndTeamVisible);
+    if (counterAndTeamVisible && !counterValueState.hasAnimatedToTarget && counterValueState.pendingTarget != null) {
+      animateCounterToTarget(counterValueState.pendingTarget, { duration: 2.4, ease: 'power2.out' });
+    }
   }
 
   if (schoolModel) {
