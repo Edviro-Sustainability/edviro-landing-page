@@ -1458,7 +1458,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   flex-direction: row;
   justify-content: center;
   max-width: 72vw;
-  font-size: 1.5rem;
+  font-size: 1.7rem;
   line-height: 1.5;
   gap: 0.25em 0.4em;
 }

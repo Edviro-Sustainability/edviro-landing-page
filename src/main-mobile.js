@@ -115,33 +115,29 @@ const GREEN_BASE = [0x0f / 255, 0x83 / 255, 0x39 / 255]; // #0f8339
 const GREEN_HOT  = [0x54 / 255, 0xd3 / 255, 0x6b / 255]; // #54d36b
 
 const WIRE_DEFS = [
-  // Wire 1 — lowest, thickest
   {
-    p0: [0.00, 0.52],
-    p1: [0.28, 0.82],
-    p2: [0.68, 0.80],
-    p3: [1.00, 0.56],
-    width: 7.5
+    p0: [0.00, 0.50],
+    p1: [0.1, 0.38],
+    p2: [0.5, 0.78],
+    p3: [1.00, 0.52],
+    width: 12
   },
-  // Wire 2 — middle
   {
-    p0: [0.00, 0.47],
-    p1: [0.28, 0.74],
-    p2: [0.68, 0.72],
-    p3: [1.00, 0.50],
-    width: 6.0
+    p0: [0.00, 0.54],
+    p1: [0.14, 0.42],
+    p2: [0.54, 0.70],
+    p3: [1.00, 0.46],
+    width: 15
   },
-  // Wire 3 — highest
   {
-    p0: [0.00, 0.42],
-    p1: [0.28, 0.66],
-    p2: [0.68, 0.64],
-    p3: [1.00, 0.44],
-    width: 5.0
+    p0: [0.00, 0.58],
+    p1: [0.18, 0.46],
+    p2: [0.58, 0.62],
+    p3: [1.00, 0.38],
+    width: 18
   }
 ];
 
-// Overall wire state animated by GSAP
 const wireState = { progress: 0 };
 
 function smoothstep(edge0, edge1, x) {
@@ -150,7 +146,6 @@ function smoothstep(edge0, edge1, x) {
 }
 
 function shaderColor(px, py, time, W, H) {
-  // Map pixel coords to a virtual "world" scale matching the GLSL bands
   const wx = (px / W) * 9;
   const wy = (py / H) * 4;
   const flow = (((wx + wy) * 0.42 - time * 0.2) % 1 + 1) % 1;
@@ -334,7 +329,6 @@ function maybeUnlockScroll() {
   lenis.scrollTo(0, { immediate: true, force: true });
   syncInvisiblePanelHeight();
   ScrollTrigger.refresh();
-  // Animate scroll phrase in after scroll unlocks
   animateScrollPhraseIn();
 }
 
@@ -518,9 +512,6 @@ function updateTitleIntroTransform(progress) {
 
 updateTitleIntroTransform(titleIntroAnimState.progress);
 
-// Scroll phrase mobile layout is handled via .is-mobile-view CSS class
-
-// Initial state for scroll phrase words
 if (scrollPhraseWords.length > 0) {
   gsap.set(scrollPhraseOverlay, { autoAlpha: 0 });
   gsap.set(scrollPhraseWords, {
@@ -650,7 +641,6 @@ const cameraScrollTimeline = gsap.timeline({
   }
 });
 
-// Fade title on scroll
 if (title) {
   gsap.set(title, { autoAlpha: 1 });
   cameraScrollTimeline.to(title, {
@@ -659,7 +649,6 @@ if (title) {
   }, 0.02 * CAMERA_SECTION_SCALE);
 }
 
-// Fade wire canvas and scroll phrase on scroll (fromTo so initial state is always 1)
 if (wireCanvas) {
   cameraScrollTimeline.fromTo(wireCanvas,
     { opacity: 1 },
