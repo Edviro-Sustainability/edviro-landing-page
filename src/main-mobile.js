@@ -26,13 +26,27 @@ const energyMeterEl = joinPanel ? joinPanel.querySelector('#energy-meter') : nul
 const energyMeterWrapper = joinPanel ? joinPanel.querySelector('#energy-meter-wrapper') : null;
 const sectionTitleLines = Array.from(document.querySelectorAll('.section-title-line'));
 const teamOverlay = document.querySelector('.team-overlay');
-const teamCards = teamOverlay ? Array.from(teamOverlay.querySelectorAll('.team-card')) : [];
-const teamCardMap = new Map(
-  teamCards.map(c => [c.dataset.member, c]).filter(([id]) => id)
-);
 const mobileCounterEl = document.querySelector('#mobile-counter');
 
 document.body.classList.add('is-site-loading', 'is-scroll-locked', 'is-mobile-view');
+
+// --- Inject inline team info into grid (right column, next to photos) ---
+const TEAM_INFO = [
+  { member: 'hursh', name: 'Hursh Shah', detail: 'Extensive experience in energy systems and data analytics', row: 2 },
+  { member: 'tanuj', name: 'Tanuj Siripurapu', detail: 'Deep technical expertise in full-stack software engineering', row: 3 },
+];
+
+const teamGridEl = document.querySelector('.team-grid');
+if (teamGridEl) {
+  for (const info of TEAM_INFO) {
+    const div = document.createElement('div');
+    div.className = 'team-info-inline';
+    div.style.gridColumn = '2';
+    div.style.gridRow = String(info.row);
+    div.innerHTML = `<span class="team-info-inline__name">${info.name}</span><span class="team-info-inline__detail">${info.detail}</span>`;
+    teamGridEl.appendChild(div);
+  }
+}
 
 function resetScrollPosition() {
   window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -114,28 +128,36 @@ fetch('/site-config.json')
 const GREEN_BASE = [0x0f / 255, 0x83 / 255, 0x39 / 255]; // #0f8339
 const GREEN_HOT  = [0x54 / 255, 0xd3 / 255, 0x6b / 255]; // #54d36b
 
+// Full-page wire network: wires travel in tidy groups of 3-4, sweeping
+// left-to-right then looping back right-to-left as the user scrolls.
+// Each group stays close together with only small vertical offsets so the
+// bundle reads as a coherent cable rather than a chaotic tangle.
 const WIRE_DEFS = [
-  {
-    p0: [0.00, 0.50],
-    p1: [0.1, 0.38],
-    p2: [0.5, 0.78],
-    p3: [1.00, 0.52],
-    width: 12
-  },
-  {
-    p0: [0.00, 0.54],
-    p1: [0.14, 0.42],
-    p2: [0.54, 0.70],
-    p3: [1.00, 0.46],
-    width: 15
-  },
-  {
-    p0: [0.00, 0.58],
-    p1: [0.18, 0.46],
-    p2: [0.58, 0.62],
-    p3: [1.00, 0.38],
-    width: 18
-  }
+  // --- Group A: left→right across hero (3 wires, tight bundle) ---
+  { p0: [-0.02, 0.005], p1: [0.30, 0.025], p2: [0.65, 0.015], p3: [1.02, 0.035], width: 12, section: 'hero' },
+  { p0: [-0.02, 0.015], p1: [0.28, 0.035], p2: [0.68, 0.025], p3: [1.02, 0.045], width: 9,  section: 'hero' },
+  { p0: [-0.02, 0.025], p1: [0.32, 0.045], p2: [0.62, 0.035], p3: [1.02, 0.055], width: 14, section: 'hero' },
+
+  // --- Group B: right→left sweep through stats (3 wires) ---
+  { p0: [1.02, 0.06], p1: [0.72, 0.09], p2: [0.28, 0.08], p3: [-0.02, 0.115], width: 11, section: 'transition1' },
+  { p0: [1.02, 0.07], p1: [0.70, 0.10], p2: [0.30, 0.09], p3: [-0.02, 0.125], width: 8,  section: 'transition1' },
+  { p0: [1.02, 0.08], p1: [0.74, 0.11], p2: [0.26, 0.10], p3: [-0.02, 0.135], width: 13, section: 'transition1' },
+
+  // --- Group C: left→right across stats/about (4 wires) ---
+  { p0: [-0.02, 0.14], p1: [0.25, 0.165], p2: [0.70, 0.155], p3: [1.02, 0.19], width: 10, section: 'stats' },
+  { p0: [-0.02, 0.15], p1: [0.22, 0.175], p2: [0.72, 0.165], p3: [1.02, 0.20], width: 13, section: 'stats' },
+  { p0: [-0.02, 0.16], p1: [0.27, 0.185], p2: [0.68, 0.175], p3: [1.02, 0.21], width: 8,  section: 'stats' },
+  { p0: [-0.02, 0.17], p1: [0.24, 0.195], p2: [0.73, 0.185], p3: [1.02, 0.22], width: 11, section: 'stats' },
+
+  // --- Group D: right→left into team section (3 wires) ---
+  { p0: [1.02, 0.24], p1: [0.68, 0.275], p2: [0.32, 0.265], p3: [-0.02, 0.31], width: 12, section: 'team' },
+  { p0: [1.02, 0.25], p1: [0.70, 0.285], p2: [0.30, 0.275], p3: [-0.02, 0.32], width: 9,  section: 'team' },
+  { p0: [1.02, 0.26], p1: [0.66, 0.295], p2: [0.34, 0.285], p3: [-0.02, 0.33], width: 14, section: 'team' },
+
+  // --- Group E: left→right through contact/footer (3 wires) ---
+  { p0: [-0.02, 0.36], p1: [0.30, 0.39], p2: [0.65, 0.38], p3: [1.02, 0.42], width: 11, section: 'contact' },
+  { p0: [-0.02, 0.37], p1: [0.28, 0.40], p2: [0.67, 0.39], p3: [1.02, 0.43], width: 8,  section: 'contact' },
+  { p0: [-0.02, 0.38], p1: [0.32, 0.41], p2: [0.63, 0.40], p3: [1.02, 0.44], width: 13, section: 'contact' },
 ];
 
 const wireState = { progress: 0 };
@@ -167,11 +189,15 @@ function cubicBezierPoint(p0, p1, p2, p3, t) {
   ];
 }
 
+// Canvas now covers full document height so wires scroll with content
 function resizeWireCanvas() {
   if (!wireCanvas) return;
   const dpr = Math.min(devicePixelRatio, 2);
+  const docH = Math.max(document.documentElement.scrollHeight, window.innerHeight);
   wireCanvas.width = window.innerWidth * dpr;
-  wireCanvas.height = window.innerHeight * dpr;
+  wireCanvas.height = docH * dpr;
+  wireCanvas.style.width = `${window.innerWidth}px`;
+  wireCanvas.style.height = `${docH}px`;
 }
 
 resizeWireCanvas();
@@ -182,16 +208,40 @@ function drawWires(time) {
   const H = wireCanvas.height;
   const dpr = Math.min(devicePixelRatio, 2);
 
-  wireCtx.clearRect(0, 0, W, H);
+  // Only redraw the visible portion + buffer for performance
+  const scrollY = window.scrollY || 0;
+  const viewH = window.innerHeight;
+  const bufferPx = 200 * dpr;
+  const clipTop = Math.max(0, scrollY * dpr - bufferPx);
+  const clipBottom = Math.min(H, (scrollY + viewH) * dpr + bufferPx);
+
+  wireCtx.clearRect(0, clipTop, W, clipBottom - clipTop);
+
+  // Compute how much of the page the user has revealed via scroll progress
+  const maxDocScroll = Math.max(1, document.documentElement.scrollHeight - viewH);
+  const scrollFrac = scrollY / maxDocScroll;
+  // Wires reveal progressively: hero wires from intro, rest as user scrolls
+  const revealY = wireState.progress * 0.10 + scrollFrac * 0.92;
 
   for (const wire of WIRE_DEFS) {
+    // Determine the vertical extent of this wire
+    const wireMinY = Math.min(wire.p0[1], wire.p1[1], wire.p2[1], wire.p3[1]);
+    const wireMaxY = Math.max(wire.p0[1], wire.p1[1], wire.p2[1], wire.p3[1]);
+
+    // Skip if wire hasn't been revealed yet
+    if (wireMinY > revealY) continue;
+
+    // Determine how much of this wire to draw (partial reveal)
+    const wireProgress = Math.min(1, (revealY - wireMinY) / Math.max(0.01, wireMaxY - wireMinY));
+
     const p0 = [wire.p0[0] * W, wire.p0[1] * H];
     const p1 = [wire.p1[0] * W, wire.p1[1] * H];
     const p2 = [wire.p2[0] * W, wire.p2[1] * H];
     const p3 = [wire.p3[0] * W, wire.p3[1] * H];
 
-    const N = 80;
-    const maxSeg = Math.floor(N * wireState.progress);
+    const N = 60;
+    const maxSeg = Math.floor(N * wireProgress);
+    if (maxSeg <= 0) continue;
 
     wireCtx.lineWidth = wire.width * dpr;
     wireCtx.lineCap = 'round';
@@ -202,6 +252,10 @@ function drawWires(time) {
       const [x0, y0] = cubicBezierPoint(p0, p1, p2, p3, t0);
       const [x1, y1] = cubicBezierPoint(p0, p1, p2, p3, t1);
 
+      // Skip segments outside visible area
+      if (y1 < clipTop && y0 < clipTop) continue;
+      if (y0 > clipBottom && y1 > clipBottom) continue;
+
       wireCtx.strokeStyle = shaderColor(x0, y0, time, W, H);
       wireCtx.beginPath();
       wireCtx.moveTo(x0, y0);
@@ -209,100 +263,15 @@ function drawWires(time) {
       wireCtx.stroke();
     }
   }
-
 }
 
-// --- Team card helpers ---
-const TEAM_MEMBER_CONFIG = [
-  { id: 'hursh', labelOffsetX: 220, labelOffsetY: -24, dotOffsetY: 120 },
-  { id: 'tanuj', labelOffsetX: 220, labelOffsetY: 22, dotOffsetY: 0 },
-];
-
-let teamOverlayVisible = false;
+// --- Team card helpers (overlay disabled on mobile — inline info used instead) ---
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function resetTeamCards() {
-  for (const card of teamCards) {
-    card.style.left = '-200vw';
-    card.style.top = '-200vh';
-    card.style.opacity = '0';
-    card.style.visibility = 'hidden';
-    const line = card.querySelector('.team-card__line');
-    const dot = card.querySelector('.team-card__dot');
-    if (line) line.style.opacity = '0';
-    if (dot) dot.style.opacity = '0';
-  }
-}
-
-function setTeamOverlayVisible(isVisible) {
-  if (!teamOverlay || teamOverlayVisible === isVisible) return;
-  teamOverlayVisible = isVisible;
-  teamOverlay.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
-  gsap.to(teamOverlay, {
-    autoAlpha: isVisible ? 1 : 0,
-    duration: prefersReducedMotion ? 0.08 : 0.22,
-    ease: 'power2.out',
-    overwrite: 'auto'
-  });
-  if (!isVisible) resetTeamCards();
-}
-
-function updateTeamCardAnchors() {
-  if (!teamOverlayVisible || teamCards.length === 0) return;
-  const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
-
-  for (const config of TEAM_MEMBER_CONFIG) {
-    const card = teamCardMap.get(config.id);
-    const gridCard = document.querySelector(`.team-grid__card[data-member="${config.id}"]`);
-    if (!card || !gridCard) continue;
-
-    const rect = gridCard.getBoundingClientRect();
-    const dotX = rect.left + rect.width * 0.5;
-    const dotY = rect.top + rect.height * 0.6 + (config.dotOffsetY || 0);
-
-    const inwardSign = dotX < window.innerWidth * 0.5 ? 1 : -1;
-    const labelX = clamp(dotX + inwardSign * config.labelOffsetX, 130, window.innerWidth - 130);
-    const labelY = clamp(dotY + config.labelOffsetY, 90, window.innerHeight - 90);
-
-    const isInView = rect.bottom > 0 && rect.top < window.innerHeight && rect.right > 0 && rect.left < window.innerWidth;
-
-    card.style.left = `${labelX}px`;
-    card.style.top = `${labelY}px`;
-    card.style.opacity = isInView ? '1' : '0';
-    card.style.visibility = 'visible';
-
-    const line = card.querySelector('.team-card__line');
-    const dot = card.querySelector('.team-card__dot');
-    if (!line || !dot) continue;
-
-    const cardWidth = card.offsetWidth;
-    const cardHeight = card.offsetHeight;
-    const cardLeft = labelX - cardWidth * 0.5;
-    const cardTop = labelY - cardHeight * 0.5;
-    const localStartX = dotX >= labelX ? cardWidth : 0;
-    const localStartY = clamp(dotY - cardTop, 8, cardHeight - 8);
-    const startX = cardLeft + localStartX;
-    const startY = cardTop + localStartY;
-    const dx = dotX - startX;
-    const dy = dotY - startY;
-    const lineLength = Math.hypot(dx, dy);
-
-    if (lineLength < 2) {
-      line.style.opacity = '0';
-      dot.style.opacity = '0';
-      continue;
-    }
-
-    line.style.left = `${localStartX}px`;
-    line.style.top = `${localStartY}px`;
-    line.style.width = `${lineLength}px`;
-    line.style.transform = `translateY(-50%) rotate(${Math.atan2(dy, dx)}rad)`;
-    line.style.opacity = '1';
-
-    dot.style.left = `${localStartX + dx}px`;
-    dot.style.top = `${localStartY + dy}px`;
-    dot.style.opacity = '1';
-  }
+// Hide the floating team overlay entirely on mobile
+if (teamOverlay) {
+  teamOverlay.style.display = 'none';
+  teamOverlay.setAttribute('aria-hidden', 'true');
 }
 
 // --- Intro sequence ---
@@ -604,8 +573,6 @@ maybeUnlockScroll();
   navSections.forEach(s => s && sectionObserver.observe(s));
 })();
 
-if (teamOverlay) gsap.set(teamOverlay, { autoAlpha: 0 });
-resetTeamCards();
 
 const postSecondPanelDuration = (() => {
   const weightedDuration = (prefersReducedMotion ? 0.8 : 1.25) * (
@@ -649,13 +616,7 @@ if (title) {
   }, 0.02 * CAMERA_SECTION_SCALE);
 }
 
-if (wireCanvas) {
-  cameraScrollTimeline.fromTo(wireCanvas,
-    { opacity: 1 },
-    { opacity: 0, duration: 0.18 * CAMERA_SECTION_SCALE },
-    0.0
-  );
-}
+// Wire canvas no longer fades out — it flows across the full page
 
 if (scrollPhraseOverlay) {
   cameraScrollTimeline.fromTo(scrollPhraseOverlay,
@@ -665,109 +626,66 @@ if (scrollPhraseOverlay) {
   );
 }
 
-// Scene cards overlay
+// Scene cards overlay — simplified for smooth mobile performance.
+// Pre-compute positions once (and on resize via invalidateOnRefresh),
+// use a single tween per card with only transform + opacity (no blur).
 if (sceneCards.length === 3) {
-  const cardOverlayStart = 0.25 * CAMERA_SECTION_SCALE;
-  const cardStarts = [0.52, 0.555, 0.59].map(v => v * CAMERA_SECTION_SCALE);
-
-  const getRootFontSize = () => {
-    const rootFontSize = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize);
-    return Number.isFinite(rootFontSize) ? rootFontSize : 16;
+  const getRem = () => {
+    const v = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize);
+    return Number.isFinite(v) ? v : 16;
   };
+  const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
 
-  const clampValue = (value, min, max) => Math.min(Math.max(value, min), max);
-
-  const getLegacyCardWidth = (compact) => {
-    const rem = getRootFontSize();
-    if (compact) return Math.min(12.2 * rem, window.innerWidth * 0.48);
-    return clampValue(window.innerWidth * 0.23, 12.8 * rem, 18.2 * rem);
-  };
-
-  const adjustXForLegacyMotion = (xValues, scaleValues, legacyWidth) => {
-    const legacyHalfWidth = legacyWidth * 0.5;
-    return xValues.map((xValue, index) => xValue - ((scaleValues[index] - 1) * legacyHalfWidth));
-  };
-
-  const getCardPassStyle = () => {
+  // Compute the centred vertical stack positions for portrait mobile
+  function computeCardLayout() {
     const w = window.innerWidth;
     const h = window.innerHeight;
-    const isPortrait = h > w;
-    if (isPortrait) {
-      const rem = getRootFontSize();
-      const cardW = w <= 540
-        ? clampValue(w * 0.88, 15 * rem, 28 * rem)
-        : clampValue(w * 0.80, 17 * rem, 34 * rem);
-      const cardH = clampValue(h * 0.25, 10 * rem, 16 * rem);
-      const gap = rem;
-      const navH = 4 * rem;
-      const totalH = 3 * cardH + 2 * gap;
-      const groupTop = navH + (h - navH - totalH) / 2;
-      const cx = -cardW / 2;
-      const cy0 = groupTop - h / 2;
-      const cy1 = groupTop + (cardH + gap) - h / 2;
-      const cy2 = groupTop + 2 * (cardH + gap) - h / 2;
-      return {
-        startX: [cx, cx, cx], startY: [cy0, cy1, cy2],
-        midX: [cx, cx, cx], midY: [cy0, cy1, cy2],
-        endX: [cx, cx, cx], endY: [cy0, cy1, cy2],
-        startScale: [1, 1, 1], midScale: [1, 1, 1], endScale: [1, 1, 1]
-      };
-    }
-    const compact = w <= 768;
-    const baseStyle = {
-      startX: [w * -0.255, w * -0.25, w * -0.24],
-      startY: [h * -0.23, h * -0.23, h * -0.23],
-      midX: [w * -0.16, w * -0.16, w * -0.155],
-      midY: [h * -0.167, h * -0.167, h * -0.167],
-      endX: [w * 0.1, w * 0.1, w * 0.1],
-      endY: [h * 0.056, h * 0.056, h * 0.056],
-      startScale: [0.5, 0.5, 0.5],
-      midScale: [1.0, 1.0, 1.0],
-      endScale: [2.5, 2.8, 3.2]
-    };
-    const legacyCardWidth = getLegacyCardWidth(compact);
-    return {
-      ...baseStyle,
-      startX: adjustXForLegacyMotion(baseStyle.startX, baseStyle.startScale, legacyCardWidth),
-      midX: adjustXForLegacyMotion(baseStyle.midX, baseStyle.midScale, legacyCardWidth),
-      endX: adjustXForLegacyMotion(baseStyle.endX, baseStyle.endScale, legacyCardWidth)
-    };
-  };
+    const rem = getRem();
+    const cardW = clamp(w * 0.85, 14 * rem, 24 * rem);
+    const cardH = clamp(h * 0.22, 8 * rem, 14 * rem);
+    const gap = rem * 0.8;
+    const navH = w <= 440 ? 3 * rem : (w <= 540 ? 3.5 * rem : 4 * rem);
+    const totalH = 3 * cardH + 2 * gap;
+    const groupTop = navH + (h - navH - totalH) / 2;
+    const cx = -cardW / 2;
+    return [0, 1, 2].map(i => ({
+      x: cx,
+      y: groupTop + i * (cardH + gap) - h / 2
+    }));
+  }
+
+  // Cache layout; GSAP invalidateOnRefresh will re-evaluate function refs
+  let cachedLayout = computeCardLayout();
+  const cardPos = (i) => cachedLayout[i];
 
   gsap.set(sceneCardsOverlay, { autoAlpha: 0 });
-  gsap.set(sceneCards, {
-    autoAlpha: 0, filter: 'blur(4px)', force3D: true, willChange: 'transform, opacity, filter'
-  });
+  gsap.set(sceneCards, { autoAlpha: 0, y: 40, force3D: true, willChange: 'transform, opacity' });
 
-  cameraScrollTimeline.to(sceneCardsOverlay, { autoAlpha: 1, duration: 0.06 * CAMERA_SECTION_SCALE }, cardOverlayStart);
+  const cardShowStart = 0.25 * CAMERA_SECTION_SCALE;
+  const cardStagger = 0.035 * CAMERA_SECTION_SCALE;
 
+  // Fade overlay in
+  cameraScrollTimeline.to(sceneCardsOverlay, {
+    autoAlpha: 1, duration: 0.08 * CAMERA_SECTION_SCALE, ease: 'none'
+  }, cardShowStart);
+
+  // Each card: single tween — slide into position + fade in
   sceneCards.forEach((card, i) => {
-    const start = cardStarts[i];
-    cameraScrollTimeline
-      .to(card, {
-        keyframes: [
-          { x: () => getCardPassStyle().startX[i], y: () => getCardPassStyle().startY[i], scale: () => getCardPassStyle().startScale[i], duration: 0 },
-          { x: () => getCardPassStyle().midX[i], y: () => getCardPassStyle().midY[i], scale: () => getCardPassStyle().midScale[i], duration: 0.1 * CAMERA_SECTION_SCALE },
-          { x: () => getCardPassStyle().endX[i], y: () => getCardPassStyle().endY[i], scale: () => getCardPassStyle().endScale[i], duration: 0.1 * CAMERA_SECTION_SCALE }
-        ]
-      }, start)
-      .to(card, {
-        keyframes: [
-          { autoAlpha: 1, duration: 0.04 * CAMERA_SECTION_SCALE },
-          { autoAlpha: 1, duration: 0.3 * CAMERA_SECTION_SCALE },
-          { autoAlpha: 1, duration: 0.06 * CAMERA_SECTION_SCALE }
-        ]
-      }, start)
-      .to(card, {
-        keyframes: [
-          { filter: 'blur(0px)', duration: 0.04 * CAMERA_SECTION_SCALE },
-          { filter: 'blur(0px)', duration: 0.3 * CAMERA_SECTION_SCALE },
-          { filter: 'blur(0px)', duration: 0.06 * CAMERA_SECTION_SCALE }
-        ]
-      }, start);
+    const entryTime = cardShowStart + 0.06 * CAMERA_SECTION_SCALE + i * cardStagger;
+
+    cameraScrollTimeline.to(card, {
+      autoAlpha: 1,
+      x: () => { cachedLayout = computeCardLayout(); return cardPos(i).x; },
+      y: () => cardPos(i).y,
+      duration: 0.12 * CAMERA_SECTION_SCALE,
+      ease: 'none'
+    }, entryTime);
   });
 
-  cameraScrollTimeline.to(sceneCardsOverlay, { autoAlpha: 0, duration: 0.06 * CAMERA_SECTION_SCALE }, 0.94 * CAMERA_SECTION_SCALE);
+  // Fade overlay out
+  cameraScrollTimeline.to(sceneCardsOverlay, {
+    autoAlpha: 0, duration: 0.06 * CAMERA_SECTION_SCALE, ease: 'none'
+  }, 0.94 * CAMERA_SECTION_SCALE);
 }
 
 cameraScrollTimeline.to({}, { duration: postSecondPanelDuration });
@@ -851,15 +769,7 @@ if (statsPanel && statsCards.length === 3) {
   });
 }
 
-// --- Team panel ---
-if (teamPanel) {
-  ScrollTrigger.create({
-    trigger: teamPanel,
-    start: 'top 76%',
-    end: 'bottom 18%',
-    onToggle: (self) => setTeamOverlayVisible(self.isActive)
-  });
-}
+// --- Team panel (overlay disabled — inline info in grid) ---
 
 // --- Contact / energy meter panel ---
 if (joinPanel && energyMeterEl) {
@@ -1002,32 +912,33 @@ if (joinPanel && energyMeterEl) {
 }
 
 // --- Resize ---
+let resizeDebounce = null;
 window.addEventListener('resize', () => {
-  resizeWireCanvas();
-  computeTitleIntroStartTransform();
-  updateTitleIntroTransform(titleIntroAnimState.progress);
-  syncInvisiblePanelHeight();
-  ScrollTrigger.refresh();
+  clearTimeout(resizeDebounce);
+  resizeDebounce = setTimeout(() => {
+    resizeWireCanvas();
+    computeTitleIntroStartTransform();
+    updateTitleIntroTransform(titleIntroAnimState.progress);
+    syncInvisiblePanelHeight();
+    ScrollTrigger.refresh();
+    // Re-measure after layout settles
+    requestAnimationFrame(resizeWireCanvas);
+  }, 100);
 });
 
-// --- Team card drift ---
-const teamDriftCards = Array.from(document.querySelectorAll('.team-grid__card[data-member]'));
-const teamDriftPhases = [0.0, 2.1];
+// --- Keep wire canvas height in sync with document ---
+if (wireCanvas) {
+  const docObserver = new ResizeObserver(() => {
+    requestAnimationFrame(resizeWireCanvas);
+  });
+  docObserver.observe(document.body);
+}
 
 // --- Main tick ---
 gsap.ticker.lagSmoothing(0);
 gsap.ticker.add((time) => {
   lenis.raf(time * 1000);
-
-  if (!prefersReducedMotion) {
-    teamDriftCards.forEach((card, i) => {
-      const t = time + teamDriftPhases[i];
-      card.style.transform = `perspective(700px) rotateX(${Math.sin(t * 0.6) * 3}deg) rotateY(${Math.sin(t * 0.8) * 4.5}deg)`;
-    });
-  }
-
   drawWires(time);
-  updateTeamCardAnchors();
 
   if (mobileCounterEl) {
     mobileCounterEl.classList.toggle('is-visible', scrollState.progress > 0.28);
