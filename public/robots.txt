@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /test.txt
+Disallow: /*.obj$
+Disallow: /*.mtl$
 
 Sitemap: https://edviroenergy.com/sitemap.xml
