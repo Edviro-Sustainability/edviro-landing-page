@@ -61,7 +61,6 @@ ScrollTrigger.scrollerProxy(scrollWrapper, {
 scrollWrapper.addEventListener('scroll', () => ScrollTrigger.update());
 
 let stableVH = document.documentElement.clientHeight || window.innerHeight;
-// Use large viewport on iOS so the site extends behind Safari's address bar
 if (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
   stableVH = Math.max(stableVH, window.screen.height);
 }
@@ -89,17 +88,10 @@ if (teamGridEl) {
   }
 }
 
-// --- Shrink hero panel and hide invisible spacer (mobile) ---
-if (firstPanel) {
-  firstPanel.style.minHeight = '80vh';
-  firstPanel.style.justifyContent = 'flex-start';
-  firstPanel.style.paddingTop = '8vh';
-}
 if (invisiblePanel) {
   invisiblePanel.style.display = 'none';
 }
 
-// --- Reposition scroll phrase and scene cards into document flow (mobile) ---
 if (scrollPhraseOverlay && firstPanel) {
   Object.assign(scrollPhraseOverlay.style, {
     position: 'relative',
@@ -110,7 +102,6 @@ if (scrollPhraseOverlay && firstPanel) {
     zIndex: '',
     display: 'flex',
     justifyContent: 'center',
-    paddingBottom: 'clamp(1.5rem, 4vh, 3rem)',
   });
   firstPanel.appendChild(scrollPhraseOverlay);
 }
@@ -131,13 +122,6 @@ if (sceneCardsOverlay && sceneCards.length === 3) {
 
     const wrapper = document.createElement('div');
     wrapper.className = 'scene-card-flow-wrapper';
-    Object.assign(wrapper.style, {
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minHeight: '90vh',
-      padding: '8rem 1rem 2rem',
-    });
     wrapper.appendChild(card);
     if (insertRef) {
       contentEl.insertBefore(wrapper, insertRef);
@@ -230,6 +214,10 @@ fetch('/site-config.json')
   .catch(err => console.warn('Failed to load site config:', err));
 
 // --- Wire Canvas ---
+const contentEl = document.querySelector('#content');
+if (wireCanvas && contentEl) {
+  contentEl.insertBefore(wireCanvas, contentEl.firstChild);
+}
 
 const GREEN_BASE = [0x0f / 255, 0x83 / 255, 0x39 / 255]; // #0f8339
 const GREEN_HOT  = [0x54 / 255, 0xd3 / 255, 0x6b / 255]; // #54d36b
@@ -237,31 +225,40 @@ const GREEN_HOT  = [0x54 / 255, 0xd3 / 255, 0x6b / 255]; // #54d36b
 const WIRE_FREQ = 8;
 const WIRE_AMP  = 0.65;
 const WIRE_CENTER_X = 0.5;
+const WIRE_SPAN = 1.5 * (2 / WIRE_FREQ);
 
 const wireState = { progress: 0 };
+let smoothRevealFrac = 0;
 
-const WIRE_ORIGIN_DOC_Y = 0.35 * stableVH / Math.max(1, document.querySelector('#scroll-wrapper')?.scrollHeight || stableVH);
-
-const basePhase = Math.PI / 2 - WIRE_ORIGIN_DOC_Y * Math.PI * WIRE_FREQ;
-
+let wireOriginDocY = 0;
 const WIRE_BUNDLE = [
-  { xShift: -0.12, phaseOffset: basePhase,        width: 20 },
-  { xShift:  0.0,  phaseOffset: basePhase - 0.02, width: 20 },
-  { xShift:  0.12, phaseOffset: basePhase - 0.04, width: 20 },
+  { xShift: -0.12, phaseOffset: 0, width: 20 },
+  { xShift:  0.0,  phaseOffset: 0, width: 20 },
+  { xShift:  0.12, phaseOffset: 0, width: 20 },
 ];
+
+function recomputeWireParams() {
+  const scrollH = Math.max(1, scrollWrapper.scrollHeight);
+  wireOriginDocY = 0.35 * stableVH / scrollH;
+  const bp = Math.PI / 2 - wireOriginDocY * Math.PI * WIRE_FREQ;
+  WIRE_BUNDLE[0].phaseOffset = bp;
+  WIRE_BUNDLE[1].phaseOffset = bp - 0.02;
+  WIRE_BUNDLE[2].phaseOffset = bp - 0.04;
+}
+
+recomputeWireParams();
 
 function smoothstep(edge0, edge1, x) {
   const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
   return t * t * (3 - 2 * t);
 }
 
-function shaderColor(px, py, time, W, H, docY) {
-  const wx = (px / W) * 9;
-  const wy = (docY != null ? docY : py / H) * 4;
-  const flow = (((wx + wy) * 0.42 - time * 0.2) % 1 + 1) % 1;
+function shaderColor(time, wireIndex) {
+  const phase = wireIndex * 0.7;
+  const flow = ((time * 0.2 + phase) % 1 + 1) % 1;
   const bandA = smoothstep(0, 0.08, flow) * (1 - smoothstep(0.08, 0.26, flow));
   const bandB = smoothstep(0.55, 0.72, flow) * (1 - smoothstep(0.72, 0.9, flow));
-  const pulse = 0.5 + 0.5 * Math.sin(time * 1.5 + wy * 2.2);
+  const pulse = 0.5 + 0.5 * Math.sin(time * 1.5 + phase);
   const glow = Math.max(bandA, Math.max(bandB, 0.45 * pulse));
   const r = Math.round(GREEN_BASE[0] * 255 + (GREEN_HOT[0] - GREEN_BASE[0]) * 255 * glow);
   const g = Math.round(GREEN_BASE[1] * 255 + (GREEN_HOT[1] - GREEN_BASE[1]) * 255 * glow);
@@ -273,19 +270,65 @@ function wireX(docY, xShift, phaseOffset) {
   return WIRE_CENTER_X + xShift + WIRE_AMP * Math.sin(docY * Math.PI * WIRE_FREQ + phaseOffset);
 }
 
+let wireGeometryDirty = true;
+let cachedWirePaths = null;
+let cachedRevealFrac = -1;
+
 function resizeWireCanvas() {
   if (!wireCanvas) return;
+  recomputeWireParams();
   const dpr = Math.min(devicePixelRatio, 1.5);
+  const scrollH = Math.max(1, scrollWrapper.scrollHeight);
   const w = window.innerWidth;
-  const h = stableVH;
-  if (wireCanvas.width === Math.round(w * dpr) && wireCanvas.height === Math.round(h * dpr)) return;
-  wireCanvas.width = Math.round(w * dpr);
-  wireCanvas.height = Math.round(h * dpr);
+  const wireHeightPx = WIRE_SPAN * scrollH;
+  const wireStartPx = 0.35 * stableVH;
+
+  const canvasW = Math.round(w * dpr);
+  const canvasH = Math.round(wireHeightPx * dpr);
+
+  wireCanvas.width = canvasW;
+  wireCanvas.height = canvasH;
   wireCanvas.style.width = `${w}px`;
-  wireCanvas.style.height = `${h}px`;
+  wireCanvas.style.height = `${wireHeightPx}px`;
+  wireCanvas.style.top = `${wireStartPx}px`;
+  wireGeometryDirty = true;
 }
 
 resizeWireCanvas();
+
+let lastScrollHeight = scrollWrapper.scrollHeight;
+const contentObserver = new ResizeObserver(() => {
+  const newH = scrollWrapper.scrollHeight;
+  if (newH !== lastScrollHeight) {
+    lastScrollHeight = newH;
+    resizeWireCanvas();
+  }
+});
+contentObserver.observe(document.querySelector('#content'));
+
+function computeWirePaths(revealFrac) {
+  const W = wireCanvas.width;
+  const H = wireCanvas.height;
+  const DOC_STEP = 0.0005;
+  const wireStart = wireOriginDocY;
+  const wireEnd = revealFrac;
+  if (wireEnd <= wireStart) return null;
+
+  const firstStep = Math.ceil(wireStart / DOC_STEP);
+  const lastStep = Math.floor(wireEnd / DOC_STEP);
+
+  return WIRE_BUNDLE.map(wire => {
+    const points = [];
+    for (let step = firstStep; step <= lastStep; step++) {
+      const docY = step * DOC_STEP;
+      const wx = wireX(docY, wire.xShift, wire.phaseOffset);
+      const cx = wx * W;
+      const cy = ((docY - wireStart) / WIRE_SPAN) * H;
+      points.push({ cx, cy, docY });
+    }
+    return points;
+  });
+}
 
 function drawWires(time) {
   if (!wireCtx || wireState.progress <= 0) return;
@@ -293,71 +336,51 @@ function drawWires(time) {
   const H = wireCanvas.height;
   const dpr = Math.min(devicePixelRatio, 1.5);
 
+  const scrollY = scrollWrapper.scrollTop || 0;
+  const docH = Math.max(1, scrollWrapper.scrollHeight);
+  const maxDocScroll = Math.max(1, docH - stableVH);
+  const scrollFrac = scrollY / maxDocScroll;
+  const maxWireDocY = wireOriginDocY + WIRE_SPAN;
+  const scrollDelay = 0.08;
+  const delayedScroll = Math.max(0, scrollFrac - scrollDelay) / (1 - scrollDelay);
+  const targetRevealFrac = Math.min(wireState.progress * 0.18 + delayedScroll * 0.7, maxWireDocY);
+
+  const lerpSpeed = 0.1;
+  smoothRevealFrac += (targetRevealFrac - smoothRevealFrac) * lerpSpeed;
+  if (Math.abs(smoothRevealFrac - targetRevealFrac) < 0.0001) smoothRevealFrac = targetRevealFrac;
+  const revealFrac = smoothRevealFrac;
+
+  if (wireGeometryDirty || revealFrac !== cachedRevealFrac) {
+    cachedWirePaths = computeWirePaths(revealFrac);
+    cachedRevealFrac = revealFrac;
+    wireGeometryDirty = false;
+  }
+
+  if (!cachedWirePaths) return;
+
   wireCtx.clearRect(0, 0, W, H);
 
-  const scrollY = scrollWrapper.scrollTop || 0;
-  const viewH = stableVH;
-  const docH = Math.max(1, scrollWrapper.scrollHeight);
-  const maxDocScroll = Math.max(1, docH - viewH);
-  const scrollFrac = scrollY / maxDocScroll;
+  WIRE_BUNDLE.forEach((wire, i) => {
+    const points = cachedWirePaths[i];
+    if (!points || points.length < 2) return;
 
-  const scrollDelay = 0;
-  const delayedScrollFrac = Math.max(0, (scrollFrac - scrollDelay) / (1 - scrollDelay));
-
-  const maxWireDocY = WIRE_ORIGIN_DOC_Y + 1.5 * (2 / WIRE_FREQ);
-  const revealFrac = Math.min(wireState.progress * 0.18 + delayedScrollFrac * 0.8, maxWireDocY);
-
-  const visTop = scrollY / Math.max(1, docH);
-  const visBottom = (scrollY + viewH) / Math.max(1, docH);
-  const visRange = visBottom - visTop;
-  if (visRange <= 0) return;
-
-  const wireStart = WIRE_ORIGIN_DOC_Y;
-  const wireEnd = revealFrac;
-  if (wireEnd <= wireStart) return;
-
-  const DOC_STEP = 0.005;
-  const firstStep = Math.ceil(wireStart / DOC_STEP);
-  const lastStep = Math.floor(wireEnd / DOC_STEP);
-
-  // Single path + single color per wire: sample color at the midpoint of
-  // the visible range so the animated pulse is still visible, but we only
-  // issue ONE beginPath/stroke per wire (3 total instead of hundreds).
-  const midDocY = (wireStart + wireEnd) * 0.5;
-  const midScreenFrac = Math.max(0, Math.min(1, (midDocY - visTop) / visRange));
-
-  for (const wire of WIRE_BUNDLE) {
     wireCtx.lineWidth = wire.width * dpr;
     wireCtx.lineCap = 'round';
     wireCtx.lineJoin = 'round';
 
-    const midWx = wireX(midDocY, wire.xShift, wire.phaseOffset);
-    wireCtx.strokeStyle = shaderColor(midWx * W, midScreenFrac * H, time, W, H, midDocY);
+    wireCtx.strokeStyle = shaderColor(time, i);
 
     wireCtx.beginPath();
-    let started = false;
-    for (let step = firstStep; step <= lastStep; step++) {
-      const docY = step * DOC_STEP;
-      const screenFrac = (docY - visTop) / visRange;
-
-      if (screenFrac < 0 || screenFrac > 1) {
-        started = false;
-        continue;
-      }
-
-      const wx = wireX(docY, wire.xShift, wire.phaseOffset);
-      const cx = wx * W;
-      const cy = screenFrac * H;
-
-      if (!started) {
-        wireCtx.moveTo(cx, cy);
-        started = true;
-      } else {
-        wireCtx.lineTo(cx, cy);
-      }
+    wireCtx.moveTo(points[0].cx, points[0].cy);
+    for (let j = 1; j < points.length - 1; j++) {
+      const midX = (points[j].cx + points[j + 1].cx) * 0.5;
+      const midY = (points[j].cy + points[j + 1].cy) * 0.5;
+      wireCtx.quadraticCurveTo(points[j].cx, points[j].cy, midX, midY);
     }
+    const last = points[points.length - 1];
+    wireCtx.lineTo(last.cx, last.cy);
     wireCtx.stroke();
-  }
+  });
 }
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -403,9 +426,9 @@ function animateScrollPhraseIn() {
     y: 0,
     scale: 1,
     rotateZ: 0,
-    duration: prefersReducedMotion ? 0.3 : 0.55,
+    duration: prefersReducedMotion ? 0.5 : 1.0,
     ease: 'power3.out',
-    stagger: prefersReducedMotion ? 0.04 : 0.08,
+    stagger: 0.06,
     delay: prefersReducedMotion ? 0.05 : 0.08
   });
 }
@@ -510,11 +533,10 @@ function bindIntroTextRevealUnlock() {
 
 function computeTitleIntroStartTransform() {
   if (!title) return;
-  // Mobile: slide from top, no scale
   titleIntroState.offsetX = 0;
   titleIntroState.offsetY = -72;
   titleIntroState.startScale = 1;
-  titleIntroState.endYOffset = 0;
+  titleIntroState.endYOffset = 30;
 }
 
 computeTitleIntroStartTransform();
@@ -712,8 +734,8 @@ if (sceneCardWrappers.length === 3) {
 
     gsap.set(card, { autoAlpha: 0, xPercent: xOffset, force3D: true });
 
-    const startOffset = 30 - i * 5;
-    const endOffset = startOffset - 40;
+    const startOffset = 65 - i * 5;
+    const endOffset = startOffset - 60;
     gsap.to(card, {
       autoAlpha: 1,
       xPercent: 0,
@@ -910,9 +932,6 @@ if (joinPanel && energyMeterEl) {
     });
   });
 
-  // Energy meter is hidden on mobile (display:none), skip continuous updates
-
-  // Tilt effect removed on mobile — energy meter is hidden and mouse events are irrelevant
 }
 
 // --- Resize ---
@@ -932,6 +951,19 @@ window.addEventListener('resize', () => {
     syncInvisiblePanelHeight();
     ScrollTrigger.refresh();
   }, 100);
+});
+
+window.addEventListener('orientationchange', () => {
+  setTimeout(() => {
+    stableVH = window.innerHeight;
+    lastKnownWidth = window.innerWidth;
+    setStableVH();
+    resizeWireCanvas();
+    computeTitleIntroStartTransform();
+    updateTitleIntroTransform(titleIntroAnimState.progress);
+    syncInvisiblePanelHeight();
+    ScrollTrigger.refresh();
+  }, 200);
 });
 
 

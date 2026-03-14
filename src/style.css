@@ -1467,13 +1467,11 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 /* --- Mobile-view overrides (applied via JS class on body) --- */
 
 .is-mobile-view #webgl {
-  position: fixed;
-  top: 0;
+  position: absolute;
   left: 0;
-  width: 100vw;
-  height: var(--stable-vh, 100vh);
   z-index: 0;
   pointer-events: none;
+  /* width, height, and top are set by JS based on wire extent */
 }
 
 .is-mobile-view .scroll-phrase {
@@ -1501,16 +1499,16 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 /* Mobile hero panel */
 .is-mobile-view .panel:first-child {
-  min-height: 85vh;
+  min-height: 80vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 /* Mobile title sizing */
 .is-mobile-view .title .text-gradient {
-  font-size: clamp(4.4rem, 19vw, 7.5rem);
+  font-size: clamp(5rem, 25vw, 9rem);
 }
 
 .is-mobile-view .text-reveal-line--subtitle {
@@ -1550,8 +1548,13 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 }
 
 .is-mobile-view .stats-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   width: 90%;
   gap: clamp(0.75rem, 2.5vw, 1.2rem);
+}
+
+.is-mobile-view .stats-card[data-stat="schools"] {
+  grid-column: 1 / -1;
 }
 
 .is-mobile-view .stats-card {
@@ -1583,7 +1586,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 .is-mobile-view .team-grid__title {
   grid-column: 1 / -1;
-  font-size: clamp(2rem, 8vw, 3.5rem);
+  font-size: clamp(2rem, 7.5vw, 3.5rem);
   margin-bottom: 0.5rem;
   place-self: center;
 }
@@ -1657,7 +1660,9 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 .is-mobile-view .contact-showcase__title {
   font-size: clamp(2rem, 7.5vw, 3.5rem);
-  line-height: 1.05;
+  line-height: normal;
+  margin-bottom: 0.5rem;
+  place-self: center;
 }
 
 .is-mobile-view .energy-meter-wrapper {
@@ -1705,10 +1710,46 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   font-size: clamp(0.72rem, 2.8vw, 0.88rem);
 }
 
-/* Mobile nav refinements — lighter blur for GPU perf */
+/* Mobile nav — consistent sizing across orientations */
 .is-mobile-view .site-nav {
+  height: clamp(3rem, 8vmin, 4rem);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+}
+
+.is-mobile-view .nav-dot__label {
+  display: none;
+}
+
+.is-mobile-view .nav-connector {
+  width: clamp(1.8rem, 5vmin, 2.8rem);
+  margin-bottom: 0;
+}
+
+.is-mobile-view .nav-dot {
+  padding: 0.55rem 0.6rem;
+}
+
+.is-mobile-view .site-nav__actions {
+  gap: 0.5rem;
+  right: 0.75rem;
+}
+
+.is-mobile-view .nav-login {
+  font-size: clamp(0.68rem, 2.5vw, 0.8rem);
+  padding: clamp(0.35rem, 1vmin, 0.45rem) clamp(0.7rem, 2vmin, 0.9rem);
+}
+
+.is-mobile-view .site-nav__brand {
+  left: 0.75rem;
+}
+
+.is-mobile-view .scene-card-flow-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: clamp(16rem, 80vh, 40rem);
+  padding-top: 45vh;
 }
 
 .is-mobile-view .site-footer {
