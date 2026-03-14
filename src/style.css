@@ -1520,8 +1520,8 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 .is-mobile-view .scene-card {
   width: clamp(14rem, 75vw, 21rem);
   min-height: unset;
-  aspect-ratio: 1 / 1;
-  padding: clamp(1.5rem, 5vw, 2.2rem);
+  aspect-ratio: unset;
+  padding: clamp(1.1rem, 4vw, 1.6rem);
 }
 
 .is-mobile-view .scene-card__label {
@@ -1558,8 +1558,8 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 }
 
 .is-mobile-view .stats-card {
-  min-height: clamp(8rem, 20vh, 12rem);
-  padding: clamp(1rem, 3.5vw, 1.5rem);
+  min-height: clamp(5.5rem, 14vh, 8rem);
+  padding: clamp(0.75rem, 2.5vw, 1.1rem);
 }
 
 .is-mobile-view .stats-card__value {

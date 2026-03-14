@@ -25,6 +25,36 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
+
+    <style>
+      body.is-site-loading {
+        background: #f7f8f7;
+      }
+      body.is-site-loading > *:not(.site-loader) {
+        opacity: 0 !important;
+        visibility: hidden !important;
+      }
+      body.is-site-loading .site-loader {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        z-index: 4;
+        display: grid;
+        place-items: center;
+        opacity: 1 !important;
+        visibility: visible !important;
+      }
+      .site-loader__spinner {
+        width: 2.8rem; height: 2.8rem;
+        border: 3px solid rgba(17, 23, 17, 0.3);
+        border-top-color: #16a34a;
+        border-radius: 50%;
+        animation: _ldr 900ms linear infinite;
+      }
+      @keyframes _ldr {
+        to { transform: rotate(360deg); }
+      }
+    </style>
   </head>
   <body class="is-site-loading">
 
@@ -227,7 +257,6 @@
                   <span class="energy-legend-item__name">Equipment</span>
                 </button>
               </div>
-              <p class="energy-meter__hint">Hover a category to isolate</p>
             </div>
           </div>
 
