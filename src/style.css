@@ -63,6 +63,11 @@ body.is-scroll-locked {
   touch-action: none;
 }
 
+body.is-scroll-locked #scroll-wrapper {
+  overflow: hidden !important;
+  touch-action: none;
+}
+
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
@@ -117,10 +122,11 @@ html.lenis, html.lenis body { height: auto; }
 
 #webgl {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
   z-index: 0;
   width: 100vw;
-  height: 100vh;
+  height: var(--stable-vh, 100vh);
   transition: opacity 220ms ease, visibility 220ms ease;
 }
 
@@ -130,7 +136,10 @@ body.is-site-loading #webgl { opacity: 0; visibility: hidden; }
 
 .site-loader {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: var(--stable-vh, 100vh);
   z-index: 4;
   display: grid;
   place-items: center;
@@ -349,7 +358,7 @@ body.is-site-loading .site-nav { opacity: 0; visibility: hidden; pointer-events:
   display: block;
   transform: translateY(115%);
   opacity: 0;
-  animation: reveal-up 800ms cubic-bezier(0.3, 0.3, 0.5, 1) forwards;
+  animation: reveal-up 500ms cubic-bezier(0.3, 0.3, 0.5, 1) forwards;
 }
 
 .text-reveal-line--subtitle {
@@ -371,7 +380,10 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 .scroll-phrase {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: var(--stable-vh, 100vh);
   z-index: 2;
   display: grid;
   align-items: start;
@@ -401,7 +413,6 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 .scroll-phrase__word {
   color: var(--text-primary);
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  will-change: transform, opacity, color, text-shadow;
 }
 
 .scroll-phrase__word--accent {
@@ -420,7 +431,10 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 .scene-cards-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: var(--stable-vh, 100vh);
   z-index: 2;
   pointer-events: none;
   overflow: hidden;
@@ -619,7 +633,10 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 .team-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: var(--stable-vh, 100vh);
   z-index: 3;
   pointer-events: none;
   opacity: 0;
@@ -1450,13 +1467,11 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 /* --- Mobile-view overrides (applied via JS class on body) --- */
 
 .is-mobile-view #webgl {
-  position: absolute;
-  inset: auto;
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: auto;
-  min-height: 100%;
+  width: 100vw;
+  height: var(--stable-vh, 100vh);
   z-index: 0;
   pointer-events: none;
 }
@@ -1472,7 +1487,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   flex-direction: row;
   justify-content: center;
   max-width: 80vw;
-  font-size: clamp(1.4rem, 4.8vw, 2rem);
+  font-size: clamp(1.7rem, 5.8vw, 2.4rem);
   line-height: 1.45;
   gap: 0.2em 0.35em;
 }
@@ -1495,7 +1510,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 /* Mobile title sizing */
 .is-mobile-view .title .text-gradient {
-  font-size: clamp(3.8rem, 16vw, 6.5rem);
+  font-size: clamp(4.4rem, 19vw, 7.5rem);
 }
 
 .is-mobile-view .text-reveal-line--subtitle {
@@ -1503,20 +1518,21 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   letter-spacing: 0.08em;
 }
 
-/* Mobile scene cards - vertical stack with proper sizing */
+/* Mobile scene cards - square with larger text */
 .is-mobile-view .scene-card {
-  width: clamp(16rem, 85vw, 24rem);
-  min-height: clamp(12rem, 28vh, 18rem);
-  padding: clamp(1.2rem, 4vw, 1.8rem);
+  width: clamp(14rem, 75vw, 21rem);
+  min-height: unset;
+  aspect-ratio: 1 / 1;
+  padding: clamp(1.5rem, 5vw, 2.2rem);
 }
 
 .is-mobile-view .scene-card__label {
-  font-size: clamp(1.2rem, 5vw, 1.8rem);
+  font-size: clamp(1.5rem, 6vw, 2.2rem);
 }
 
 .is-mobile-view .scene-card__sublabel {
-  font-size: clamp(0.82rem, 3.2vw, 1.1rem);
-  line-height: 1.4;
+  font-size: clamp(0.95rem, 3.8vw, 1.3rem);
+  line-height: 1.45;
 }
 
 /* Mobile stats section */
@@ -1672,7 +1688,8 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 /* Mobile counter */
 .is-mobile-view .mobile-counter {
-  padding-bottom: 14rem;
+  padding-top: 8rem;
+  padding-bottom: 4rem;
 }
 
 .is-mobile-view .mobile-counter__line {
@@ -1688,10 +1705,15 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   font-size: clamp(0.72rem, 2.8vw, 0.88rem);
 }
 
-/* Mobile nav refinements */
+/* Mobile nav refinements — lighter blur for GPU perf */
 .is-mobile-view .site-nav {
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.is-mobile-view .site-footer {
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .is-mobile-view .nav-brand {

@@ -1,4 +1,3 @@
-import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './style.css';
@@ -23,14 +22,56 @@ const invisiblePanel = document.querySelector('.panel.invisible');
 const firstPanel = document.querySelector('#content > .panel:first-child');
 const joinShowcase = joinPanel ? joinPanel.querySelector('.contact-showcase') : null;
 const energyMeterEl = joinPanel ? joinPanel.querySelector('#energy-meter') : null;
-const energyMeterWrapper = joinPanel ? joinPanel.querySelector('#energy-meter-wrapper') : null;
 const sectionTitleLines = Array.from(document.querySelectorAll('.section-title-line'));
 const teamOverlay = document.querySelector('.team-overlay');
 const mobileCounterEl = document.querySelector('#mobile-counter');
 
 document.body.classList.add('is-site-loading', 'is-scroll-locked', 'is-mobile-view');
 
-// --- Inject inline team info into grid (right column, next to photos) ---
+const scrollWrapper = document.createElement('div');
+scrollWrapper.id = 'scroll-wrapper';
+while (document.body.firstChild) {
+  scrollWrapper.appendChild(document.body.firstChild);
+}
+document.body.appendChild(scrollWrapper);
+
+Object.assign(scrollWrapper.style, {
+  position: 'fixed',
+  top: '0',
+  left: '0',
+  width: '100vw',
+  height: '100vh',
+  overflowX: 'hidden',
+  overflowY: 'auto',
+  WebkitOverflowScrolling: 'touch',
+});
+Object.assign(document.documentElement.style, { overflow: 'hidden', height: '100%' });
+Object.assign(document.body.style, { overflow: 'hidden', height: '100%' });
+
+ScrollTrigger.defaults({ scroller: scrollWrapper });
+ScrollTrigger.scrollerProxy(scrollWrapper, {
+  scrollTop(value) {
+    if (arguments.length) { scrollWrapper.scrollTop = value; }
+    return scrollWrapper.scrollTop;
+  },
+  getBoundingClientRect() {
+    return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
+  },
+});
+scrollWrapper.addEventListener('scroll', () => ScrollTrigger.update());
+
+let stableVH = document.documentElement.clientHeight || window.innerHeight;
+// Use large viewport on iOS so the site extends behind Safari's address bar
+if (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+  stableVH = Math.max(stableVH, window.screen.height);
+}
+let lastKnownWidth = window.innerWidth;
+
+function setStableVH() {
+  document.documentElement.style.setProperty('--stable-vh', `${stableVH}px`);
+}
+setStableVH();
+
 const TEAM_INFO = [
   { member: 'hursh', name: 'Hursh Shah', detail: 'Extensive experience in energy systems and data analytics', row: 2 },
   { member: 'tanuj', name: 'Tanuj Siripurapu', detail: 'Deep technical expertise in full-stack software engineering', row: 3 },
@@ -48,7 +89,74 @@ if (teamGridEl) {
   }
 }
 
+// --- Shrink hero panel and hide invisible spacer (mobile) ---
+if (firstPanel) {
+  firstPanel.style.minHeight = '80vh';
+  firstPanel.style.justifyContent = 'flex-start';
+  firstPanel.style.paddingTop = '8vh';
+}
+if (invisiblePanel) {
+  invisiblePanel.style.display = 'none';
+}
+
+// --- Reposition scroll phrase and scene cards into document flow (mobile) ---
+if (scrollPhraseOverlay && firstPanel) {
+  Object.assign(scrollPhraseOverlay.style, {
+    position: 'relative',
+    top: 'auto',
+    left: 'auto',
+    width: '100%',
+    height: 'auto',
+    zIndex: '',
+    display: 'flex',
+    justifyContent: 'center',
+    paddingBottom: 'clamp(1.5rem, 4vh, 3rem)',
+  });
+  firstPanel.appendChild(scrollPhraseOverlay);
+}
+
+const sceneCardWrappers = [];
+if (sceneCardsOverlay && sceneCards.length === 3) {
+  const contentEl = document.querySelector('#content');
+  const insertRef = statsPanel || teamPanel || joinPanel;
+
+  sceneCards.forEach((card) => {
+    Object.assign(card.style, {
+      position: 'relative',
+      top: 'auto',
+      left: 'auto',
+      transform: 'none',
+      margin: '0 auto',
+    });
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'scene-card-flow-wrapper';
+    Object.assign(wrapper.style, {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      minHeight: '90vh',
+      padding: '8rem 1rem 2rem',
+    });
+    wrapper.appendChild(card);
+    if (insertRef) {
+      contentEl.insertBefore(wrapper, insertRef);
+    } else {
+      contentEl.appendChild(wrapper);
+    }
+    sceneCardWrappers.push(wrapper);
+  });
+
+  sceneCardsOverlay.style.display = 'none';
+
+  if (mobileCounterEl && insertRef) {
+    const contentEl2 = document.querySelector('#content');
+    contentEl2.insertBefore(mobileCounterEl, insertRef);
+  }
+}
+
 function resetScrollPosition() {
+  scrollWrapper.scrollTop = 0;
   window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   document.documentElement.scrollTop = 0;
   document.body.scrollTop = 0;
@@ -98,8 +206,6 @@ function markLoadComplete(key) {
 if (!loadingState.windowLoaded) {
   window.addEventListener('load', () => markLoadComplete('windowLoaded'), { once: true });
 }
-// If page was already complete when script ran, the load event will never fire.
-// Defer to next frame so that bindIntroTextRevealUnlock() below can queue the reveal first.
 else {
   requestAnimationFrame(() => markLoadComplete('windowLoaded'));
 }
@@ -128,48 +234,30 @@ fetch('/site-config.json')
 const GREEN_BASE = [0x0f / 255, 0x83 / 255, 0x39 / 255]; // #0f8339
 const GREEN_HOT  = [0x54 / 255, 0xd3 / 255, 0x6b / 255]; // #54d36b
 
-// Full-page wire network: wires travel in tidy groups of 3-4, sweeping
-// left-to-right then looping back right-to-left as the user scrolls.
-// Each group stays close together with only small vertical offsets so the
-// bundle reads as a coherent cable rather than a chaotic tangle.
-const WIRE_DEFS = [
-  // --- Group A: left→right across hero (3 wires, tight bundle) ---
-  { p0: [-0.02, 0.005], p1: [0.30, 0.025], p2: [0.65, 0.015], p3: [1.02, 0.035], width: 12, section: 'hero' },
-  { p0: [-0.02, 0.015], p1: [0.28, 0.035], p2: [0.68, 0.025], p3: [1.02, 0.045], width: 9,  section: 'hero' },
-  { p0: [-0.02, 0.025], p1: [0.32, 0.045], p2: [0.62, 0.035], p3: [1.02, 0.055], width: 14, section: 'hero' },
-
-  // --- Group B: right→left sweep through stats (3 wires) ---
-  { p0: [1.02, 0.06], p1: [0.72, 0.09], p2: [0.28, 0.08], p3: [-0.02, 0.115], width: 11, section: 'transition1' },
-  { p0: [1.02, 0.07], p1: [0.70, 0.10], p2: [0.30, 0.09], p3: [-0.02, 0.125], width: 8,  section: 'transition1' },
-  { p0: [1.02, 0.08], p1: [0.74, 0.11], p2: [0.26, 0.10], p3: [-0.02, 0.135], width: 13, section: 'transition1' },
-
-  // --- Group C: left→right across stats/about (4 wires) ---
-  { p0: [-0.02, 0.14], p1: [0.25, 0.165], p2: [0.70, 0.155], p3: [1.02, 0.19], width: 10, section: 'stats' },
-  { p0: [-0.02, 0.15], p1: [0.22, 0.175], p2: [0.72, 0.165], p3: [1.02, 0.20], width: 13, section: 'stats' },
-  { p0: [-0.02, 0.16], p1: [0.27, 0.185], p2: [0.68, 0.175], p3: [1.02, 0.21], width: 8,  section: 'stats' },
-  { p0: [-0.02, 0.17], p1: [0.24, 0.195], p2: [0.73, 0.185], p3: [1.02, 0.22], width: 11, section: 'stats' },
-
-  // --- Group D: right→left into team section (3 wires) ---
-  { p0: [1.02, 0.24], p1: [0.68, 0.275], p2: [0.32, 0.265], p3: [-0.02, 0.31], width: 12, section: 'team' },
-  { p0: [1.02, 0.25], p1: [0.70, 0.285], p2: [0.30, 0.275], p3: [-0.02, 0.32], width: 9,  section: 'team' },
-  { p0: [1.02, 0.26], p1: [0.66, 0.295], p2: [0.34, 0.285], p3: [-0.02, 0.33], width: 14, section: 'team' },
-
-  // --- Group E: left→right through contact/footer (3 wires) ---
-  { p0: [-0.02, 0.36], p1: [0.30, 0.39], p2: [0.65, 0.38], p3: [1.02, 0.42], width: 11, section: 'contact' },
-  { p0: [-0.02, 0.37], p1: [0.28, 0.40], p2: [0.67, 0.39], p3: [1.02, 0.43], width: 8,  section: 'contact' },
-  { p0: [-0.02, 0.38], p1: [0.32, 0.41], p2: [0.63, 0.40], p3: [1.02, 0.44], width: 13, section: 'contact' },
-];
+const WIRE_FREQ = 8;
+const WIRE_AMP  = 0.65;
+const WIRE_CENTER_X = 0.5;
 
 const wireState = { progress: 0 };
+
+const WIRE_ORIGIN_DOC_Y = 0.35 * stableVH / Math.max(1, document.querySelector('#scroll-wrapper')?.scrollHeight || stableVH);
+
+const basePhase = Math.PI / 2 - WIRE_ORIGIN_DOC_Y * Math.PI * WIRE_FREQ;
+
+const WIRE_BUNDLE = [
+  { xShift: -0.12, phaseOffset: basePhase,        width: 20 },
+  { xShift:  0.0,  phaseOffset: basePhase - 0.02, width: 20 },
+  { xShift:  0.12, phaseOffset: basePhase - 0.04, width: 20 },
+];
 
 function smoothstep(edge0, edge1, x) {
   const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
   return t * t * (3 - 2 * t);
 }
 
-function shaderColor(px, py, time, W, H) {
+function shaderColor(px, py, time, W, H, docY) {
   const wx = (px / W) * 9;
-  const wy = (py / H) * 4;
+  const wy = (docY != null ? docY : py / H) * 4;
   const flow = (((wx + wy) * 0.42 - time * 0.2) % 1 + 1) % 1;
   const bandA = smoothstep(0, 0.08, flow) * (1 - smoothstep(0.08, 0.26, flow));
   const bandB = smoothstep(0.55, 0.72, flow) * (1 - smoothstep(0.72, 0.9, flow));
@@ -181,23 +269,20 @@ function shaderColor(px, py, time, W, H) {
   return `rgb(${r},${g},${b})`;
 }
 
-function cubicBezierPoint(p0, p1, p2, p3, t) {
-  const mt = 1 - t;
-  return [
-    mt * mt * mt * p0[0] + 3 * mt * mt * t * p1[0] + 3 * mt * t * t * p2[0] + t * t * t * p3[0],
-    mt * mt * mt * p0[1] + 3 * mt * mt * t * p1[1] + 3 * mt * t * t * p2[1] + t * t * t * p3[1]
-  ];
+function wireX(docY, xShift, phaseOffset) {
+  return WIRE_CENTER_X + xShift + WIRE_AMP * Math.sin(docY * Math.PI * WIRE_FREQ + phaseOffset);
 }
 
-// Canvas now covers full document height so wires scroll with content
 function resizeWireCanvas() {
   if (!wireCanvas) return;
-  const dpr = Math.min(devicePixelRatio, 2);
-  const docH = Math.max(document.documentElement.scrollHeight, window.innerHeight);
-  wireCanvas.width = window.innerWidth * dpr;
-  wireCanvas.height = docH * dpr;
-  wireCanvas.style.width = `${window.innerWidth}px`;
-  wireCanvas.style.height = `${docH}px`;
+  const dpr = Math.min(devicePixelRatio, 1.5);
+  const w = window.innerWidth;
+  const h = stableVH;
+  if (wireCanvas.width === Math.round(w * dpr) && wireCanvas.height === Math.round(h * dpr)) return;
+  wireCanvas.width = Math.round(w * dpr);
+  wireCanvas.height = Math.round(h * dpr);
+  wireCanvas.style.width = `${w}px`;
+  wireCanvas.style.height = `${h}px`;
 }
 
 resizeWireCanvas();
@@ -206,76 +291,84 @@ function drawWires(time) {
   if (!wireCtx || wireState.progress <= 0) return;
   const W = wireCanvas.width;
   const H = wireCanvas.height;
-  const dpr = Math.min(devicePixelRatio, 2);
+  const dpr = Math.min(devicePixelRatio, 1.5);
 
-  // Only redraw the visible portion + buffer for performance
-  const scrollY = window.scrollY || 0;
-  const viewH = window.innerHeight;
-  const bufferPx = 200 * dpr;
-  const clipTop = Math.max(0, scrollY * dpr - bufferPx);
-  const clipBottom = Math.min(H, (scrollY + viewH) * dpr + bufferPx);
+  wireCtx.clearRect(0, 0, W, H);
 
-  wireCtx.clearRect(0, clipTop, W, clipBottom - clipTop);
-
-  // Compute how much of the page the user has revealed via scroll progress
-  const maxDocScroll = Math.max(1, document.documentElement.scrollHeight - viewH);
+  const scrollY = scrollWrapper.scrollTop || 0;
+  const viewH = stableVH;
+  const docH = Math.max(1, scrollWrapper.scrollHeight);
+  const maxDocScroll = Math.max(1, docH - viewH);
   const scrollFrac = scrollY / maxDocScroll;
-  // Wires reveal progressively: hero wires from intro, rest as user scrolls
-  const revealY = wireState.progress * 0.10 + scrollFrac * 0.92;
 
-  for (const wire of WIRE_DEFS) {
-    // Determine the vertical extent of this wire
-    const wireMinY = Math.min(wire.p0[1], wire.p1[1], wire.p2[1], wire.p3[1]);
-    const wireMaxY = Math.max(wire.p0[1], wire.p1[1], wire.p2[1], wire.p3[1]);
+  const scrollDelay = 0;
+  const delayedScrollFrac = Math.max(0, (scrollFrac - scrollDelay) / (1 - scrollDelay));
 
-    // Skip if wire hasn't been revealed yet
-    if (wireMinY > revealY) continue;
+  const maxWireDocY = WIRE_ORIGIN_DOC_Y + 1.5 * (2 / WIRE_FREQ);
+  const revealFrac = Math.min(wireState.progress * 0.18 + delayedScrollFrac * 0.8, maxWireDocY);
 
-    // Determine how much of this wire to draw (partial reveal)
-    const wireProgress = Math.min(1, (revealY - wireMinY) / Math.max(0.01, wireMaxY - wireMinY));
+  const visTop = scrollY / Math.max(1, docH);
+  const visBottom = (scrollY + viewH) / Math.max(1, docH);
+  const visRange = visBottom - visTop;
+  if (visRange <= 0) return;
 
-    const p0 = [wire.p0[0] * W, wire.p0[1] * H];
-    const p1 = [wire.p1[0] * W, wire.p1[1] * H];
-    const p2 = [wire.p2[0] * W, wire.p2[1] * H];
-    const p3 = [wire.p3[0] * W, wire.p3[1] * H];
+  const wireStart = WIRE_ORIGIN_DOC_Y;
+  const wireEnd = revealFrac;
+  if (wireEnd <= wireStart) return;
 
-    const N = 60;
-    const maxSeg = Math.floor(N * wireProgress);
-    if (maxSeg <= 0) continue;
+  const DOC_STEP = 0.005;
+  const firstStep = Math.ceil(wireStart / DOC_STEP);
+  const lastStep = Math.floor(wireEnd / DOC_STEP);
 
+  // Single path + single color per wire: sample color at the midpoint of
+  // the visible range so the animated pulse is still visible, but we only
+  // issue ONE beginPath/stroke per wire (3 total instead of hundreds).
+  const midDocY = (wireStart + wireEnd) * 0.5;
+  const midScreenFrac = Math.max(0, Math.min(1, (midDocY - visTop) / visRange));
+
+  for (const wire of WIRE_BUNDLE) {
     wireCtx.lineWidth = wire.width * dpr;
     wireCtx.lineCap = 'round';
+    wireCtx.lineJoin = 'round';
 
-    for (let i = 0; i < maxSeg; i++) {
-      const t0 = i / N;
-      const t1 = (i + 1) / N;
-      const [x0, y0] = cubicBezierPoint(p0, p1, p2, p3, t0);
-      const [x1, y1] = cubicBezierPoint(p0, p1, p2, p3, t1);
+    const midWx = wireX(midDocY, wire.xShift, wire.phaseOffset);
+    wireCtx.strokeStyle = shaderColor(midWx * W, midScreenFrac * H, time, W, H, midDocY);
 
-      // Skip segments outside visible area
-      if (y1 < clipTop && y0 < clipTop) continue;
-      if (y0 > clipBottom && y1 > clipBottom) continue;
+    wireCtx.beginPath();
+    let started = false;
+    for (let step = firstStep; step <= lastStep; step++) {
+      const docY = step * DOC_STEP;
+      const screenFrac = (docY - visTop) / visRange;
 
-      wireCtx.strokeStyle = shaderColor(x0, y0, time, W, H);
-      wireCtx.beginPath();
-      wireCtx.moveTo(x0, y0);
-      wireCtx.lineTo(x1, y1);
-      wireCtx.stroke();
+      if (screenFrac < 0 || screenFrac > 1) {
+        started = false;
+        continue;
+      }
+
+      const wx = wireX(docY, wire.xShift, wire.phaseOffset);
+      const cx = wx * W;
+      const cy = screenFrac * H;
+
+      if (!started) {
+        wireCtx.moveTo(cx, cy);
+        started = true;
+      } else {
+        wireCtx.lineTo(cx, cy);
+      }
     }
+    wireCtx.stroke();
   }
 }
 
-// --- Team card helpers (overlay disabled on mobile — inline info used instead) ---
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Hide the floating team overlay entirely on mobile
 if (teamOverlay) {
   teamOverlay.style.display = 'none';
   teamOverlay.setAttribute('aria-hidden', 'true');
 }
 
 // --- Intro sequence ---
-const introDuration = prefersReducedMotion ? 1.35 : 2.55;
+const introDuration = prefersReducedMotion ? 1.0 : 1.6;
 const titleIntroState = { offsetX: 0, offsetY: 0, startScale: 2.15, endYOffset: 0 };
 const titleIntroAnimState = { progress: 0 };
 const introLeadTextLines = gsap.utils.toArray('.text-reveal-line--lead');
@@ -285,17 +378,12 @@ const introUnlockState = { introDone: false, textRevealDone: false, scrollUnlock
 let introCameraStarted = false;
 let introBrandRevealStarted = false;
 
-let lenis = null;
-
 function maybeUnlockScroll() {
-  if (!lenis) return;
   if (introUnlockState.scrollUnlocked) return;
   if (!introUnlockState.introDone || !introUnlockState.textRevealDone) return;
   introUnlockState.scrollUnlocked = true;
   document.body.classList.remove('is-scroll-locked');
   resetScrollPosition();
-  lenis.start();
-  lenis.scrollTo(0, { immediate: true, force: true });
   syncInvisiblePanelHeight();
   ScrollTrigger.refresh();
   animateScrollPhraseIn();
@@ -318,7 +406,7 @@ function animateScrollPhraseIn() {
     duration: prefersReducedMotion ? 0.3 : 0.55,
     ease: 'power3.out',
     stagger: prefersReducedMotion ? 0.04 : 0.08,
-    delay: prefersReducedMotion ? 0.1 : 0.2
+    delay: prefersReducedMotion ? 0.05 : 0.08
   });
 }
 
@@ -339,11 +427,11 @@ function playIntroBrandReveal() {
   }
 
   const hasLeadIntro = introLeadTextLines.length > 0;
-  const leadHoldDuration = hasLeadIntro ? (prefersReducedMotion ? 0.15 : 0.45) : 0;
-  const leadExitDuration = hasLeadIntro ? (prefersReducedMotion ? 0.26 : 0.5) : 0;
-  const brandRevealDelay = hasLeadIntro ? 0 : (prefersReducedMotion ? 0.12 : 0.28);
-  const brandRevealDuration = prefersReducedMotion ? 0.26 : 0.8;
-  const brandToCameraDelay = hasLeadIntro ? (prefersReducedMotion ? 0.04 : 0.2) : 0;
+  const leadHoldDuration = hasLeadIntro ? (prefersReducedMotion ? 0.1 : 0.25) : 0;
+  const leadExitDuration = hasLeadIntro ? (prefersReducedMotion ? 0.2 : 0.35) : 0;
+  const brandRevealDelay = hasLeadIntro ? 0 : (prefersReducedMotion ? 0.08 : 0.15);
+  const brandRevealDuration = prefersReducedMotion ? 0.2 : 0.5;
+  const brandToCameraDelay = hasLeadIntro ? (prefersReducedMotion ? 0.02 : 0.1) : 0;
 
   if (hasLeadIntro) {
     introLeadTextLines.forEach(line => {
@@ -444,10 +532,10 @@ const introTl = gsap.timeline({
   onComplete: () => {
     introUnlockState.introDone = true;
     maybeUnlockScroll();
-    // Animate wires in after title settles
     gsap.to(wireState, {
       progress: 1,
-      duration: prefersReducedMotion ? 0.6 : 1.1,
+      duration: prefersReducedMotion ? 1.0 : 2.5,
+      delay: 0.5,
       ease: 'power2.out'
     });
   }
@@ -463,9 +551,9 @@ introTl.to(titleIntroAnimState, {
 if (introSubtitleLine) {
   introTl.to(introSubtitleLine, {
     yPercent: 0, opacity: 1, filter: 'blur(0px)',
-    duration: prefersReducedMotion ? 0.4 : 0.7,
+    duration: prefersReducedMotion ? 0.3 : 0.5,
     ease: 'power2.out'
-  }, introDuration * 0.4);
+  }, introDuration * 0.35);
 }
 
 if (title) title.style.transformOrigin = '50% 50%';
@@ -492,14 +580,7 @@ if (scrollPhraseWords.length > 0) {
   });
 }
 
-// --- Lenis ---
-lenis = new Lenis({
-  duration: prefersReducedMotion ? 1.1 : 3.0, smoothWheel: true, smoothTouch: true
-});
-
-lenis.on('scroll', ScrollTrigger.update);
-lenis.stop();
-lenis.scrollTo(0, { immediate: true, force: true });
+scrollWrapper.scrollTop = 0;
 bindIntroTextRevealUnlock();
 maybeUnlockScroll();
 
@@ -552,11 +633,12 @@ maybeUnlockScroll();
       triggerFlow(activeNavIndex >= 0 ? activeNavIndex : i, i);
       setActiveNav(i);
       if (i === 0) {
-        lenis.scrollTo(0, { duration: prefersReducedMotion ? 1.2 : 2.4, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+        scrollWrapper.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
       } else {
         const section = navSections[i];
-        if (!section || !lenis) return;
-        lenis.scrollTo(section, { offset: -58, duration: prefersReducedMotion ? 1.2 : 2.4, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+        if (!section) return;
+        const top = section.offsetTop;
+        scrollWrapper.scrollTo({ top, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
       }
     });
   });
@@ -587,7 +669,7 @@ const CAMERA_SECTION_SCALE = 3.5;
 
 function syncInvisiblePanelHeight() {
   if (!invisiblePanel || postSecondPanelDuration <= 0) return;
-  const vh = window.innerHeight;
+  const vh = stableVH;
   const H1 = firstPanel ? firstPanel.offsetHeight : 0;
   const Hs = statsPanel ? statsPanel.offsetHeight : 0;
   const Ht = teamPanel ? teamPanel.offsetHeight : 0;
@@ -616,81 +698,40 @@ if (title) {
   }, 0.02 * CAMERA_SECTION_SCALE);
 }
 
-// Wire canvas no longer fades out — it flows across the full page
-
 if (scrollPhraseOverlay) {
-  cameraScrollTimeline.fromTo(scrollPhraseOverlay,
-    { autoAlpha: 1 },
-    { autoAlpha: 0, duration: 0.18 * CAMERA_SECTION_SCALE },
-    0.0
+  cameraScrollTimeline.to(scrollPhraseOverlay,
+    { autoAlpha: 0, duration: (prefersReducedMotion ? 0.03 : 0.06) * CAMERA_SECTION_SCALE },
+    0.02 * CAMERA_SECTION_SCALE
   );
 }
 
-// Scene cards overlay — simplified for smooth mobile performance.
-// Pre-compute positions once (and on resize via invalidateOnRefresh),
-// use a single tween per card with only transform + opacity (no blur).
-if (sceneCards.length === 3) {
-  const getRem = () => {
-    const v = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize);
-    return Number.isFinite(v) ? v : 16;
-  };
-  const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
-
-  // Compute the centred vertical stack positions for portrait mobile
-  function computeCardLayout() {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    const rem = getRem();
-    const cardW = clamp(w * 0.85, 14 * rem, 24 * rem);
-    const cardH = clamp(h * 0.22, 8 * rem, 14 * rem);
-    const gap = rem * 0.8;
-    const navH = w <= 440 ? 3 * rem : (w <= 540 ? 3.5 * rem : 4 * rem);
-    const totalH = 3 * cardH + 2 * gap;
-    const groupTop = navH + (h - navH - totalH) / 2;
-    const cx = -cardW / 2;
-    return [0, 1, 2].map(i => ({
-      x: cx,
-      y: groupTop + i * (cardH + gap) - h / 2
-    }));
-  }
-
-  // Cache layout; GSAP invalidateOnRefresh will re-evaluate function refs
-  let cachedLayout = computeCardLayout();
-  const cardPos = (i) => cachedLayout[i];
-
-  gsap.set(sceneCardsOverlay, { autoAlpha: 0 });
-  gsap.set(sceneCards, { autoAlpha: 0, y: 40, force3D: true, willChange: 'transform, opacity' });
-
-  const cardShowStart = 0.25 * CAMERA_SECTION_SCALE;
-  const cardStagger = 0.035 * CAMERA_SECTION_SCALE;
-
-  // Fade overlay in
-  cameraScrollTimeline.to(sceneCardsOverlay, {
-    autoAlpha: 1, duration: 0.08 * CAMERA_SECTION_SCALE, ease: 'none'
-  }, cardShowStart);
-
-  // Each card: single tween — slide into position + fade in
+if (sceneCardWrappers.length === 3) {
   sceneCards.forEach((card, i) => {
-    const entryTime = cardShowStart + 0.06 * CAMERA_SECTION_SCALE + i * cardStagger;
+    const direction = i % 2 === 0 ? 1 : -1;
+    const xOffset = direction * 120;
 
-    cameraScrollTimeline.to(card, {
+    gsap.set(card, { autoAlpha: 0, xPercent: xOffset, force3D: true });
+
+    const startOffset = 30 - i * 5;
+    const endOffset = startOffset - 40;
+    gsap.to(card, {
       autoAlpha: 1,
-      x: () => { cachedLayout = computeCardLayout(); return cardPos(i).x; },
-      y: () => cardPos(i).y,
-      duration: 0.12 * CAMERA_SECTION_SCALE,
-      ease: 'none'
-    }, entryTime);
+      xPercent: 0,
+      duration: 1,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: sceneCardWrappers[i],
+        start: `top ${startOffset}%`,
+        end: `top ${endOffset}%`,
+        scrub: true,
+        invalidateOnRefresh: true
+      }
+    });
   });
-
-  // Fade overlay out
-  cameraScrollTimeline.to(sceneCardsOverlay, {
-    autoAlpha: 0, duration: 0.06 * CAMERA_SECTION_SCALE, ease: 'none'
-  }, 0.94 * CAMERA_SECTION_SCALE);
 }
 
 cameraScrollTimeline.to({}, { duration: postSecondPanelDuration });
 
-// --- Section title underlines ---
 if (sectionTitleLines.length > 0) {
   gsap.set(sectionTitleLines, { '--section-underline-progress': 0 });
   sectionTitleLines.forEach((titleLine) => {
@@ -729,18 +770,17 @@ if (statsPanel && statsCards.length === 3) {
     gsap.set(statsInsightCard, {
       autoAlpha: 0,
       y: () => (window.innerWidth <= 768 ? 34 : 56),
-      force3D: true,
-      willChange: 'transform, opacity'
+      force3D: true
     });
   }
 
-  gsap.set(statsCards, { autoAlpha: 0, force3D: true, willChange: 'transform, opacity' });
+  gsap.set(statsCards, { autoAlpha: 0, force3D: true });
 
   const statsCardsTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: statsPanel,
-      start: 'top 68%',
-      end: 'top 28%',
+      start: 'top 85%',
+      end: 'top 35%',
       scrub: true,
       invalidateOnRefresh: true
     }
@@ -768,8 +808,6 @@ if (statsPanel && statsCards.length === 3) {
     );
   });
 }
-
-// --- Team panel (overlay disabled — inline info in grid) ---
 
 // --- Contact / energy meter panel ---
 if (joinPanel && energyMeterEl) {
@@ -872,43 +910,9 @@ if (joinPanel && energyMeterEl) {
     });
   });
 
-  gsap.ticker.add((time) => {
-    if (chartState.revealed) updateChart(prefersReducedMotion ? 0 : time);
-  });
+  // Energy meter is hidden on mobile (display:none), skip continuous updates
 
-  if (!prefersReducedMotion && energyMeterWrapper) {
-    let tiltBounds = energyMeterEl.getBoundingClientRect();
-    const tiltCenter = { x: 0, y: 0, scale: 1.0 };
-
-    function updateMeterTilt() {
-      const nx = Math.max(-1, Math.min(1, tiltCenter.x / (tiltBounds.width / 2)));
-      const ny = Math.max(-1, Math.min(1, tiltCenter.y / (tiltBounds.height / 2)));
-      energyMeterWrapper.style.transform = `perspective(900px) scale3d(${tiltCenter.scale}, ${tiltCenter.scale}, ${tiltCenter.scale}) rotateX(${-ny * 10}deg) rotateY(${nx * 10}deg)`;
-    }
-
-    function applyMeterTilt(e) {
-      tiltBounds = energyMeterEl.getBoundingClientRect();
-      gsap.to(tiltCenter, {
-        x: e.clientX - tiltBounds.x - tiltBounds.width / 2,
-        y: e.clientY - tiltBounds.y - tiltBounds.height / 2,
-        scale: 1.04,
-        duration: 0.35, ease: 'power2.out', overwrite: true, onUpdate: updateMeterTilt
-      });
-    }
-
-    energyMeterEl.addEventListener('mouseenter', () => {
-      tiltBounds = energyMeterEl.getBoundingClientRect();
-      document.addEventListener('mousemove', applyMeterTilt);
-    });
-    energyMeterEl.addEventListener('mouseleave', () => {
-      document.removeEventListener('mousemove', applyMeterTilt);
-      gsap.to(tiltCenter, {
-        x: 0, y: 0, scale: 1.0,
-        duration: 0.55, ease: 'power2.out', overwrite: true, onUpdate: updateMeterTilt,
-        onComplete: () => { energyMeterWrapper.style.transform = ''; }
-      });
-    });
-  }
+  // Tilt effect removed on mobile — energy meter is hidden and mouse events are irrelevant
 }
 
 // --- Resize ---
@@ -916,31 +920,33 @@ let resizeDebounce = null;
 window.addEventListener('resize', () => {
   clearTimeout(resizeDebounce);
   resizeDebounce = setTimeout(() => {
+    const currentWidth = window.innerWidth;
+    if (currentWidth !== lastKnownWidth) {
+      lastKnownWidth = currentWidth;
+      stableVH = window.innerHeight;
+      setStableVH();
+    }
     resizeWireCanvas();
     computeTitleIntroStartTransform();
     updateTitleIntroTransform(titleIntroAnimState.progress);
     syncInvisiblePanelHeight();
     ScrollTrigger.refresh();
-    // Re-measure after layout settles
-    requestAnimationFrame(resizeWireCanvas);
   }, 100);
 });
 
-// --- Keep wire canvas height in sync with document ---
-if (wireCanvas) {
-  const docObserver = new ResizeObserver(() => {
-    requestAnimationFrame(resizeWireCanvas);
-  });
-  docObserver.observe(document.body);
-}
 
 // --- Main tick ---
-gsap.ticker.lagSmoothing(0);
+gsap.ticker.lagSmoothing(500, 33);
+
+let lastCounterVisible = false;
 gsap.ticker.add((time) => {
-  lenis.raf(time * 1000);
   drawWires(time);
 
   if (mobileCounterEl) {
-    mobileCounterEl.classList.toggle('is-visible', scrollState.progress > 0.28);
+    const shouldShow = scrollState.progress > 0.28;
+    if (shouldShow !== lastCounterVisible) {
+      lastCounterVisible = shouldShow;
+      mobileCounterEl.classList.toggle('is-visible', shouldShow);
+    }
   }
 });
