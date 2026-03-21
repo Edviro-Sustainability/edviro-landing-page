@@ -1097,46 +1097,10 @@ if (title) {
 cameraScrollTimeline.to(scrollState, {
   keyframes: [
     {
-      cameraOffsetX: -19.68, cameraOffsetY: -0.984, cameraOffsetZ: -20.664,
-      lookAtOffsetX: -25.584, lookAtOffsetY: 0, lookAtOffsetZ: -25.584, gridDownLock: 0,
-      duration: 0.52 * CAMERA_SECTION_SCALE,
-      ease: 'power1.inOut'
-    },
-    {
-      cameraOffsetX: -19.68, cameraOffsetY: -0.984, cameraOffsetZ: -20.664,
-      lookAtOffsetX: -25.584, lookAtOffsetY: 0, lookAtOffsetZ: -25.584, gridDownLock: 0,
-      duration: 0.14 * CAMERA_SECTION_SCALE,
-      ease: 'none'
-    },
-    {
-      cameraOffsetX: -22.96, cameraOffsetY: -1.148, cameraOffsetZ: -24.108,
-      lookAtOffsetX: -29.848, lookAtOffsetY: 0, lookAtOffsetZ: -29.848, gridDownLock: 0,
-      duration: 0.08 * CAMERA_SECTION_SCALE,
-      ease: 'power3.inOut'
-    },
-    {
-      cameraOffsetX: -22.96, cameraOffsetY: -1.148, cameraOffsetZ: -24.108,
-      lookAtOffsetX: -29.848, lookAtOffsetY: 0, lookAtOffsetZ: -29.848, gridDownLock: 0,
-      duration: 0.14 * CAMERA_SECTION_SCALE,
-      ease: 'none'
-    },
-    {
-      cameraOffsetX: -29.52, cameraOffsetY: -1.476, cameraOffsetZ: -30.996,
-      lookAtOffsetX: -38.376, lookAtOffsetY: 0, lookAtOffsetZ: -38.376, gridDownLock: 0,
-      duration: 0.08 * CAMERA_SECTION_SCALE,
-      ease: 'power3.inOut'
-    },
-    {
-      cameraOffsetX: -29.52, cameraOffsetY: -1.476, cameraOffsetZ: -30.996,
-      lookAtOffsetX: -38.376, lookAtOffsetY: 0, lookAtOffsetZ: -38.376, gridDownLock: 0,
-      duration: 0.14 * CAMERA_SECTION_SCALE,
-      ease: 'none'
-    },
-    {
       cameraOffsetX: -32.8, cameraOffsetY: -1.64, cameraOffsetZ: -34.44,
       lookAtOffsetX: -42.64, lookAtOffsetY: 0, lookAtOffsetZ: -42.64, gridDownLock: 0,
-      duration: 0.08 * CAMERA_SECTION_SCALE,
-      ease: 'power3.inOut'
+      duration: 0.82 * CAMERA_SECTION_SCALE,
+      ease: 'none'
     },
     {
       cameraOffsetX: -44.0, cameraOffsetY: -1.5, cameraOffsetZ: -42.0,
@@ -1145,7 +1109,7 @@ cameraScrollTimeline.to(scrollState, {
       ease: 'sine.out'
     }
   ]
-}, 0);
+});
 
 cameraScrollTimeline.to(parallaxScrollState, {
   multiplier: 0,
@@ -1154,8 +1118,8 @@ cameraScrollTimeline.to(parallaxScrollState, {
 
 if (scrollPhraseWords.length > 0) {
   const phraseWordsStart = 0.05 * CAMERA_SECTION_SCALE;
-  const phraseExitStart = 0.3 * CAMERA_SECTION_SCALE;
-  const phraseOverlayExitStart = 0.4 * CAMERA_SECTION_SCALE;
+  const phraseExitStart = 0.4 * CAMERA_SECTION_SCALE;
+  const phraseOverlayExitStart = 0.5 * CAMERA_SECTION_SCALE;
   const getPhraseStartYOffset = () => -window.innerHeight * 0.36;
 
   gsap.set(scrollPhraseOverlay, { autoAlpha: 0 });
@@ -1198,8 +1162,8 @@ if (scrollPhraseWords.length > 0) {
 }
 
 if (sceneCards.length === 3) {
-  const cardOverlayStart = 0.42 * CAMERA_SECTION_SCALE;
-  const cardStarts = [0.44, 0.66, 0.88].map(v => v * CAMERA_SECTION_SCALE);
+  const cardOverlayStart = 0.25 * CAMERA_SECTION_SCALE;
+  const cardStarts = [0.46, 0.59, 0.72].map(v => v * CAMERA_SECTION_SCALE);
 
   const getRootFontSize = () => {
     const rootFontSize = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize);
@@ -1225,7 +1189,7 @@ if (sceneCards.length === 3) {
     const isPortrait = h > w;
     const compact = w <= 768;
     const baseStyle = {
-      startX: [w * -0.255, w * -0.25, w * -0.24],
+      startX: [w * -0.28, w * -0.26, w * -0.24],
       startY: [h * -0.23, h * -0.23, h * -0.23],
       midX: [w * -0.16, w * -0.16, w * -0.155],
       midY: [h * -0.167, h * -0.167, h * -0.167],
@@ -1262,28 +1226,29 @@ if (sceneCards.length === 3) {
       .to(card, {
         keyframes: [
           { x: () => getCardPassStyle().startX[i], y: () => getCardPassStyle().startY[i], scale: () => getCardPassStyle().startScale[i], duration: 0 },
-          { x: () => getCardPassStyle().midX[i], y: () => getCardPassStyle().midY[i], scale: () => getCardPassStyle().midScale[i], duration: 0.08 * CAMERA_SECTION_SCALE, ease: 'power3.inOut' },
-          { x: () => getCardPassStyle().midX[i], y: () => getCardPassStyle().midY[i], scale: () => getCardPassStyle().midScale[i], duration: 0.14 * CAMERA_SECTION_SCALE },
-          { x: () => getCardPassStyle().endX[i], y: () => getCardPassStyle().endY[i], scale: () => getCardPassStyle().endScale[i], duration: 0.08 * CAMERA_SECTION_SCALE, ease: 'power3.inOut' }
+          { x: () => getCardPassStyle().midX[i], y: () => getCardPassStyle().midY[i], scale: () => getCardPassStyle().midScale[i], duration: 0.1 * CAMERA_SECTION_SCALE },
+          { x: () => getCardPassStyle().endX[i], y: () => getCardPassStyle().endY[i], scale: () => getCardPassStyle().endScale[i], duration: 0.1 * CAMERA_SECTION_SCALE }
         ]
       }, start)
       .to(card, {
         keyframes: [
-          { autoAlpha: 1, duration: 0.08 * CAMERA_SECTION_SCALE, ease: 'power3.inOut' },
-          { autoAlpha: 1, duration: 0.14 * CAMERA_SECTION_SCALE },
-          { autoAlpha: 0, duration: 0.08 * CAMERA_SECTION_SCALE, ease: 'power3.inOut' }
+          { autoAlpha: 1, duration: 0.04 * CAMERA_SECTION_SCALE },
+          // Mobile: hold long so all 3 are visible together; overlay fades them out.
+          // Desktop: short hold then individual fade-out (original behaviour).
+          { autoAlpha: 1, duration: 0.08 * CAMERA_SECTION_SCALE },
+          { autoAlpha: 0, duration: 0.06 * CAMERA_SECTION_SCALE }
         ]
       }, start)
       .to(card, {
         keyframes: [
-          { filter: 'blur(0px)', duration: 0.08 * CAMERA_SECTION_SCALE, ease: 'power3.inOut' },
-          { filter: 'blur(0px)', duration: 0.14 * CAMERA_SECTION_SCALE },
-          { filter: 'blur(6px)', duration: 0.08 * CAMERA_SECTION_SCALE, ease: 'power3.inOut' }
+          { filter: 'blur(0px)', duration: 0.04 * CAMERA_SECTION_SCALE },
+          { filter: 'blur(0px)', duration: 0.08 * CAMERA_SECTION_SCALE },
+          { filter: 'blur(6px)', duration: 0.06 * CAMERA_SECTION_SCALE }
         ]
       }, start);
   });
 
-  cameraScrollTimeline.to(sceneCardsOverlay, { autoAlpha: 0, duration: 0.06 * CAMERA_SECTION_SCALE }, 1.18 * CAMERA_SECTION_SCALE);
+  cameraScrollTimeline.to(sceneCardsOverlay, { autoAlpha: 0, duration: 0.06 * CAMERA_SECTION_SCALE }, 0.94 * CAMERA_SECTION_SCALE);
   }
 
 if (sectionTitleLines.length > 0) {
@@ -1664,4 +1629,3 @@ gsap.ticker.add((time) => {
     renderer.render(scene, camera);
   }
 });
-

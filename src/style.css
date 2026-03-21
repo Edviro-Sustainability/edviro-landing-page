@@ -61,7 +61,6 @@
 html, body {
   margin: 0;
   min-width: 320px;
-  overflow-x: hidden;
   background: var(--bg-base);
   color: var(--text-primary);
   font-family: "Avenir Next", Avenir, "Segoe UI", Roboto, Arial, sans-serif;
@@ -512,7 +511,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 .panel--stats {
   min-height: clamp(36rem, 80vh, 56rem);
-  padding-block: 50vh;
+  padding-block: clamp(3.6rem, 8vh, 6rem);
   align-items: center;
 }
 
@@ -1259,7 +1258,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
   .panel--stats {
     min-height: auto;
-    padding-block: 36vh;
+    padding-block: clamp(3rem, 8vh, 5rem);
     padding-inline: clamp(1rem, 3vw, 2rem);
   }
 
@@ -1323,7 +1322,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   }
 
   .panel--stats {
-    padding-block: 28vh;
+    padding-block: clamp(2rem, 5vh, 3.5rem);
   }
 
   .panel--contact {
@@ -1490,11 +1489,14 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   }
 }
 
+/* --- Mobile-view overrides (applied via JS class on body) --- */
+
 .is-mobile-view #webgl {
   position: absolute;
   left: 0;
   z-index: 0;
   pointer-events: none;
+  /* width, height, and top are set by JS based on wire extent */
 }
 
 .is-mobile-view .scroll-phrase {
