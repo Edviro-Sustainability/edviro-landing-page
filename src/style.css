@@ -61,6 +61,7 @@
 html, body {
   margin: 0;
   min-width: 320px;
+  overflow-x: hidden;
   background: var(--bg-base);
   color: var(--text-primary);
   font-family: "Avenir Next", Avenir, "Segoe UI", Roboto, Arial, sans-serif;
@@ -511,7 +512,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 .panel--stats {
   min-height: clamp(36rem, 80vh, 56rem);
-  padding-block: clamp(3.6rem, 8vh, 6rem);
+  padding-block: 50vh;
   align-items: center;
 }
 
@@ -959,8 +960,9 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   font-size: clamp(0.82rem, 1.05vw, 1.1rem);
   font-weight: 650;
   letter-spacing: 0.04em;
-  text-decoration: none;
   text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
   transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
   box-shadow: 0 4px 16px rgba(var(--green-rgb-600), 0.4);
 }
@@ -1257,7 +1259,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
   .panel--stats {
     min-height: auto;
-    padding-block: clamp(3rem, 8vh, 5rem);
+    padding-block: 36vh;
     padding-inline: clamp(1rem, 3vw, 2rem);
   }
 
@@ -1321,7 +1323,7 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   }
 
   .panel--stats {
-    padding-block: clamp(2rem, 5vh, 3.5rem);
+    padding-block: 28vh;
   }
 
   .panel--contact {
@@ -1488,14 +1490,11 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   }
 }
 
-/* --- Mobile-view overrides (applied via JS class on body) --- */
-
 .is-mobile-view #webgl {
   position: absolute;
   left: 0;
   z-index: 0;
   pointer-events: none;
-  /* width, height, and top are set by JS based on wire extent */
 }
 
 .is-mobile-view .scroll-phrase {

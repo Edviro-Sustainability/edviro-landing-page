@@ -1096,56 +1096,48 @@ if (title) {
 
 cameraScrollTimeline.to(scrollState, {
   keyframes: [
-    // Move to stop 1 (40% of journey) – camera + card 1 both moving
     {
-      cameraOffsetX: -13.12, cameraOffsetY: -0.656, cameraOffsetZ: -13.776,
-      lookAtOffsetX: -17.056, lookAtOffsetY: 0, lookAtOffsetZ: -17.056, gridDownLock: 0,
-      duration: 0.40 * CAMERA_SECTION_SCALE,
+      cameraOffsetX: -19.68, cameraOffsetY: -0.984, cameraOffsetZ: -20.664,
+      lookAtOffsetX: -25.584, lookAtOffsetY: 0, lookAtOffsetZ: -25.584, gridDownLock: 0,
+      duration: 0.52 * CAMERA_SECTION_SCALE,
       ease: 'power1.inOut'
     },
-    // Freeze at stop 1 – camera + card 1 both hold (card at mid)
     {
-      cameraOffsetX: -13.12, cameraOffsetY: -0.656, cameraOffsetZ: -13.776,
-      lookAtOffsetX: -17.056, lookAtOffsetY: 0, lookAtOffsetZ: -17.056, gridDownLock: 0,
-      duration: 0.08 * CAMERA_SECTION_SCALE,
+      cameraOffsetX: -19.68, cameraOffsetY: -0.984, cameraOffsetZ: -20.664,
+      lookAtOffsetX: -25.584, lookAtOffsetY: 0, lookAtOffsetZ: -25.584, gridDownLock: 0,
+      duration: 0.14 * CAMERA_SECTION_SCALE,
       ease: 'none'
     },
-    // Move to stop 2 (65% of journey) – camera + card 1 exit + card 2 enter both moving
     {
-      cameraOffsetX: -21.32, cameraOffsetY: -1.066, cameraOffsetZ: -22.386,
-      lookAtOffsetX: -27.716, lookAtOffsetY: 0, lookAtOffsetZ: -27.716, gridDownLock: 0,
-      duration: 0.06 * CAMERA_SECTION_SCALE,
-      ease: 'power1.inOut'
-    },
-    // Freeze at stop 2 – camera + card 2 both hold (card at mid)
-    {
-      cameraOffsetX: -21.32, cameraOffsetY: -1.066, cameraOffsetZ: -22.386,
-      lookAtOffsetX: -27.716, lookAtOffsetY: 0, lookAtOffsetZ: -27.716, gridDownLock: 0,
+      cameraOffsetX: -22.96, cameraOffsetY: -1.148, cameraOffsetZ: -24.108,
+      lookAtOffsetX: -29.848, lookAtOffsetY: 0, lookAtOffsetZ: -29.848, gridDownLock: 0,
       duration: 0.08 * CAMERA_SECTION_SCALE,
+      ease: 'power3.inOut'
+    },
+    {
+      cameraOffsetX: -22.96, cameraOffsetY: -1.148, cameraOffsetZ: -24.108,
+      lookAtOffsetX: -29.848, lookAtOffsetY: 0, lookAtOffsetZ: -29.848, gridDownLock: 0,
+      duration: 0.14 * CAMERA_SECTION_SCALE,
       ease: 'none'
     },
-    // Move to stop 3 (85% of journey) – camera + card 2 exit + card 3 enter both moving
     {
-      cameraOffsetX: -27.88, cameraOffsetY: -1.394, cameraOffsetZ: -29.274,
-      lookAtOffsetX: -36.244, lookAtOffsetY: 0, lookAtOffsetZ: -36.244, gridDownLock: 0,
-      duration: 0.06 * CAMERA_SECTION_SCALE,
-      ease: 'power1.inOut'
-    },
-    // Freeze at stop 3 – camera + card 3 both hold (card at mid)
-    {
-      cameraOffsetX: -27.88, cameraOffsetY: -1.394, cameraOffsetZ: -29.274,
-      lookAtOffsetX: -36.244, lookAtOffsetY: 0, lookAtOffsetZ: -36.244, gridDownLock: 0,
+      cameraOffsetX: -29.52, cameraOffsetY: -1.476, cameraOffsetZ: -30.996,
+      lookAtOffsetX: -38.376, lookAtOffsetY: 0, lookAtOffsetZ: -38.376, gridDownLock: 0,
       duration: 0.08 * CAMERA_SECTION_SCALE,
+      ease: 'power3.inOut'
+    },
+    {
+      cameraOffsetX: -29.52, cameraOffsetY: -1.476, cameraOffsetZ: -30.996,
+      lookAtOffsetX: -38.376, lookAtOffsetY: 0, lookAtOffsetZ: -38.376, gridDownLock: 0,
+      duration: 0.14 * CAMERA_SECTION_SCALE,
       ease: 'none'
     },
-    // Move to end of first section (100% of journey) – card 3 exit
     {
       cameraOffsetX: -32.8, cameraOffsetY: -1.64, cameraOffsetZ: -34.44,
       lookAtOffsetX: -42.64, lookAtOffsetY: 0, lookAtOffsetZ: -42.64, gridDownLock: 0,
-      duration: 0.06 * CAMERA_SECTION_SCALE,
-      ease: 'none'
+      duration: 0.08 * CAMERA_SECTION_SCALE,
+      ease: 'power3.inOut'
     },
-    // Keyframe 2: flip and rotate down towards the counter
     {
       cameraOffsetX: -44.0, cameraOffsetY: -1.5, cameraOffsetZ: -42.0,
       lookAtOffsetX: -36.0, lookAtOffsetY: -18.0, lookAtOffsetZ: -16.0, gridDownLock: 1,
@@ -1162,8 +1154,8 @@ cameraScrollTimeline.to(parallaxScrollState, {
 
 if (scrollPhraseWords.length > 0) {
   const phraseWordsStart = 0.05 * CAMERA_SECTION_SCALE;
-  const phraseExitStart = 0.4 * CAMERA_SECTION_SCALE;
-  const phraseOverlayExitStart = 0.5 * CAMERA_SECTION_SCALE;
+  const phraseExitStart = 0.3 * CAMERA_SECTION_SCALE;
+  const phraseOverlayExitStart = 0.4 * CAMERA_SECTION_SCALE;
   const getPhraseStartYOffset = () => -window.innerHeight * 0.36;
 
   gsap.set(scrollPhraseOverlay, { autoAlpha: 0 });
@@ -1206,8 +1198,8 @@ if (scrollPhraseWords.length > 0) {
 }
 
 if (sceneCards.length === 3) {
-  const cardOverlayStart = 0.30 * CAMERA_SECTION_SCALE;
-  const cardStarts = [0.36, 0.50, 0.64].map(v => v * CAMERA_SECTION_SCALE);
+  const cardOverlayStart = 0.42 * CAMERA_SECTION_SCALE;
+  const cardStarts = [0.44, 0.66, 0.88].map(v => v * CAMERA_SECTION_SCALE);
 
   const getRootFontSize = () => {
     const rootFontSize = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize);
@@ -1270,28 +1262,28 @@ if (sceneCards.length === 3) {
       .to(card, {
         keyframes: [
           { x: () => getCardPassStyle().startX[i], y: () => getCardPassStyle().startY[i], scale: () => getCardPassStyle().startScale[i], duration: 0 },
-          { x: () => getCardPassStyle().midX[i], y: () => getCardPassStyle().midY[i], scale: () => getCardPassStyle().midScale[i], duration: 0.04 * CAMERA_SECTION_SCALE },
-          { x: () => getCardPassStyle().midX[i], y: () => getCardPassStyle().midY[i], scale: () => getCardPassStyle().midScale[i], duration: 0.08 * CAMERA_SECTION_SCALE },
-          { x: () => getCardPassStyle().endX[i], y: () => getCardPassStyle().endY[i], scale: () => getCardPassStyle().endScale[i], duration: 0.06 * CAMERA_SECTION_SCALE }
+          { x: () => getCardPassStyle().midX[i], y: () => getCardPassStyle().midY[i], scale: () => getCardPassStyle().midScale[i], duration: 0.08 * CAMERA_SECTION_SCALE, ease: 'power3.inOut' },
+          { x: () => getCardPassStyle().midX[i], y: () => getCardPassStyle().midY[i], scale: () => getCardPassStyle().midScale[i], duration: 0.14 * CAMERA_SECTION_SCALE },
+          { x: () => getCardPassStyle().endX[i], y: () => getCardPassStyle().endY[i], scale: () => getCardPassStyle().endScale[i], duration: 0.08 * CAMERA_SECTION_SCALE, ease: 'power3.inOut' }
         ]
       }, start)
       .to(card, {
         keyframes: [
-          { autoAlpha: 1, duration: 0.04 * CAMERA_SECTION_SCALE },
-          { autoAlpha: 1, duration: 0.08 * CAMERA_SECTION_SCALE },
-          { autoAlpha: 0, duration: 0.06 * CAMERA_SECTION_SCALE }
+          { autoAlpha: 1, duration: 0.08 * CAMERA_SECTION_SCALE, ease: 'power3.inOut' },
+          { autoAlpha: 1, duration: 0.14 * CAMERA_SECTION_SCALE },
+          { autoAlpha: 0, duration: 0.08 * CAMERA_SECTION_SCALE, ease: 'power3.inOut' }
         ]
       }, start)
       .to(card, {
         keyframes: [
-          { filter: 'blur(0px)', duration: 0.04 * CAMERA_SECTION_SCALE },
-          { filter: 'blur(0px)', duration: 0.08 * CAMERA_SECTION_SCALE },
-          { filter: 'blur(6px)', duration: 0.06 * CAMERA_SECTION_SCALE }
+          { filter: 'blur(0px)', duration: 0.08 * CAMERA_SECTION_SCALE, ease: 'power3.inOut' },
+          { filter: 'blur(0px)', duration: 0.14 * CAMERA_SECTION_SCALE },
+          { filter: 'blur(6px)', duration: 0.08 * CAMERA_SECTION_SCALE, ease: 'power3.inOut' }
         ]
       }, start);
   });
 
-  cameraScrollTimeline.to(sceneCardsOverlay, { autoAlpha: 0, duration: 0.06 * CAMERA_SECTION_SCALE }, 0.82 * CAMERA_SECTION_SCALE);
+  cameraScrollTimeline.to(sceneCardsOverlay, { autoAlpha: 0, duration: 0.06 * CAMERA_SECTION_SCALE }, 1.18 * CAMERA_SECTION_SCALE);
   }
 
 if (sectionTitleLines.length > 0) {
