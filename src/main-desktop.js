@@ -1096,12 +1096,56 @@ if (title) {
 
 cameraScrollTimeline.to(scrollState, {
   keyframes: [
+    // Move to stop 1 (40% of journey) – camera + card 1 both moving
+    {
+      cameraOffsetX: -13.12, cameraOffsetY: -0.656, cameraOffsetZ: -13.776,
+      lookAtOffsetX: -17.056, lookAtOffsetY: 0, lookAtOffsetZ: -17.056, gridDownLock: 0,
+      duration: 0.40 * CAMERA_SECTION_SCALE,
+      ease: 'power1.inOut'
+    },
+    // Freeze at stop 1 – camera + card 1 both hold (card at mid)
+    {
+      cameraOffsetX: -13.12, cameraOffsetY: -0.656, cameraOffsetZ: -13.776,
+      lookAtOffsetX: -17.056, lookAtOffsetY: 0, lookAtOffsetZ: -17.056, gridDownLock: 0,
+      duration: 0.08 * CAMERA_SECTION_SCALE,
+      ease: 'none'
+    },
+    // Move to stop 2 (65% of journey) – camera + card 1 exit + card 2 enter both moving
+    {
+      cameraOffsetX: -21.32, cameraOffsetY: -1.066, cameraOffsetZ: -22.386,
+      lookAtOffsetX: -27.716, lookAtOffsetY: 0, lookAtOffsetZ: -27.716, gridDownLock: 0,
+      duration: 0.06 * CAMERA_SECTION_SCALE,
+      ease: 'power1.inOut'
+    },
+    // Freeze at stop 2 – camera + card 2 both hold (card at mid)
+    {
+      cameraOffsetX: -21.32, cameraOffsetY: -1.066, cameraOffsetZ: -22.386,
+      lookAtOffsetX: -27.716, lookAtOffsetY: 0, lookAtOffsetZ: -27.716, gridDownLock: 0,
+      duration: 0.08 * CAMERA_SECTION_SCALE,
+      ease: 'none'
+    },
+    // Move to stop 3 (85% of journey) – camera + card 2 exit + card 3 enter both moving
+    {
+      cameraOffsetX: -27.88, cameraOffsetY: -1.394, cameraOffsetZ: -29.274,
+      lookAtOffsetX: -36.244, lookAtOffsetY: 0, lookAtOffsetZ: -36.244, gridDownLock: 0,
+      duration: 0.06 * CAMERA_SECTION_SCALE,
+      ease: 'power1.inOut'
+    },
+    // Freeze at stop 3 – camera + card 3 both hold (card at mid)
+    {
+      cameraOffsetX: -27.88, cameraOffsetY: -1.394, cameraOffsetZ: -29.274,
+      lookAtOffsetX: -36.244, lookAtOffsetY: 0, lookAtOffsetZ: -36.244, gridDownLock: 0,
+      duration: 0.08 * CAMERA_SECTION_SCALE,
+      ease: 'none'
+    },
+    // Move to end of first section (100% of journey) – card 3 exit
     {
       cameraOffsetX: -32.8, cameraOffsetY: -1.64, cameraOffsetZ: -34.44,
       lookAtOffsetX: -42.64, lookAtOffsetY: 0, lookAtOffsetZ: -42.64, gridDownLock: 0,
-      duration: 0.82 * CAMERA_SECTION_SCALE,
+      duration: 0.06 * CAMERA_SECTION_SCALE,
       ease: 'none'
     },
+    // Keyframe 2: flip and rotate down towards the counter
     {
       cameraOffsetX: -44.0, cameraOffsetY: -1.5, cameraOffsetZ: -42.0,
       lookAtOffsetX: -36.0, lookAtOffsetY: -18.0, lookAtOffsetZ: -16.0, gridDownLock: 1,
@@ -1109,7 +1153,7 @@ cameraScrollTimeline.to(scrollState, {
       ease: 'sine.out'
     }
   ]
-});
+}, 0);
 
 cameraScrollTimeline.to(parallaxScrollState, {
   multiplier: 0,
@@ -1162,8 +1206,8 @@ if (scrollPhraseWords.length > 0) {
 }
 
 if (sceneCards.length === 3) {
-  const cardOverlayStart = 0.25 * CAMERA_SECTION_SCALE;
-  const cardStarts = [0.52, 0.62, 0.72].map(v => v * CAMERA_SECTION_SCALE);
+  const cardOverlayStart = 0.30 * CAMERA_SECTION_SCALE;
+  const cardStarts = [0.36, 0.50, 0.64].map(v => v * CAMERA_SECTION_SCALE);
 
   const getRootFontSize = () => {
     const rootFontSize = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize);
@@ -1226,15 +1270,14 @@ if (sceneCards.length === 3) {
       .to(card, {
         keyframes: [
           { x: () => getCardPassStyle().startX[i], y: () => getCardPassStyle().startY[i], scale: () => getCardPassStyle().startScale[i], duration: 0 },
-          { x: () => getCardPassStyle().midX[i], y: () => getCardPassStyle().midY[i], scale: () => getCardPassStyle().midScale[i], duration: 0.1 * CAMERA_SECTION_SCALE },
-          { x: () => getCardPassStyle().endX[i], y: () => getCardPassStyle().endY[i], scale: () => getCardPassStyle().endScale[i], duration: 0.1 * CAMERA_SECTION_SCALE }
+          { x: () => getCardPassStyle().midX[i], y: () => getCardPassStyle().midY[i], scale: () => getCardPassStyle().midScale[i], duration: 0.04 * CAMERA_SECTION_SCALE },
+          { x: () => getCardPassStyle().midX[i], y: () => getCardPassStyle().midY[i], scale: () => getCardPassStyle().midScale[i], duration: 0.08 * CAMERA_SECTION_SCALE },
+          { x: () => getCardPassStyle().endX[i], y: () => getCardPassStyle().endY[i], scale: () => getCardPassStyle().endScale[i], duration: 0.06 * CAMERA_SECTION_SCALE }
         ]
       }, start)
       .to(card, {
         keyframes: [
           { autoAlpha: 1, duration: 0.04 * CAMERA_SECTION_SCALE },
-          // Mobile: hold long so all 3 are visible together; overlay fades them out.
-          // Desktop: short hold then individual fade-out (original behaviour).
           { autoAlpha: 1, duration: 0.08 * CAMERA_SECTION_SCALE },
           { autoAlpha: 0, duration: 0.06 * CAMERA_SECTION_SCALE }
         ]
@@ -1248,7 +1291,7 @@ if (sceneCards.length === 3) {
       }, start);
   });
 
-  cameraScrollTimeline.to(sceneCardsOverlay, { autoAlpha: 0, duration: 0.06 * CAMERA_SECTION_SCALE }, 0.94 * CAMERA_SECTION_SCALE);
+  cameraScrollTimeline.to(sceneCardsOverlay, { autoAlpha: 0, duration: 0.06 * CAMERA_SECTION_SCALE }, 0.82 * CAMERA_SECTION_SCALE);
   }
 
 if (sectionTitleLines.length > 0) {
