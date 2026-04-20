@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2.js';
 import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry.js';
@@ -369,7 +369,7 @@ const introState = {
 };
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const introDuration = prefersReducedMotion ? 1.35 : 2.55;
-const loader = new OBJLoader();
+const loader = new GLTFLoader();
 const keyframeTwoEndLookAtOffset = new THREE.Vector3(-36.0, -18.0, -16.0);
 const counterFontUrl = '/Avenir Black.ttf';
 let counterMaterial = null;
@@ -626,8 +626,8 @@ function applyTheme() {
 
 applyTheme();
 
-loader.load('/school.obj', (loadedModel) => {
-  schoolModel = loadedModel;
+loader.load('/school.glb', (gltf) => {
+  schoolModel = gltf.scene;
   const modelMeshes = [];
   schoolModel.traverse((child) => {
     if (child.isMesh) modelMeshes.push(child);
@@ -673,8 +673,8 @@ loader.load('/school.obj', (loadedModel) => {
   markLoadComplete('schoolLoaded');
 });
 
-loader.load('/wiring.obj', (loadedModel) => {
-  wiringModel = loadedModel;
+loader.load('/wiring.glb', (gltf) => {
+  wiringModel = gltf.scene;
   wiringModel.scale.setScalar(0.12);
   wiringModel.position.set(0, -4, 0);
 
