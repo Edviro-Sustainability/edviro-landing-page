@@ -514,7 +514,11 @@ function applySiteConfig(config) {
     const card = document.querySelector(`.stats-card[data-stat="${key}"]`);
     if (card) {
       const valueEl = card.querySelector('.stats-card__value');
-      if (valueEl) valueEl.textContent = String(value);
+      if (valueEl) {
+        const unitEl = valueEl.querySelector('.stats-card__unit');
+        valueEl.textContent = String(value) + ' ';
+        if (unitEl) valueEl.appendChild(unitEl);
+      }
     }
   }
 

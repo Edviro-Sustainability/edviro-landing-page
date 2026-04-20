@@ -1,4 +1,3 @@
-import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './style.css';
@@ -23,18 +22,125 @@ const invisiblePanel = document.querySelector('.panel.invisible');
 const firstPanel = document.querySelector('#content > .panel:first-child');
 const joinShowcase = joinPanel ? joinPanel.querySelector('.contact-showcase') : null;
 const energyMeterEl = joinPanel ? joinPanel.querySelector('#energy-meter') : null;
-const energyMeterWrapper = joinPanel ? joinPanel.querySelector('#energy-meter-wrapper') : null;
 const sectionTitleLines = Array.from(document.querySelectorAll('.section-title-line'));
 const teamOverlay = document.querySelector('.team-overlay');
-const teamCards = teamOverlay ? Array.from(teamOverlay.querySelectorAll('.team-card')) : [];
-const teamCardMap = new Map(
-  teamCards.map(c => [c.dataset.member, c]).filter(([id]) => id)
-);
 const mobileCounterEl = document.querySelector('#mobile-counter');
 
 document.body.classList.add('is-site-loading', 'is-scroll-locked', 'is-mobile-view');
 
+const scrollWrapper = document.createElement('div');
+scrollWrapper.id = 'scroll-wrapper';
+while (document.body.firstChild) {
+  scrollWrapper.appendChild(document.body.firstChild);
+}
+document.body.appendChild(scrollWrapper);
+
+Object.assign(scrollWrapper.style, {
+  position: 'fixed',
+  top: '0',
+  left: '0',
+  width: '100vw',
+  height: '100vh',
+  overflowX: 'hidden',
+  overflowY: 'auto',
+  WebkitOverflowScrolling: 'touch',
+});
+Object.assign(document.documentElement.style, { overflow: 'hidden', height: '100%' });
+Object.assign(document.body.style, { overflow: 'hidden', height: '100%' });
+
+ScrollTrigger.defaults({ scroller: scrollWrapper });
+ScrollTrigger.scrollerProxy(scrollWrapper, {
+  scrollTop(value) {
+    if (arguments.length) { scrollWrapper.scrollTop = value; }
+    return scrollWrapper.scrollTop;
+  },
+  getBoundingClientRect() {
+    return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
+  },
+});
+scrollWrapper.addEventListener('scroll', () => ScrollTrigger.update());
+
+let stableVH = document.documentElement.clientHeight || window.innerHeight;
+if (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+  stableVH = Math.max(stableVH, window.screen.height);
+}
+let lastKnownWidth = window.innerWidth;
+
+function setStableVH() {
+  document.documentElement.style.setProperty('--stable-vh', `${stableVH}px`);
+}
+setStableVH();
+
+const TEAM_INFO = [
+  { member: 'hursh', name: 'Hursh Shah', detail: 'Extensive experience in energy systems and data analytics', row: 2 },
+  { member: 'tanuj', name: 'Tanuj Siripurapu', detail: 'Deep technical expertise in full-stack software engineering', row: 3 },
+];
+
+const teamGridEl = document.querySelector('.team-grid');
+if (teamGridEl) {
+  for (const info of TEAM_INFO) {
+    const div = document.createElement('div');
+    div.className = 'team-info-inline';
+    div.style.gridColumn = '2';
+    div.style.gridRow = String(info.row);
+    div.innerHTML = `<span class="team-info-inline__name">${info.name}</span><span class="team-info-inline__detail">${info.detail}</span>`;
+    teamGridEl.appendChild(div);
+  }
+}
+
+if (invisiblePanel) {
+  invisiblePanel.style.display = 'none';
+}
+
+if (scrollPhraseOverlay && firstPanel) {
+  Object.assign(scrollPhraseOverlay.style, {
+    position: 'relative',
+    top: 'auto',
+    left: 'auto',
+    width: '100%',
+    height: 'auto',
+    zIndex: '',
+    display: 'flex',
+    justifyContent: 'center',
+  });
+  firstPanel.appendChild(scrollPhraseOverlay);
+}
+
+const sceneCardWrappers = [];
+if (sceneCardsOverlay && sceneCards.length === 3) {
+  const contentEl = document.querySelector('#content');
+  const insertRef = statsPanel || teamPanel || joinPanel;
+
+  sceneCards.forEach((card) => {
+    Object.assign(card.style, {
+      position: 'relative',
+      top: 'auto',
+      left: 'auto',
+      transform: 'none',
+      margin: '0 auto',
+    });
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'scene-card-flow-wrapper';
+    wrapper.appendChild(card);
+    if (insertRef) {
+      contentEl.insertBefore(wrapper, insertRef);
+    } else {
+      contentEl.appendChild(wrapper);
+    }
+    sceneCardWrappers.push(wrapper);
+  });
+
+  sceneCardsOverlay.style.display = 'none';
+
+  if (mobileCounterEl && insertRef) {
+    const contentEl2 = document.querySelector('#content');
+    contentEl2.insertBefore(mobileCounterEl, insertRef);
+  }
+}
+
 function resetScrollPosition() {
+  scrollWrapper.scrollTop = 0;
   window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   document.documentElement.scrollTop = 0;
   document.body.scrollTop = 0;
@@ -84,8 +190,6 @@ function markLoadComplete(key) {
 if (!loadingState.windowLoaded) {
   window.addEventListener('load', () => markLoadComplete('windowLoaded'), { once: true });
 }
-// If page was already complete when script ran, the load event will never fire.
-// Defer to next frame so that bindIntroTextRevealUnlock() below can queue the reveal first.
 else {
   requestAnimationFrame(() => markLoadComplete('windowLoaded'));
 }
@@ -99,7 +203,11 @@ function applySiteConfig(config) {
     const card = document.querySelector(`.stats-card[data-stat="${key}"]`);
     if (card) {
       const valueEl = card.querySelector('.stats-card__value');
-      if (valueEl) valueEl.textContent = String(value);
+      if (valueEl) {
+        const unitEl = valueEl.querySelector('.stats-card__unit');
+        valueEl.textContent = String(value) + ' ';
+        if (unitEl) valueEl.appendChild(unitEl);
+      }
     }
   }
 }
@@ -110,48 +218,51 @@ fetch('/site-config.json')
   .catch(err => console.warn('Failed to load site config:', err));
 
 // --- Wire Canvas ---
+const contentEl = document.querySelector('#content');
+if (wireCanvas && contentEl) {
+  contentEl.insertBefore(wireCanvas, contentEl.firstChild);
+}
 
 const GREEN_BASE = [0x0f / 255, 0x83 / 255, 0x39 / 255]; // #0f8339
 const GREEN_HOT  = [0x54 / 255, 0xd3 / 255, 0x6b / 255]; // #54d36b
 
-const WIRE_DEFS = [
-  {
-    p0: [0.00, 0.50],
-    p1: [0.1, 0.38],
-    p2: [0.5, 0.78],
-    p3: [1.00, 0.52],
-    width: 12
-  },
-  {
-    p0: [0.00, 0.54],
-    p1: [0.14, 0.42],
-    p2: [0.54, 0.70],
-    p3: [1.00, 0.46],
-    width: 15
-  },
-  {
-    p0: [0.00, 0.58],
-    p1: [0.18, 0.46],
-    p2: [0.58, 0.62],
-    p3: [1.00, 0.38],
-    width: 18
-  }
-];
+const WIRE_FREQ = 8;
+const WIRE_AMP  = 0.65;
+const WIRE_CENTER_X = 0.5;
+const WIRE_SPAN = 1.5 * (2 / WIRE_FREQ);
 
 const wireState = { progress: 0 };
+let smoothRevealFrac = 0;
+
+let wireOriginDocY = 0;
+const WIRE_BUNDLE = [
+  { xShift: -0.12, phaseOffset: 0, width: 20 },
+  { xShift:  0.0,  phaseOffset: 0, width: 20 },
+  { xShift:  0.12, phaseOffset: 0, width: 20 },
+];
+
+function recomputeWireParams() {
+  const scrollH = Math.max(1, scrollWrapper.scrollHeight);
+  wireOriginDocY = 0.35 * stableVH / scrollH;
+  const bp = Math.PI / 2 - wireOriginDocY * Math.PI * WIRE_FREQ;
+  WIRE_BUNDLE[0].phaseOffset = bp;
+  WIRE_BUNDLE[1].phaseOffset = bp - 0.02;
+  WIRE_BUNDLE[2].phaseOffset = bp - 0.04;
+}
+
+recomputeWireParams();
 
 function smoothstep(edge0, edge1, x) {
   const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
   return t * t * (3 - 2 * t);
 }
 
-function shaderColor(px, py, time, W, H) {
-  const wx = (px / W) * 9;
-  const wy = (py / H) * 4;
-  const flow = (((wx + wy) * 0.42 - time * 0.2) % 1 + 1) % 1;
+function shaderColor(time, wireIndex) {
+  const phase = wireIndex * 0.7;
+  const flow = ((time * 0.2 + phase) % 1 + 1) % 1;
   const bandA = smoothstep(0, 0.08, flow) * (1 - smoothstep(0.08, 0.26, flow));
   const bandB = smoothstep(0.55, 0.72, flow) * (1 - smoothstep(0.72, 0.9, flow));
-  const pulse = 0.5 + 0.5 * Math.sin(time * 1.5 + wy * 2.2);
+  const pulse = 0.5 + 0.5 * Math.sin(time * 1.5 + phase);
   const glow = Math.max(bandA, Math.max(bandB, 0.45 * pulse));
   const r = Math.round(GREEN_BASE[0] * 255 + (GREEN_HOT[0] - GREEN_BASE[0]) * 255 * glow);
   const g = Math.round(GREEN_BASE[1] * 255 + (GREEN_HOT[1] - GREEN_BASE[1]) * 255 * glow);
@@ -159,154 +270,132 @@ function shaderColor(px, py, time, W, H) {
   return `rgb(${r},${g},${b})`;
 }
 
-function cubicBezierPoint(p0, p1, p2, p3, t) {
-  const mt = 1 - t;
-  return [
-    mt * mt * mt * p0[0] + 3 * mt * mt * t * p1[0] + 3 * mt * t * t * p2[0] + t * t * t * p3[0],
-    mt * mt * mt * p0[1] + 3 * mt * mt * t * p1[1] + 3 * mt * t * t * p2[1] + t * t * t * p3[1]
-  ];
+function wireX(docY, xShift, phaseOffset) {
+  return WIRE_CENTER_X + xShift + WIRE_AMP * Math.sin(docY * Math.PI * WIRE_FREQ + phaseOffset);
 }
+
+let wireGeometryDirty = true;
+let cachedWirePaths = null;
+let cachedRevealFrac = -1;
 
 function resizeWireCanvas() {
   if (!wireCanvas) return;
-  const dpr = Math.min(devicePixelRatio, 2);
-  wireCanvas.width = window.innerWidth * dpr;
-  wireCanvas.height = window.innerHeight * dpr;
+  recomputeWireParams();
+  const dpr = Math.min(devicePixelRatio, 1.5);
+  const scrollH = Math.max(1, scrollWrapper.scrollHeight);
+  const w = window.innerWidth;
+  const wireHeightPx = WIRE_SPAN * scrollH;
+  const wireStartPx = 0.35 * stableVH;
+
+  const canvasW = Math.round(w * dpr);
+  const canvasH = Math.round(wireHeightPx * dpr);
+
+  wireCanvas.width = canvasW;
+  wireCanvas.height = canvasH;
+  wireCanvas.style.width = `${w}px`;
+  wireCanvas.style.height = `${wireHeightPx}px`;
+  wireCanvas.style.top = `${wireStartPx}px`;
+  wireGeometryDirty = true;
 }
 
 resizeWireCanvas();
+
+let lastScrollHeight = scrollWrapper.scrollHeight;
+const contentObserver = new ResizeObserver(() => {
+  const newH = scrollWrapper.scrollHeight;
+  if (newH !== lastScrollHeight) {
+    lastScrollHeight = newH;
+    resizeWireCanvas();
+  }
+});
+contentObserver.observe(document.querySelector('#content'));
+
+function computeWirePaths(revealFrac) {
+  const W = wireCanvas.width;
+  const H = wireCanvas.height;
+  const DOC_STEP = 0.0005;
+  const wireStart = wireOriginDocY;
+  const wireEnd = revealFrac;
+  if (wireEnd <= wireStart) return null;
+
+  const firstStep = Math.ceil(wireStart / DOC_STEP);
+  const lastStep = Math.floor(wireEnd / DOC_STEP);
+
+  return WIRE_BUNDLE.map(wire => {
+    const points = [];
+    for (let step = firstStep; step <= lastStep; step++) {
+      const docY = step * DOC_STEP;
+      const wx = wireX(docY, wire.xShift, wire.phaseOffset);
+      const cx = wx * W;
+      const cy = ((docY - wireStart) / WIRE_SPAN) * H;
+      points.push({ cx, cy, docY });
+    }
+    return points;
+  });
+}
 
 function drawWires(time) {
   if (!wireCtx || wireState.progress <= 0) return;
   const W = wireCanvas.width;
   const H = wireCanvas.height;
-  const dpr = Math.min(devicePixelRatio, 2);
+  const dpr = Math.min(devicePixelRatio, 1.5);
+
+  const scrollY = scrollWrapper.scrollTop || 0;
+  const docH = Math.max(1, scrollWrapper.scrollHeight);
+  const maxDocScroll = Math.max(1, docH - stableVH);
+  const scrollFrac = scrollY / maxDocScroll;
+  const maxWireDocY = wireOriginDocY + WIRE_SPAN;
+  const scrollDelay = 0.08;
+  const delayedScroll = Math.max(0, scrollFrac - scrollDelay) / (1 - scrollDelay);
+  const targetRevealFrac = Math.min(wireState.progress * 0.18 + delayedScroll * 0.7, maxWireDocY);
+
+  const lerpSpeed = 0.1;
+  smoothRevealFrac += (targetRevealFrac - smoothRevealFrac) * lerpSpeed;
+  if (Math.abs(smoothRevealFrac - targetRevealFrac) < 0.0001) smoothRevealFrac = targetRevealFrac;
+  const revealFrac = smoothRevealFrac;
+
+  if (wireGeometryDirty || revealFrac !== cachedRevealFrac) {
+    cachedWirePaths = computeWirePaths(revealFrac);
+    cachedRevealFrac = revealFrac;
+    wireGeometryDirty = false;
+  }
+
+  if (!cachedWirePaths) return;
 
   wireCtx.clearRect(0, 0, W, H);
 
-  for (const wire of WIRE_DEFS) {
-    const p0 = [wire.p0[0] * W, wire.p0[1] * H];
-    const p1 = [wire.p1[0] * W, wire.p1[1] * H];
-    const p2 = [wire.p2[0] * W, wire.p2[1] * H];
-    const p3 = [wire.p3[0] * W, wire.p3[1] * H];
-
-    const N = 80;
-    const maxSeg = Math.floor(N * wireState.progress);
+  WIRE_BUNDLE.forEach((wire, i) => {
+    const points = cachedWirePaths[i];
+    if (!points || points.length < 2) return;
 
     wireCtx.lineWidth = wire.width * dpr;
     wireCtx.lineCap = 'round';
+    wireCtx.lineJoin = 'round';
 
-    for (let i = 0; i < maxSeg; i++) {
-      const t0 = i / N;
-      const t1 = (i + 1) / N;
-      const [x0, y0] = cubicBezierPoint(p0, p1, p2, p3, t0);
-      const [x1, y1] = cubicBezierPoint(p0, p1, p2, p3, t1);
+    wireCtx.strokeStyle = shaderColor(time, i);
 
-      wireCtx.strokeStyle = shaderColor(x0, y0, time, W, H);
-      wireCtx.beginPath();
-      wireCtx.moveTo(x0, y0);
-      wireCtx.lineTo(x1, y1);
-      wireCtx.stroke();
+    wireCtx.beginPath();
+    wireCtx.moveTo(points[0].cx, points[0].cy);
+    for (let j = 1; j < points.length - 1; j++) {
+      const midX = (points[j].cx + points[j + 1].cx) * 0.5;
+      const midY = (points[j].cy + points[j + 1].cy) * 0.5;
+      wireCtx.quadraticCurveTo(points[j].cx, points[j].cy, midX, midY);
     }
-  }
-
+    const last = points[points.length - 1];
+    wireCtx.lineTo(last.cx, last.cy);
+    wireCtx.stroke();
+  });
 }
 
-// --- Team card helpers ---
-const TEAM_MEMBER_CONFIG = [
-  { id: 'hursh', labelOffsetX: 220, labelOffsetY: -24, dotOffsetY: 120 },
-  { id: 'tanuj', labelOffsetX: 220, labelOffsetY: 22, dotOffsetY: 0 },
-];
-
-let teamOverlayVisible = false;
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function resetTeamCards() {
-  for (const card of teamCards) {
-    card.style.left = '-200vw';
-    card.style.top = '-200vh';
-    card.style.opacity = '0';
-    card.style.visibility = 'hidden';
-    const line = card.querySelector('.team-card__line');
-    const dot = card.querySelector('.team-card__dot');
-    if (line) line.style.opacity = '0';
-    if (dot) dot.style.opacity = '0';
-  }
-}
-
-function setTeamOverlayVisible(isVisible) {
-  if (!teamOverlay || teamOverlayVisible === isVisible) return;
-  teamOverlayVisible = isVisible;
-  teamOverlay.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
-  gsap.to(teamOverlay, {
-    autoAlpha: isVisible ? 1 : 0,
-    duration: prefersReducedMotion ? 0.08 : 0.22,
-    ease: 'power2.out',
-    overwrite: 'auto'
-  });
-  if (!isVisible) resetTeamCards();
-}
-
-function updateTeamCardAnchors() {
-  if (!teamOverlayVisible || teamCards.length === 0) return;
-  const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
-
-  for (const config of TEAM_MEMBER_CONFIG) {
-    const card = teamCardMap.get(config.id);
-    const gridCard = document.querySelector(`.team-grid__card[data-member="${config.id}"]`);
-    if (!card || !gridCard) continue;
-
-    const rect = gridCard.getBoundingClientRect();
-    const dotX = rect.left + rect.width * 0.5;
-    const dotY = rect.top + rect.height * 0.6 + (config.dotOffsetY || 0);
-
-    const inwardSign = dotX < window.innerWidth * 0.5 ? 1 : -1;
-    const labelX = clamp(dotX + inwardSign * config.labelOffsetX, 130, window.innerWidth - 130);
-    const labelY = clamp(dotY + config.labelOffsetY, 90, window.innerHeight - 90);
-
-    const isInView = rect.bottom > 0 && rect.top < window.innerHeight && rect.right > 0 && rect.left < window.innerWidth;
-
-    card.style.left = `${labelX}px`;
-    card.style.top = `${labelY}px`;
-    card.style.opacity = isInView ? '1' : '0';
-    card.style.visibility = 'visible';
-
-    const line = card.querySelector('.team-card__line');
-    const dot = card.querySelector('.team-card__dot');
-    if (!line || !dot) continue;
-
-    const cardWidth = card.offsetWidth;
-    const cardHeight = card.offsetHeight;
-    const cardLeft = labelX - cardWidth * 0.5;
-    const cardTop = labelY - cardHeight * 0.5;
-    const localStartX = dotX >= labelX ? cardWidth : 0;
-    const localStartY = clamp(dotY - cardTop, 8, cardHeight - 8);
-    const startX = cardLeft + localStartX;
-    const startY = cardTop + localStartY;
-    const dx = dotX - startX;
-    const dy = dotY - startY;
-    const lineLength = Math.hypot(dx, dy);
-
-    if (lineLength < 2) {
-      line.style.opacity = '0';
-      dot.style.opacity = '0';
-      continue;
-    }
-
-    line.style.left = `${localStartX}px`;
-    line.style.top = `${localStartY}px`;
-    line.style.width = `${lineLength}px`;
-    line.style.transform = `translateY(-50%) rotate(${Math.atan2(dy, dx)}rad)`;
-    line.style.opacity = '1';
-
-    dot.style.left = `${localStartX + dx}px`;
-    dot.style.top = `${localStartY + dy}px`;
-    dot.style.opacity = '1';
-  }
+if (teamOverlay) {
+  teamOverlay.style.display = 'none';
+  teamOverlay.setAttribute('aria-hidden', 'true');
 }
 
 // --- Intro sequence ---
-const introDuration = prefersReducedMotion ? 1.35 : 2.55;
+const introDuration = prefersReducedMotion ? 1.0 : 1.6;
 const titleIntroState = { offsetX: 0, offsetY: 0, startScale: 2.15, endYOffset: 0 };
 const titleIntroAnimState = { progress: 0 };
 const introLeadTextLines = gsap.utils.toArray('.text-reveal-line--lead');
@@ -316,17 +405,12 @@ const introUnlockState = { introDone: false, textRevealDone: false, scrollUnlock
 let introCameraStarted = false;
 let introBrandRevealStarted = false;
 
-let lenis = null;
-
 function maybeUnlockScroll() {
-  if (!lenis) return;
   if (introUnlockState.scrollUnlocked) return;
   if (!introUnlockState.introDone || !introUnlockState.textRevealDone) return;
   introUnlockState.scrollUnlocked = true;
   document.body.classList.remove('is-scroll-locked');
   resetScrollPosition();
-  lenis.start();
-  lenis.scrollTo(0, { immediate: true, force: true });
   syncInvisiblePanelHeight();
   ScrollTrigger.refresh();
   animateScrollPhraseIn();
@@ -346,10 +430,10 @@ function animateScrollPhraseIn() {
     y: 0,
     scale: 1,
     rotateZ: 0,
-    duration: prefersReducedMotion ? 0.3 : 0.55,
+    duration: prefersReducedMotion ? 0.5 : 1.0,
     ease: 'power3.out',
-    stagger: prefersReducedMotion ? 0.04 : 0.08,
-    delay: prefersReducedMotion ? 0.1 : 0.2
+    stagger: 0.06,
+    delay: prefersReducedMotion ? 0.05 : 0.08
   });
 }
 
@@ -370,11 +454,11 @@ function playIntroBrandReveal() {
   }
 
   const hasLeadIntro = introLeadTextLines.length > 0;
-  const leadHoldDuration = hasLeadIntro ? (prefersReducedMotion ? 0.15 : 0.45) : 0;
-  const leadExitDuration = hasLeadIntro ? (prefersReducedMotion ? 0.26 : 0.5) : 0;
-  const brandRevealDelay = hasLeadIntro ? 0 : (prefersReducedMotion ? 0.12 : 0.28);
-  const brandRevealDuration = prefersReducedMotion ? 0.26 : 0.8;
-  const brandToCameraDelay = hasLeadIntro ? (prefersReducedMotion ? 0.04 : 0.2) : 0;
+  const leadHoldDuration = hasLeadIntro ? (prefersReducedMotion ? 0.1 : 0.25) : 0;
+  const leadExitDuration = hasLeadIntro ? (prefersReducedMotion ? 0.2 : 0.35) : 0;
+  const brandRevealDelay = hasLeadIntro ? 0 : (prefersReducedMotion ? 0.08 : 0.15);
+  const brandRevealDuration = prefersReducedMotion ? 0.2 : 0.5;
+  const brandToCameraDelay = hasLeadIntro ? (prefersReducedMotion ? 0.02 : 0.1) : 0;
 
   if (hasLeadIntro) {
     introLeadTextLines.forEach(line => {
@@ -453,11 +537,10 @@ function bindIntroTextRevealUnlock() {
 
 function computeTitleIntroStartTransform() {
   if (!title) return;
-  // Mobile: slide from top, no scale
   titleIntroState.offsetX = 0;
   titleIntroState.offsetY = -72;
   titleIntroState.startScale = 1;
-  titleIntroState.endYOffset = 0;
+  titleIntroState.endYOffset = 30;
 }
 
 computeTitleIntroStartTransform();
@@ -475,10 +558,10 @@ const introTl = gsap.timeline({
   onComplete: () => {
     introUnlockState.introDone = true;
     maybeUnlockScroll();
-    // Animate wires in after title settles
     gsap.to(wireState, {
       progress: 1,
-      duration: prefersReducedMotion ? 0.6 : 1.1,
+      duration: prefersReducedMotion ? 1.0 : 2.5,
+      delay: 0.5,
       ease: 'power2.out'
     });
   }
@@ -494,9 +577,9 @@ introTl.to(titleIntroAnimState, {
 if (introSubtitleLine) {
   introTl.to(introSubtitleLine, {
     yPercent: 0, opacity: 1, filter: 'blur(0px)',
-    duration: prefersReducedMotion ? 0.4 : 0.7,
+    duration: prefersReducedMotion ? 0.3 : 0.5,
     ease: 'power2.out'
-  }, introDuration * 0.4);
+  }, introDuration * 0.35);
 }
 
 if (title) title.style.transformOrigin = '50% 50%';
@@ -523,14 +606,7 @@ if (scrollPhraseWords.length > 0) {
   });
 }
 
-// --- Lenis ---
-lenis = new Lenis({
-  duration: prefersReducedMotion ? 1.1 : 3.0, smoothWheel: true, smoothTouch: true
-});
-
-lenis.on('scroll', ScrollTrigger.update);
-lenis.stop();
-lenis.scrollTo(0, { immediate: true, force: true });
+scrollWrapper.scrollTop = 0;
 bindIntroTextRevealUnlock();
 maybeUnlockScroll();
 
@@ -583,11 +659,12 @@ maybeUnlockScroll();
       triggerFlow(activeNavIndex >= 0 ? activeNavIndex : i, i);
       setActiveNav(i);
       if (i === 0) {
-        lenis.scrollTo(0, { duration: prefersReducedMotion ? 1.2 : 2.4, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+        scrollWrapper.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
       } else {
         const section = navSections[i];
-        if (!section || !lenis) return;
-        lenis.scrollTo(section, { offset: -58, duration: prefersReducedMotion ? 1.2 : 2.4, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+        if (!section) return;
+        const top = section.offsetTop;
+        scrollWrapper.scrollTo({ top, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
       }
     });
   });
@@ -604,8 +681,6 @@ maybeUnlockScroll();
   navSections.forEach(s => s && sectionObserver.observe(s));
 })();
 
-if (teamOverlay) gsap.set(teamOverlay, { autoAlpha: 0 });
-resetTeamCards();
 
 const postSecondPanelDuration = (() => {
   const weightedDuration = (prefersReducedMotion ? 0.8 : 1.25) * (
@@ -620,7 +695,7 @@ const CAMERA_SECTION_SCALE = 3.5;
 
 function syncInvisiblePanelHeight() {
   if (!invisiblePanel || postSecondPanelDuration <= 0) return;
-  const vh = window.innerHeight;
+  const vh = stableVH;
   const H1 = firstPanel ? firstPanel.offsetHeight : 0;
   const Hs = statsPanel ? statsPanel.offsetHeight : 0;
   const Ht = teamPanel ? teamPanel.offsetHeight : 0;
@@ -649,130 +724,40 @@ if (title) {
   }, 0.02 * CAMERA_SECTION_SCALE);
 }
 
-if (wireCanvas) {
-  cameraScrollTimeline.fromTo(wireCanvas,
-    { opacity: 1 },
-    { opacity: 0, duration: 0.18 * CAMERA_SECTION_SCALE },
-    0.0
-  );
-}
-
 if (scrollPhraseOverlay) {
-  cameraScrollTimeline.fromTo(scrollPhraseOverlay,
-    { autoAlpha: 1 },
-    { autoAlpha: 0, duration: 0.18 * CAMERA_SECTION_SCALE },
-    0.0
+  cameraScrollTimeline.to(scrollPhraseOverlay,
+    { autoAlpha: 0, duration: (prefersReducedMotion ? 0.03 : 0.06) * CAMERA_SECTION_SCALE },
+    0.02 * CAMERA_SECTION_SCALE
   );
 }
 
-// Scene cards overlay
-if (sceneCards.length === 3) {
-  const cardOverlayStart = 0.25 * CAMERA_SECTION_SCALE;
-  const cardStarts = [0.52, 0.555, 0.59].map(v => v * CAMERA_SECTION_SCALE);
-
-  const getRootFontSize = () => {
-    const rootFontSize = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize);
-    return Number.isFinite(rootFontSize) ? rootFontSize : 16;
-  };
-
-  const clampValue = (value, min, max) => Math.min(Math.max(value, min), max);
-
-  const getLegacyCardWidth = (compact) => {
-    const rem = getRootFontSize();
-    if (compact) return Math.min(12.2 * rem, window.innerWidth * 0.48);
-    return clampValue(window.innerWidth * 0.23, 12.8 * rem, 18.2 * rem);
-  };
-
-  const adjustXForLegacyMotion = (xValues, scaleValues, legacyWidth) => {
-    const legacyHalfWidth = legacyWidth * 0.5;
-    return xValues.map((xValue, index) => xValue - ((scaleValues[index] - 1) * legacyHalfWidth));
-  };
-
-  const getCardPassStyle = () => {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    const isPortrait = h > w;
-    if (isPortrait) {
-      const rem = getRootFontSize();
-      const cardW = w <= 540
-        ? clampValue(w * 0.88, 15 * rem, 28 * rem)
-        : clampValue(w * 0.80, 17 * rem, 34 * rem);
-      const cardH = clampValue(h * 0.25, 10 * rem, 16 * rem);
-      const gap = rem;
-      const navH = 4 * rem;
-      const totalH = 3 * cardH + 2 * gap;
-      const groupTop = navH + (h - navH - totalH) / 2;
-      const cx = -cardW / 2;
-      const cy0 = groupTop - h / 2;
-      const cy1 = groupTop + (cardH + gap) - h / 2;
-      const cy2 = groupTop + 2 * (cardH + gap) - h / 2;
-      return {
-        startX: [cx, cx, cx], startY: [cy0, cy1, cy2],
-        midX: [cx, cx, cx], midY: [cy0, cy1, cy2],
-        endX: [cx, cx, cx], endY: [cy0, cy1, cy2],
-        startScale: [1, 1, 1], midScale: [1, 1, 1], endScale: [1, 1, 1]
-      };
-    }
-    const compact = w <= 768;
-    const baseStyle = {
-      startX: [w * -0.255, w * -0.25, w * -0.24],
-      startY: [h * -0.23, h * -0.23, h * -0.23],
-      midX: [w * -0.16, w * -0.16, w * -0.155],
-      midY: [h * -0.167, h * -0.167, h * -0.167],
-      endX: [w * 0.1, w * 0.1, w * 0.1],
-      endY: [h * 0.056, h * 0.056, h * 0.056],
-      startScale: [0.5, 0.5, 0.5],
-      midScale: [1.0, 1.0, 1.0],
-      endScale: [2.5, 2.8, 3.2]
-    };
-    const legacyCardWidth = getLegacyCardWidth(compact);
-    return {
-      ...baseStyle,
-      startX: adjustXForLegacyMotion(baseStyle.startX, baseStyle.startScale, legacyCardWidth),
-      midX: adjustXForLegacyMotion(baseStyle.midX, baseStyle.midScale, legacyCardWidth),
-      endX: adjustXForLegacyMotion(baseStyle.endX, baseStyle.endScale, legacyCardWidth)
-    };
-  };
-
-  gsap.set(sceneCardsOverlay, { autoAlpha: 0 });
-  gsap.set(sceneCards, {
-    autoAlpha: 0, filter: 'blur(4px)', force3D: true, willChange: 'transform, opacity, filter'
-  });
-
-  cameraScrollTimeline.to(sceneCardsOverlay, { autoAlpha: 1, duration: 0.06 * CAMERA_SECTION_SCALE }, cardOverlayStart);
-
+if (sceneCardWrappers.length === 3) {
   sceneCards.forEach((card, i) => {
-    const start = cardStarts[i];
-    cameraScrollTimeline
-      .to(card, {
-        keyframes: [
-          { x: () => getCardPassStyle().startX[i], y: () => getCardPassStyle().startY[i], scale: () => getCardPassStyle().startScale[i], duration: 0 },
-          { x: () => getCardPassStyle().midX[i], y: () => getCardPassStyle().midY[i], scale: () => getCardPassStyle().midScale[i], duration: 0.1 * CAMERA_SECTION_SCALE },
-          { x: () => getCardPassStyle().endX[i], y: () => getCardPassStyle().endY[i], scale: () => getCardPassStyle().endScale[i], duration: 0.1 * CAMERA_SECTION_SCALE }
-        ]
-      }, start)
-      .to(card, {
-        keyframes: [
-          { autoAlpha: 1, duration: 0.04 * CAMERA_SECTION_SCALE },
-          { autoAlpha: 1, duration: 0.3 * CAMERA_SECTION_SCALE },
-          { autoAlpha: 1, duration: 0.06 * CAMERA_SECTION_SCALE }
-        ]
-      }, start)
-      .to(card, {
-        keyframes: [
-          { filter: 'blur(0px)', duration: 0.04 * CAMERA_SECTION_SCALE },
-          { filter: 'blur(0px)', duration: 0.3 * CAMERA_SECTION_SCALE },
-          { filter: 'blur(0px)', duration: 0.06 * CAMERA_SECTION_SCALE }
-        ]
-      }, start);
-  });
+    const direction = i % 2 === 0 ? 1 : -1;
+    const xOffset = direction * 120;
 
-  cameraScrollTimeline.to(sceneCardsOverlay, { autoAlpha: 0, duration: 0.06 * CAMERA_SECTION_SCALE }, 0.94 * CAMERA_SECTION_SCALE);
+    gsap.set(card, { autoAlpha: 0, xPercent: xOffset, force3D: true });
+
+    const startOffset = 65 - i * 5;
+    const endOffset = startOffset - 60;
+    gsap.to(card, {
+      autoAlpha: 1,
+      xPercent: 0,
+      duration: 1,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: sceneCardWrappers[i],
+        start: `top ${startOffset}%`,
+        end: `top ${endOffset}%`,
+        scrub: true,
+        invalidateOnRefresh: true
+      }
+    });
+  });
 }
 
 cameraScrollTimeline.to({}, { duration: postSecondPanelDuration });
 
-// --- Section title underlines ---
 if (sectionTitleLines.length > 0) {
   gsap.set(sectionTitleLines, { '--section-underline-progress': 0 });
   sectionTitleLines.forEach((titleLine) => {
@@ -811,18 +796,17 @@ if (statsPanel && statsCards.length === 3) {
     gsap.set(statsInsightCard, {
       autoAlpha: 0,
       y: () => (window.innerWidth <= 768 ? 34 : 56),
-      force3D: true,
-      willChange: 'transform, opacity'
+      force3D: true
     });
   }
 
-  gsap.set(statsCards, { autoAlpha: 0, force3D: true, willChange: 'transform, opacity' });
+  gsap.set(statsCards, { autoAlpha: 0, force3D: true });
 
   const statsCardsTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: statsPanel,
-      start: 'top 68%',
-      end: 'top 28%',
+      start: 'top 85%',
+      end: 'top 35%',
       scrub: true,
       invalidateOnRefresh: true
     }
@@ -848,16 +832,6 @@ if (statsPanel && statsCards.length === 3) {
       },
       statsCardsStartOffset + (index * (prefersReducedMotion ? 0.02 : 0.09))
     );
-  });
-}
-
-// --- Team panel ---
-if (teamPanel) {
-  ScrollTrigger.create({
-    trigger: teamPanel,
-    start: 'top 76%',
-    end: 'bottom 18%',
-    onToggle: (self) => setTeamOverlayVisible(self.isActive)
   });
 }
 
@@ -962,74 +936,53 @@ if (joinPanel && energyMeterEl) {
     });
   });
 
-  gsap.ticker.add((time) => {
-    if (chartState.revealed) updateChart(prefersReducedMotion ? 0 : time);
-  });
-
-  if (!prefersReducedMotion && energyMeterWrapper) {
-    let tiltBounds = energyMeterEl.getBoundingClientRect();
-    const tiltCenter = { x: 0, y: 0, scale: 1.0 };
-
-    function updateMeterTilt() {
-      const nx = Math.max(-1, Math.min(1, tiltCenter.x / (tiltBounds.width / 2)));
-      const ny = Math.max(-1, Math.min(1, tiltCenter.y / (tiltBounds.height / 2)));
-      energyMeterWrapper.style.transform = `perspective(900px) scale3d(${tiltCenter.scale}, ${tiltCenter.scale}, ${tiltCenter.scale}) rotateX(${-ny * 10}deg) rotateY(${nx * 10}deg)`;
-    }
-
-    function applyMeterTilt(e) {
-      tiltBounds = energyMeterEl.getBoundingClientRect();
-      gsap.to(tiltCenter, {
-        x: e.clientX - tiltBounds.x - tiltBounds.width / 2,
-        y: e.clientY - tiltBounds.y - tiltBounds.height / 2,
-        scale: 1.04,
-        duration: 0.35, ease: 'power2.out', overwrite: true, onUpdate: updateMeterTilt
-      });
-    }
-
-    energyMeterEl.addEventListener('mouseenter', () => {
-      tiltBounds = energyMeterEl.getBoundingClientRect();
-      document.addEventListener('mousemove', applyMeterTilt);
-    });
-    energyMeterEl.addEventListener('mouseleave', () => {
-      document.removeEventListener('mousemove', applyMeterTilt);
-      gsap.to(tiltCenter, {
-        x: 0, y: 0, scale: 1.0,
-        duration: 0.55, ease: 'power2.out', overwrite: true, onUpdate: updateMeterTilt,
-        onComplete: () => { energyMeterWrapper.style.transform = ''; }
-      });
-    });
-  }
 }
 
 // --- Resize ---
+let resizeDebounce = null;
 window.addEventListener('resize', () => {
-  resizeWireCanvas();
-  computeTitleIntroStartTransform();
-  updateTitleIntroTransform(titleIntroAnimState.progress);
-  syncInvisiblePanelHeight();
-  ScrollTrigger.refresh();
+  clearTimeout(resizeDebounce);
+  resizeDebounce = setTimeout(() => {
+    const currentWidth = window.innerWidth;
+    if (currentWidth !== lastKnownWidth) {
+      lastKnownWidth = currentWidth;
+      stableVH = window.innerHeight;
+      setStableVH();
+    }
+    resizeWireCanvas();
+    computeTitleIntroStartTransform();
+    updateTitleIntroTransform(titleIntroAnimState.progress);
+    syncInvisiblePanelHeight();
+    ScrollTrigger.refresh();
+  }, 100);
 });
 
-// --- Team card drift ---
-const teamDriftCards = Array.from(document.querySelectorAll('.team-grid__card[data-member]'));
-const teamDriftPhases = [0.0, 2.1];
+window.addEventListener('orientationchange', () => {
+  setTimeout(() => {
+    stableVH = window.innerHeight;
+    lastKnownWidth = window.innerWidth;
+    setStableVH();
+    resizeWireCanvas();
+    computeTitleIntroStartTransform();
+    updateTitleIntroTransform(titleIntroAnimState.progress);
+    syncInvisiblePanelHeight();
+    ScrollTrigger.refresh();
+  }, 200);
+});
+
 
 // --- Main tick ---
-gsap.ticker.lagSmoothing(0);
+gsap.ticker.lagSmoothing(500, 33);
+
+let lastCounterVisible = false;
 gsap.ticker.add((time) => {
-  lenis.raf(time * 1000);
-
-  if (!prefersReducedMotion) {
-    teamDriftCards.forEach((card, i) => {
-      const t = time + teamDriftPhases[i];
-      card.style.transform = `perspective(700px) rotateX(${Math.sin(t * 0.6) * 3}deg) rotateY(${Math.sin(t * 0.8) * 4.5}deg)`;
-    });
-  }
-
   drawWires(time);
-  updateTeamCardAnchors();
 
   if (mobileCounterEl) {
-    mobileCounterEl.classList.toggle('is-visible', scrollState.progress > 0.28);
+    const shouldShow = scrollState.progress > 0.28;
+    if (shouldShow !== lastCounterVisible) {
+      lastCounterVisible = shouldShow;
+      mobileCounterEl.classList.toggle('is-visible', shouldShow);
+    }
   }
 });

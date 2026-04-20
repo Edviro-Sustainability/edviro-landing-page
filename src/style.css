@@ -46,6 +46,18 @@
   opacity: 1;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 html, body {
   margin: 0;
   min-width: 320px;
@@ -61,6 +73,11 @@ html, body {
 
 body.is-scroll-locked {
   overflow: hidden;
+  touch-action: none;
+}
+
+body.is-scroll-locked #scroll-wrapper {
+  overflow: hidden !important;
   touch-action: none;
 }
 
@@ -118,10 +135,11 @@ html.lenis, html.lenis body { height: auto; }
 
 #webgl {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
   z-index: 0;
   width: 100vw;
-  height: 100vh;
+  height: var(--stable-vh, 100vh);
   transition: opacity 220ms ease, visibility 220ms ease;
 }
 
@@ -131,7 +149,10 @@ body.is-site-loading #webgl { opacity: 0; visibility: hidden; }
 
 .site-loader {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: var(--stable-vh, 100vh);
   z-index: 4;
   display: grid;
   place-items: center;
@@ -350,7 +371,7 @@ body.is-site-loading .site-nav { opacity: 0; visibility: hidden; pointer-events:
   display: block;
   transform: translateY(115%);
   opacity: 0;
-  animation: reveal-up 800ms cubic-bezier(0.3, 0.3, 0.5, 1) forwards;
+  animation: reveal-up 500ms cubic-bezier(0.3, 0.3, 0.5, 1) forwards;
 }
 
 .text-reveal-line--subtitle {
@@ -372,7 +393,10 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 .scroll-phrase {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: var(--stable-vh, 100vh);
   z-index: 2;
   display: grid;
   align-items: start;
@@ -402,7 +426,6 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 .scroll-phrase__word {
   color: var(--text-primary);
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  will-change: transform, opacity, color, text-shadow;
 }
 
 .scroll-phrase__word--accent {
@@ -421,7 +444,10 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 .scene-cards-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: var(--stable-vh, 100vh);
   z-index: 2;
   pointer-events: none;
   overflow: hidden;
@@ -529,6 +555,18 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   line-height: 0.88;
 }
 
+.stats-card__unit {
+  font-size: 0.38em;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  vertical-align: baseline;
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  -webkit-text-fill-color: rgba(var(--green-rgb-200), 0.7);
+  color: rgba(var(--green-rgb-200), 0.7);
+}
+
 .panel--team {
   min-height: 100vh !important;
   padding: clamp(2rem, 5vh, 4rem) clamp(1.5rem, 5vw, 5rem);
@@ -620,7 +658,10 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 .team-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: var(--stable-vh, 100vh);
   z-index: 3;
   pointer-events: none;
   opacity: 0;
@@ -1448,6 +1489,16 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   }
 }
 
+/* --- Mobile-view overrides (applied via JS class on body) --- */
+
+.is-mobile-view #webgl {
+  position: absolute;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+  /* width, height, and top are set by JS based on wire extent */
+}
+
 .is-mobile-view .scroll-phrase {
   align-items: flex-end;
   padding-top: 0;
@@ -1458,15 +1509,279 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
   flex-wrap: wrap;
   flex-direction: row;
   justify-content: center;
-  max-width: 72vw;
-  font-size: 1.7rem;
-  line-height: 1.5;
-  gap: 0.25em 0.4em;
+  max-width: 80vw;
+  font-size: clamp(1.7rem, 5.8vw, 2.4rem);
+  line-height: 1.45;
+  gap: 0.2em 0.35em;
 }
 
 .is-mobile-view .scroll-phrase__row {
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: center;
-  gap: 0.25em 0.4em;
+  gap: 0.2em 0.35em;
+}
+
+/* Mobile hero panel */
+.is-mobile-view .panel:first-child {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Mobile title sizing */
+.is-mobile-view .title .text-gradient {
+  font-size: clamp(5rem, 25vw, 9rem);
+}
+
+.is-mobile-view .text-reveal-line--subtitle {
+  font-size: clamp(1.1rem, 4.5vw, 1.6rem);
+  letter-spacing: 0.08em;
+}
+
+/* Mobile scene cards - square with larger text */
+.is-mobile-view .scene-card {
+  width: clamp(14rem, 75vw, 21rem);
+  min-height: unset;
+  aspect-ratio: unset;
+  padding: clamp(1.1rem, 4vw, 1.6rem);
+}
+
+.is-mobile-view .scene-card__label {
+  font-size: clamp(1.5rem, 6vw, 2.2rem);
+}
+
+.is-mobile-view .scene-card__sublabel {
+  font-size: clamp(0.95rem, 3.8vw, 1.3rem);
+  line-height: 1.45;
+}
+
+/* Mobile stats section */
+.is-mobile-view .panel--stats {
+  padding-block: clamp(2.5rem, 6vh, 4rem);
+  padding-inline: clamp(1rem, 4vw, 2rem);
+}
+
+.is-mobile-view .insight-card {
+  width: 88vw;
+  font-size: clamp(0.95rem, 3.8vw, 1.3rem);
+  line-height: 1.55;
+  padding: clamp(1.2rem, 4vw, 2rem);
+  margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
+}
+
+.is-mobile-view .stats-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 90%;
+  gap: clamp(0.75rem, 2.5vw, 1.2rem);
+}
+
+.is-mobile-view .stats-card[data-stat="schools"] {
+  grid-column: 1 / -1;
+}
+
+.is-mobile-view .stats-card {
+  min-height: clamp(5.5rem, 14vh, 8rem);
+  padding: clamp(0.75rem, 2.5vw, 1.1rem);
+}
+
+.is-mobile-view .stats-card__value {
+  font-size: clamp(2.2rem, 10vw, 3.5rem);
+}
+
+.is-mobile-view .stats-card__label {
+  font-size: clamp(0.68rem, 2.8vw, 0.85rem);
+}
+
+/* Mobile team section — 2-column: photos left, info right */
+.is-mobile-view .panel--team {
+  padding: clamp(2rem, 5vh, 3rem) clamp(1rem, 4vw, 2rem);
+  min-height: auto !important;
+}
+
+.is-mobile-view .team-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto auto auto;
+  gap: clamp(0.8rem, 2.5vw, 1.2rem);
+  align-items: center;
+}
+
+.is-mobile-view .team-grid__title {
+  grid-column: 1 / -1;
+  font-size: clamp(2rem, 7.5vw, 3.5rem);
+  margin-bottom: 0.5rem;
+  place-self: center;
+}
+
+.is-mobile-view .team-grid__card {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  height: auto;
+  max-height: clamp(14rem, 42vw, 20rem);
+  border-width: 0.4rem;
+  border-radius: 1rem;
+  place-self: center;
+}
+
+.is-mobile-view .team-grid__card[data-member="hursh"] {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.is-mobile-view .team-grid__card[data-member="tanuj"] {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+.is-mobile-view .team-grid__subtitle {
+  grid-column: 1 / -1;
+  grid-row: 4;
+  font-size: clamp(0.88rem, 3.5vw, 1.15rem);
+  line-height: 1.55;
+  max-width: 100% !important;
+}
+
+/* Mobile team info panels — shown inline in the right column */
+.is-mobile-view .team-info-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: clamp(0.6rem, 2.5vw, 1rem);
+}
+
+.is-mobile-view .team-info-inline__name {
+  font-size: clamp(1rem, 4vw, 1.3rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background-image: linear-gradient(90deg, var(--color-primary) 0%, var(--green-900) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.is-mobile-view .team-info-inline__detail {
+  font-size: clamp(0.78rem, 3vw, 0.95rem);
+  line-height: 1.45;
+  color: rgba(17, 20, 23, 0.78);
+}
+
+/* Mobile contact section */
+.is-mobile-view .panel--contact {
+  padding: clamp(2rem, 5vh, 3.5rem) clamp(0.75rem, 3vw, 1.5rem);
+  min-height: auto;
+}
+
+.is-mobile-view .contact-showcase {
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    'title'
+    'card';
+  gap: clamp(1.2rem, 3vw, 2rem);
+}
+
+.is-mobile-view .contact-showcase__title {
+  font-size: clamp(2rem, 7.5vw, 3.5rem);
+  line-height: normal;
+  margin-bottom: 0.5rem;
+  place-self: center;
+}
+
+.is-mobile-view .energy-meter-wrapper {
+  display: none;
+}
+
+.is-mobile-view .contact-card {
+  padding: clamp(1.2rem, 4vw, 1.8rem);
+}
+
+.is-mobile-view .contact-card__eyebrow {
+  font-size: clamp(0.62rem, 2.5vw, 0.78rem);
+}
+
+.is-mobile-view .contact-card__desc {
+  font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+  line-height: 1.5;
+}
+
+.is-mobile-view .contact-card__email {
+  font-size: clamp(0.75rem, 3vw, 0.92rem);
+}
+
+.is-mobile-view .contact-card__email-btn {
+  font-size: clamp(0.82rem, 3.5vw, 1rem);
+  padding: clamp(0.7rem, 3vw, 1rem) clamp(1rem, 4vw, 1.5rem);
+}
+
+/* Mobile counter */
+.is-mobile-view .mobile-counter {
+  padding-top: 8rem;
+  padding-bottom: 4rem;
+}
+
+.is-mobile-view .mobile-counter__line {
+  font-size: clamp(2.8rem, 14vw, 5.5rem);
+}
+
+/* Mobile footer */
+.is-mobile-view .site-footer {
+  padding: 1rem 1rem;
+}
+
+.is-mobile-view .site-footer__text {
+  font-size: clamp(0.72rem, 2.8vw, 0.88rem);
+}
+
+/* Mobile nav — consistent sizing across orientations */
+.is-mobile-view .site-nav {
+  height: clamp(3rem, 8vmin, 4rem);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.is-mobile-view .nav-dot__label {
+  display: none;
+}
+
+.is-mobile-view .nav-connector {
+  width: clamp(1.8rem, 5vmin, 2.8rem);
+  margin-bottom: 0;
+}
+
+.is-mobile-view .nav-dot {
+  padding: 0.55rem 0.6rem;
+}
+
+.is-mobile-view .site-nav__actions {
+  gap: 0.5rem;
+  right: 0.75rem;
+}
+
+.is-mobile-view .nav-login {
+  font-size: clamp(0.68rem, 2.5vw, 0.8rem);
+  padding: clamp(0.35rem, 1vmin, 0.45rem) clamp(0.7rem, 2vmin, 0.9rem);
+}
+
+.is-mobile-view .site-nav__brand {
+  left: 0.75rem;
+}
+
+.is-mobile-view .scene-card-flow-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: clamp(12rem, 50vh, 28rem);
+  padding-top: 25vh;
+}
+
+.is-mobile-view .site-footer {
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.is-mobile-view .nav-brand {
+  font-size: clamp(1rem, 4vw, 1.2rem);
 }
