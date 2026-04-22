@@ -182,6 +182,13 @@ const teamCardMap = new Map(
 );
 const THEME_NAME = 'light';
 
+const isLowEnd = (() => {
+  const cores = navigator.hardwareConcurrency ?? 4;
+  const mem = navigator.deviceMemory ?? 4;
+  return cores <= 4 || mem <= 2;
+})();
+const MAX_PIXEL_RATIO = isLowEnd ? 1 : 2;
+
 document.body.classList.add('is-site-loading', 'is-scroll-locked');
 
 function resetScrollPosition() {
@@ -353,12 +360,12 @@ camera.position.set(0, 0.5, 7.5);
 scene.add(camera);
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
-renderer.shadowMap.enabled = true;
+renderer.shadowMap.enabled = !isLowEnd;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 let composer = null;
@@ -371,28 +378,30 @@ let wireBloomPass = null;
 
 {
   composer = new EffectComposer(renderer);
-  composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  composer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO));
   composer.setSize(window.innerWidth, window.innerHeight);
 
   const renderPass = new RenderPass(scene, camera);
   composer.addPass(renderPass);
 
-  dofPass = new BokehPass(scene, camera, { focus: 12.0, aperture: 0.0001 });
-  composer.addPass(dofPass);
+  if (!isLowEnd) {
+    dofPass = new BokehPass(scene, camera, { focus: 12.0, aperture: 0.0001 });
+    composer.addPass(dofPass);
 
-  const pixelRatio = Math.min(window.devicePixelRatio, 2);
-  fxaaPass = new ShaderPass(FXAAShader);
-  fxaaPass.material.uniforms.resolution.value.set(
-    1 / (window.innerWidth * pixelRatio),
-    1 / (window.innerHeight * pixelRatio)
-  );
-  composer.addPass(fxaaPass);
+    const pixelRatio = Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO);
+    fxaaPass = new ShaderPass(FXAAShader);
+    fxaaPass.material.uniforms.resolution.value.set(
+      1 / (window.innerWidth * pixelRatio),
+      1 / (window.innerHeight * pixelRatio)
+    );
+    composer.addPass(fxaaPass);
+  }
 
   outputPass = new OutputPass();
   composer.addPass(outputPass);
 
   maskComposer = new EffectComposer(renderer);
-  maskComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  maskComposer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO));
   maskComposer.setSize(window.innerWidth, window.innerHeight);
   maskComposer.renderToScreen = false;
   maskComposer.renderTarget1.texture.colorSpace = THREE.SRGBColorSpace;
@@ -412,7 +421,7 @@ let wireBloomPass = null;
 const hemiLight = new THREE.HemisphereLight(themeConfig.light.hemiColor, themeConfig.light.hemiGroundColor, themeConfig.light.hemiIntensity);
 const dirLight = new THREE.DirectionalLight(themeConfig.light.dirColor, themeConfig.light.dirIntensity);
 dirLight.position.set(-6, 10, 12);
-dirLight.shadow.mapSize.set(2048, 2048);
+dirLight.shadow.mapSize.set(isLowEnd ? 1024 : 2048, isLowEnd ? 1024 : 2048);
 dirLight.castShadow = true;
 dirLight.shadow.radius = 20;
 dirLight.shadow.camera.left = -40;
@@ -827,10 +836,11 @@ const pointerXTo = gsap.quickTo(pointerCurrent, 'x', { duration: 0.6, ease: 'pow
 const pointerYTo = gsap.quickTo(pointerCurrent, 'y', { duration: 0.6, ease: 'power3.out' });
 const pointerStrengthTo = gsap.quickTo(schoolNoiseUniforms.uPointerStrength, 'value', { duration: 0.6, ease: 'power2.out' });
 
+const pointerRaw = { x: 0, y: 0, dirty: false };
 window.addEventListener('pointermove', (event) => {
-  pointerXTo((event.clientX / window.innerWidth) * 2 - 1);
-  pointerYTo(-(event.clientY / window.innerHeight) * 2 + 1);
-  pointerStrengthTo(1.0);
+  pointerRaw.x = (event.clientX / window.innerWidth) * 2 - 1;
+  pointerRaw.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  pointerRaw.dirty = true;
 });
 
 window.addEventListener('pointerleave', () => {
@@ -1659,8 +1669,11 @@ cameraScrollTimeline.to(scrollState, {
   duration: postSecondPanelDuration
 });
 
+let _resizeTimer = null;
 window.addEventListener('resize', () => {
-  const pixelRatio = Math.min(window.devicePixelRatio, 2);
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(() => {
+  const pixelRatio = Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO);
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -1683,14 +1696,22 @@ window.addEventListener('resize', () => {
   updateTitleIntroTransform(titleIntroAnimState.progress);
   syncInvisiblePanelHeight();
   ScrollTrigger.refresh();
+  }, 150);
 });
 
 const teamDriftCards = Array.from(document.querySelectorAll('.team-grid__card[data-member]'));
 const teamDriftPhases = [0.0, 2.1];
 
-gsap.ticker.lagSmoothing(0);
+gsap.ticker.lagSmoothing(500, 16);
 gsap.ticker.add((time) => {
   lenis.raf(time * 1000);
+
+  if (pointerRaw.dirty) {
+    pointerXTo(pointerRaw.x);
+    pointerYTo(pointerRaw.y);
+    pointerStrengthTo(1.0);
+    pointerRaw.dirty = false;
+  }
 
   if (!prefersReducedMotion) {
     teamDriftCards.forEach((card, i) => {
@@ -1752,7 +1773,7 @@ gsap.ticker.add((time) => {
 
   updateTeamCardAnchors();
 
-  if (schoolNoiseOverlays.length > 0) renderWireMask();
+  if (schoolNoiseOverlays.length > 0 && !counterAndTeamVisible) renderWireMask();
 
   if (composer) {
     composer.render();
