@@ -23,10 +23,11 @@ import maskFragmentShader from './maskfragment.glsl?raw';
 gsap.registerPlugin(ScrollTrigger);
 
 class VanillaSmoothScroll {
-  constructor({ lerpFactor = 0.07 } = {}) {
+  constructor({ lerpFactor = 0.07, speedMultiplier = 1.0 } = {}) {
     this._target = window.scrollY;
     this._current = window.scrollY;
     this._lerpFactor = lerpFactor;
+    this._speedMultiplier = speedMultiplier;
     this._stopped = true;
     this._scrollListeners = [];
     this._lastTime = null;
@@ -52,7 +53,7 @@ class VanillaSmoothScroll {
     let delta = e.deltaY;
     if (e.deltaMode === 1) delta *= 40;
     else if (e.deltaMode === 2) delta *= window.innerHeight;
-    this._target = this._clamp(this._target + delta);
+    this._target = this._clamp(this._target + delta * this._speedMultiplier);
   }
 
   _onKeydown(e) {
@@ -70,7 +71,7 @@ class VanillaSmoothScroll {
     else if (e.key === 'Home') { this._target = 0; return; }
     if (delta !== 0) {
       if (this._tween) { this._tween.kill(); this._tween = null; }
-      this._target = this._clamp(this._target + delta);
+      this._target = this._clamp(this._target + delta * this._speedMultiplier);
     }
   }
 
@@ -1114,8 +1115,10 @@ function updateTitleIntroTransform(progress) {
 
 updateTitleIntroTransform(titleIntroAnimState.progress);
 
-const LERP_CAMERA = prefersReducedMotion ? 0.28 : 0.07;
-const LERP_FLAT   = prefersReducedMotion ? 0.50 : 0.14;
+const LERP_CAMERA = 0.16;
+const LERP_FLAT   = 0.16;
+const SPEED_3D    = 0.6;
+const SPEED_2D    = 1.0;
 
 lenis = new VanillaSmoothScroll({ lerpFactor: LERP_CAMERA });
 
@@ -1743,6 +1746,9 @@ gsap.ticker.add((time) => {
 
   const targetLerp = counterAndTeamVisible ? LERP_FLAT : LERP_CAMERA;
   lenis._lerpFactor += (targetLerp - lenis._lerpFactor) * 0.04;
+
+  const targetSpeed = counterAndTeamVisible ? SPEED_2D : SPEED_3D;
+  lenis._speedMultiplier += (targetSpeed - lenis._speedMultiplier) * 0.04;
 
   subjectGroup.position.x = -parallaxX * parallaxSettings.groupX;
   subjectGroup.position.y = -parallaxY * parallaxSettings.groupY;
