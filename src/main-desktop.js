@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -22,6 +21,138 @@ import maskVertexShader from './maskvertex.glsl?raw';
 import maskFragmentShader from './maskfragment.glsl?raw';
 
 gsap.registerPlugin(ScrollTrigger);
+
+class VanillaSmoothScroll {
+  constructor({ lerpFactor = 0.07 } = {}) {
+    this._target = window.scrollY;
+    this._current = window.scrollY;
+    this._lerpFactor = lerpFactor;
+    this._stopped = true;
+    this._scrollListeners = [];
+    this._lastTime = null;
+    this._tween = null;
+    this._onWheel = this._onWheel.bind(this);
+    this._onKeydown = this._onKeydown.bind(this);
+    window.addEventListener('wheel', this._onWheel, { passive: false });
+    window.addEventListener('keydown', this._onKeydown);
+  }
+
+  _maxScroll() {
+    return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  }
+
+  _clamp(v) {
+    return Math.max(0, Math.min(this._maxScroll(), v));
+  }
+
+  _onWheel(e) {
+    e.preventDefault();
+    if (this._stopped) return;
+    if (this._tween) { this._tween.kill(); this._tween = null; }
+    let delta = e.deltaY;
+    if (e.deltaMode === 1) delta *= 40;
+    else if (e.deltaMode === 2) delta *= window.innerHeight;
+    this._target = this._clamp(this._target + delta);
+  }
+
+  _onKeydown(e) {
+    if (this._stopped) return;
+    const active = document.activeElement;
+    if (active && active !== document.body && active !== document.documentElement) return;
+    const pageH = window.innerHeight * 0.9;
+    let delta = 0;
+    if (e.key === 'ArrowDown') delta = 80;
+    else if (e.key === 'ArrowUp') delta = -80;
+    else if (e.key === 'PageDown') delta = pageH;
+    else if (e.key === 'PageUp') delta = -pageH;
+    else if (e.key === ' ') delta = e.shiftKey ? -pageH : pageH;
+    else if (e.key === 'End') { this._target = this._maxScroll(); return; }
+    else if (e.key === 'Home') { this._target = 0; return; }
+    if (delta !== 0) {
+      if (this._tween) { this._tween.kill(); this._tween = null; }
+      this._target = this._clamp(this._target + delta);
+    }
+  }
+
+  on(event, cb) {
+    if (event === 'scroll') this._scrollListeners.push(cb);
+  }
+
+  stop() {
+    this._stopped = true;
+    this._target = window.scrollY;
+    this._current = window.scrollY;
+    if (this._tween) { this._tween.kill(); this._tween = null; }
+  }
+
+  start() {
+    this._stopped = false;
+    this._target = window.scrollY;
+    this._current = window.scrollY;
+  }
+
+  scrollTo(target, { immediate = false, force = false, duration = 1.0, easing, offset = 0 } = {}) {
+    let targetY;
+    if (typeof target === 'number') {
+      targetY = target + offset;
+    } else if (target instanceof Element) {
+      const rect = target.getBoundingClientRect();
+      targetY = window.scrollY + rect.top + offset;
+    } else {
+      return;
+    }
+    targetY = this._clamp(targetY);
+
+    if (immediate || force) {
+      if (this._tween) { this._tween.kill(); this._tween = null; }
+      this._target = targetY;
+      this._current = targetY;
+      window.scrollTo(0, targetY);
+      this._scrollListeners.forEach(cb => cb({ scroll: targetY }));
+      return;
+    }
+
+    if (this._tween) this._tween.kill();
+    const proxy = { value: this._current };
+    this._tween = gsap.to(proxy, {
+      value: targetY,
+      duration,
+      ease: easing || 'power3.inOut',
+      onUpdate: () => {
+        this._target = proxy.value;
+        this._current = proxy.value;
+        window.scrollTo(0, proxy.value);
+        this._scrollListeners.forEach(cb => cb({ scroll: proxy.value }));
+      },
+      onComplete: () => {
+        this._target = targetY;
+        this._current = targetY;
+        this._tween = null;
+      }
+    });
+  }
+
+  raf(timeMs) {
+    if (this._lastTime === null) { this._lastTime = timeMs; return; }
+    const dt = Math.min((timeMs - this._lastTime) / 1000, 0.1);
+    this._lastTime = timeMs;
+
+    if (this._stopped || this._tween) return;
+
+    const alpha = 1 - Math.pow(1 - this._lerpFactor, dt * 60);
+    this._current += (this._target - this._current) * alpha;
+    if (Math.abs(this._target - this._current) < 0.05) this._current = this._target;
+
+    window.scrollTo(0, this._current);
+    this._scrollListeners.forEach(cb => cb({ scroll: this._current }));
+  }
+
+  destroy() {
+    window.removeEventListener('wheel', this._onWheel);
+    window.removeEventListener('keydown', this._onKeydown);
+    if (this._tween) this._tween.kill();
+  }
+}
 
 const MASK_LAYER = 1;
 
@@ -969,8 +1100,8 @@ function updateTitleIntroTransform(progress) {
 
 updateTitleIntroTransform(titleIntroAnimState.progress);
 
-lenis = new Lenis({
-  duration: prefersReducedMotion ? 1.1 : 3.0, smoothWheel: true, smoothTouch: true
+lenis = new VanillaSmoothScroll({
+  lerpFactor: prefersReducedMotion ? 0.28 : 0.07
 });
 
 lenis.on('scroll', ScrollTrigger.update);
