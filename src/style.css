@@ -182,8 +182,8 @@ body.is-site-loading .site-loader { opacity: 1; visibility: visible; }
   padding: 0 2rem;
   background: var(--glass);
   border-bottom: 1px solid var(--border-soft);
-  backdrop-filter: blur(3rem);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   transition: opacity 220ms ease, visibility 220ms ease;
 }
 
@@ -1120,8 +1120,8 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 
 
 .site-footer {
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 .mobile-counter {
@@ -1489,11 +1489,11 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 /* --- Mobile-view overrides (applied via JS class on body) --- */
 
 .is-mobile-view #webgl {
-  position: absolute;
+  position: fixed;
+  top: 0;
   left: 0;
   z-index: 0;
   pointer-events: none;
-  /* width, height, and top are set by JS based on wire extent */
 }
 
 .is-mobile-view .scroll-phrase {
@@ -1735,8 +1735,8 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 /* Mobile nav — consistent sizing across orientations */
 .is-mobile-view .site-nav {
   height: clamp(3rem, 8vmin, 4rem);
-  backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 }
 
 .is-mobile-view .nav-dot__label {
@@ -1775,8 +1775,8 @@ body.is-site-loading .text-reveal-line { animation: none; transform: translateY(
 }
 
 .is-mobile-view .site-footer {
-  backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
 .is-mobile-view .nav-brand {

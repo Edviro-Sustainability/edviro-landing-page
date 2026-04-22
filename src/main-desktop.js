@@ -182,12 +182,16 @@ const teamCardMap = new Map(
 );
 const THEME_NAME = 'light';
 
+const isFirefox = /Firefox\/[\d.]+/.test(navigator.userAgent);
 const isLowEnd = (() => {
   const cores = navigator.hardwareConcurrency ?? 4;
-  const mem = navigator.deviceMemory ?? 4;
+  const mem = navigator.deviceMemory ?? 4; // always undefined in Firefox, falls back to 4
   return cores <= 4 || mem <= 2;
 })();
-const MAX_PIXEL_RATIO = isLowEnd ? 1 : 2;
+// Firefox WebGL pipeline is measurably slower than Blink regardless of hardware tier,
+// so disable the expensive post-processing passes there too.
+const isReducedQuality = isLowEnd || isFirefox;
+const MAX_PIXEL_RATIO = isLowEnd ? 1 : isFirefox ? 1.5 : 2;
 
 document.body.classList.add('is-site-loading', 'is-scroll-locked');
 
@@ -384,7 +388,7 @@ let wireBloomPass = null;
   const renderPass = new RenderPass(scene, camera);
   composer.addPass(renderPass);
 
-  if (!isLowEnd) {
+  if (!isReducedQuality) {
     dofPass = new BokehPass(scene, camera, { focus: 12.0, aperture: 0.0001 });
     composer.addPass(dofPass);
 
@@ -421,7 +425,7 @@ let wireBloomPass = null;
 const hemiLight = new THREE.HemisphereLight(themeConfig.light.hemiColor, themeConfig.light.hemiGroundColor, themeConfig.light.hemiIntensity);
 const dirLight = new THREE.DirectionalLight(themeConfig.light.dirColor, themeConfig.light.dirIntensity);
 dirLight.position.set(-6, 10, 12);
-dirLight.shadow.mapSize.set(isLowEnd ? 1024 : 2048, isLowEnd ? 1024 : 2048);
+dirLight.shadow.mapSize.set(isReducedQuality ? 1024 : 2048, isReducedQuality ? 1024 : 2048);
 dirLight.castShadow = true;
 dirLight.shadow.radius = 20;
 dirLight.shadow.camera.left = -40;
@@ -1110,9 +1114,10 @@ function updateTitleIntroTransform(progress) {
 
 updateTitleIntroTransform(titleIntroAnimState.progress);
 
-lenis = new VanillaSmoothScroll({
-  lerpFactor: prefersReducedMotion ? 0.28 : 0.07
-});
+const LERP_CAMERA = prefersReducedMotion ? 0.28 : 0.07;
+const LERP_FLAT   = prefersReducedMotion ? 0.50 : 0.14;
+
+lenis = new VanillaSmoothScroll({ lerpFactor: LERP_CAMERA });
 
 lenis.on('scroll', ScrollTrigger.update);
 lenis.stop();
@@ -1735,6 +1740,9 @@ gsap.ticker.add((time) => {
   const cameraParallaxX = parallaxX * parallaxSettings.cameraX;
   const cameraParallaxY = parallaxY * parallaxSettings.cameraY;
   const counterAndTeamVisible = scrollState.cameraOffsetX <= -32.5;
+
+  const targetLerp = counterAndTeamVisible ? LERP_FLAT : LERP_CAMERA;
+  lenis._lerpFactor += (targetLerp - lenis._lerpFactor) * 0.04;
 
   subjectGroup.position.x = -parallaxX * parallaxSettings.groupX;
   subjectGroup.position.y = -parallaxY * parallaxSettings.groupY;

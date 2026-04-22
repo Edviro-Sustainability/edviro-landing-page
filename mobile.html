@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-visual" />
     <title>Edviro - Agentic Energy Management for School Districts</title>
 
     <meta name="description" content="Edviro is agentic energy management for school districts. We identify optimizations by simulating possible changes, delegate work to AI agents and facilities staff, then verify the savings with measurement and verification." />
@@ -25,103 +25,225 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
-    <style>body{opacity:0}</style>
   </head>
-  <body>
-    <nav class="m-nav">
-      <span class="m-nav__brand">Edviro</span>
-      <a class="m-nav__cta" href="https://dash.edviroenergy.com" target="_blank" rel="noopener noreferrer">Dashboard</a>
+  <body class="is-site-loading">
+
+    <canvas id="webgl"></canvas>
+
+    <div id="site-loader" class="site-loader" role="status" aria-live="polite" aria-label="Loading site">
+      <span class="site-loader__spinner" aria-hidden="true"></span>
+    </div>
+
+    <div class="scroll-phrase" aria-hidden="true">
+      <p class="scroll-phrase__line">
+        <span class="scroll-phrase__row">
+          <span class="scroll-phrase__word">Take</span>
+          <span class="scroll-phrase__word">back</span>
+          <span class="scroll-phrase__word scroll-phrase__word--accent">control</span>
+          <span class="scroll-phrase__word">of</span>
+        </span>
+        <span class="scroll-phrase__row">
+          <span class="scroll-phrase__word">your</span>
+          <span class="scroll-phrase__word">school's</span>
+          <span class="scroll-phrase__word scroll-phrase__word--accent">power</span>
+        </span>
+      </p>
+    </div>
+
+    <div class="team-overlay" aria-hidden="true">
+      <button class="team-card card-light" data-member="hursh" type="button">
+        <span class="team-card__name">Hursh Shah</span>
+        <span class="team-card__detail">Extensive experience in energy systems and data analytics</span>
+        <span class="team-card__line" aria-hidden="true"></span>
+        <span class="team-card__dot" aria-hidden="true"></span>
+      </button>
+      <button class="team-card card-light" data-member="tanuj" type="button">
+        <span class="team-card__name">Tanuj Siripurapu</span>
+        <span class="team-card__detail">Deep technical expertise in full-stack software engineering</span>
+        <span class="team-card__line" aria-hidden="true"></span>
+        <span class="team-card__dot" aria-hidden="true"></span>
+      </button>
+    </div>
+
+    <nav class="site-nav" id="site-nav" aria-label="Site navigation">
+      <div class="site-nav__brand" aria-hidden="true">
+        <span class="nav-brand">Edviro</span>
+      </div>
+      <div class="site-nav__chain" aria-label="Page sections">
+        <button class="nav-dot" data-target="#services-section" data-index="0" type="button" aria-label="Jump to Services">
+          <span class="nav-dot__pip"></span>
+          <span class="nav-dot__label">Services</span>
+        </button>
+        <div class="nav-connector" data-index="0" aria-hidden="true"><span class="nav-connector__pulse"></span></div>
+        <button class="nav-dot" data-target="#about-section" data-index="1" type="button" aria-label="Jump to About">
+          <span class="nav-dot__pip"></span>
+          <span class="nav-dot__label">About</span>
+        </button>
+        <div class="nav-connector" data-index="1" aria-hidden="true"><span class="nav-connector__pulse"></span></div>
+        <button class="nav-dot" data-target="#team-section" data-index="2" type="button" aria-label="Jump to Team">
+          <span class="nav-dot__pip"></span>
+          <span class="nav-dot__label">Team</span>
+        </button>
+        <div class="nav-connector" data-index="2" aria-hidden="true"><span class="nav-connector__pulse"></span></div>
+        <button class="nav-dot" data-target="#contact-section" data-index="3" type="button" aria-label="Jump to Contact">
+          <span class="nav-dot__pip"></span>
+          <span class="nav-dot__label">Contact</span>
+        </button>
+      </div>
+      <div class="site-nav__actions">
+        <a class="nav-login" href="https://dash.edviroenergy.com" target="_blank" rel="noopener noreferrer">Dashboard</a>
+      </div>
     </nav>
 
-    <main>
-      <section class="m-hero">
-        <h1 class="m-hero__title">Edviro</h1>
-        <p class="m-hero__subtitle">Agentic Energy Management</p>
-        <p class="m-hero__tagline">Take back <strong>control</strong> of your school's <strong>power</strong></p>
+    <main id="content">
+      <section class="panel">
+        <h1 class="title" aria-label="Edviro Agentic Energy Management">
+          <span class="text-reveal-mask text-reveal-mask--brand" aria-hidden="true">
+            <span class="text-reveal-line text-gradient">Edviro</span>
+          </span>
+          <span class="text-reveal-mask text-reveal-mask--subtitle" aria-hidden="true">
+            <span class="text-reveal-line text-reveal-line--subtitle">Agentic Energy Management</span>
+          </span>
+        </h1>
       </section>
 
-      <section class="m-features m-fade-in">
-        <h2 class="m-section-title">What We Do</h2>
-        <div class="m-feature-grid">
-          <article class="m-feature">
-            <div class="m-feature__icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.3-4.3"/><path d="M8 11h1.5l1.25-2.5L12.25 13l1.25-2 1 .5"/></svg>
-            </div>
-            <h3 class="m-feature__title">Identify</h3>
-            <p class="m-feature__desc">We watch your live data, catch the anomalies, and simulate fixes to find the ones worth doing.</p>
-          </article>
-          <article class="m-feature">
-            <div class="m-feature__icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.2"/><circle cx="5" cy="18" r="2.2"/><circle cx="19" cy="18" r="2.2"/><path d="M12 7.2v3"/><path d="m11 11-5 5"/><path d="m13 11 5 5"/></svg>
-            </div>
-            <h3 class="m-feature__title">Delegate</h3>
-            <p class="m-feature__desc">Agents act on the fix, or hand it to the right person with all the context they need.</p>
-          </article>
-          <article class="m-feature">
-            <div class="m-feature__icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M5 20V11"/><path d="M10 20V8"/><path d="M15 20v-6"/><path d="M20 20V5"/><path d="m8 6 3 3 4-4 4 4"/></svg>
-            </div>
-            <h3 class="m-feature__title">Verify</h3>
-            <p class="m-feature__desc">M&amp;V confirms the savings actually show up on the next bill.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="m-about m-fade-in">
-        <p class="m-about__text">Our pilot with local school districts started by uncovering hundreds of thousands in overbilling and inefficiency. Now our agentic platform takes it end-to-end: simulating fixes, dispatching agents to act on or delegate them, and verifying every dollar of savings shows up on the next bill.</p>
-        <div class="m-stats">
-          <div class="m-stat" data-stat="schools">
-            <span class="m-stat__value">7</span>
-            <span class="m-stat__label">Schools</span>
-          </div>
-          <div class="m-stat" data-stat="districts">
-            <span class="m-stat__value">1</span>
-            <span class="m-stat__label">Districts</span>
-          </div>
-          <div class="m-stat" data-stat="usagePoints">
-            <span class="m-stat__value">16</span>
-            <span class="m-stat__label">Usage Points</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="m-team m-fade-in">
-        <h2 class="m-section-title">Meet The Team</h2>
-        <p class="m-team__intro">Edviro Energy is run by two passionate college students who grew fed up with seeing their hometown high schools lose thousands of valuable tax payer money to inefficiences, overbillings, and simple oversights that can be fixed with proper dashboarding and modern day API tools</p>
-        <div class="m-team-grid">
-          <article class="m-team-card">
-            <div class="m-team-card__photo" style="background-image: url('/hursh.jpg')"></div>
-            <div class="m-team-card__info">
-              <h3 class="m-team-card__name">Hursh Shah</h3>
-              <p class="m-team-card__role">Extensive experience in energy systems and data analytics</p>
-            </div>
-          </article>
-          <article class="m-team-card">
-            <div class="m-team-card__photo" style="background-image: url('/tanuj.jpg')"></div>
-            <div class="m-team-card__info">
-              <h3 class="m-team-card__name">Tanuj Siripurapu</h3>
-              <p class="m-team-card__role">Deep technical expertise in full-stack software engineering</p>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="m-contact m-fade-in">
-        <h2 class="m-section-title">Contact Us</h2>
-        <article class="m-contact-card">
-          <span class="m-contact-card__badge">District Partnerships</span>
-          <p class="m-contact-card__desc">We're expanding to our first clients and are looking for forward-thinking school districts to join our mission of agentic energy optimization.</p>
-          <p class="m-contact-card__highlight">Be part of the next generation of agentic energy management for schools.</p>
-          <p class="m-contact-card__email">partnerships@edviroenergy.com</p>
-          <a class="m-contact-card__btn" href="mailto:partnerships@edviroenergy.com">Email Us</a>
+      <div class="scene-cards-overlay" aria-hidden="true">
+        <article class="scene-card card-dark scene-card--one">
+          <p class="scene-card__label">Identify</p>
+          <p class="scene-card__sublabel">We watch your live data, catch the anomalies, and simulate fixes to find the ones worth doing.</p>
         </article>
+        <article class="scene-card card-dark scene-card--two">
+          <p class="scene-card__label">Delegate</p>
+          <p class="scene-card__sublabel">Agents act on the fix, or hand it to the right person with all the context they need.</p>
+        </article>
+        <article class="scene-card card-dark scene-card--three">
+          <p class="scene-card__label">Verify</p>
+          <p class="scene-card__sublabel">M&amp;V confirms the savings actually show up on the next bill.</p>
+        </article>
+      </div>
+
+      <section class="panel invisible" id="services-section"></section>
+
+      <div id="mobile-counter" class="mobile-counter" aria-hidden="true">
+        <p class="mobile-counter__line">over</p>
+        <p class="mobile-counter__line">$400k</p>
+        <p class="mobile-counter__line">saved</p>
+      </div>
+
+      <section class="panel container panel--stats" id="about-section" aria-label="District footprint summary">
+        <p class="insight-card card-light">Our pilot with local school districts started by uncovering hundreds of thousands in overbilling and inefficiency. Now our agentic platform takes it end-to-end: simulating fixes, dispatching agents to act on or delegate them, and verifying every dollar of savings shows up on the next bill.</p>
+        <div class="stats-grid" role="list">
+          <article class="stats-card card-dark" role="listitem" data-stat="schools">
+            <p class="stats-card__label">Schools</p>
+            <p class="stats-card__value">7</p>
+          </article>
+          <article class="stats-card card-dark" role="listitem" data-stat="districts">
+            <p class="stats-card__label">Districts</p>
+            <p class="stats-card__value">1</p>
+          </article>
+          <article class="stats-card card-dark" role="listitem" data-stat="usagePoints">
+            <p class="stats-card__label">Usage Points</p>
+            <p class="stats-card__value">16</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel container panel--team" id="team-section">
+        <div class="team-grid">
+          <h2 class="team-grid__title text-gradient section-title-line">Meet The Team</h2>
+          <article class="team-grid__card" data-member="hursh"></article>
+          <article class="team-grid__card" data-member="tanuj"></article>
+          <p class="team-grid__subtitle card-light">Edviro Energy is run by two passionate college students who grew fed up with seeing their hometown high schools lose thousands of valuable tax payer money to inefficiences, overbillings, and simple oversights that can be fixed with proper dashboarding and modern day API tools</p>
+        </div>
+      </section>
+
+      <section class="panel container panel--contact" id="contact-section" aria-label="Partnership invitations">
+        <div class="contact-showcase">
+          <h2 class="contact-showcase__title text-gradient section-title-line">Contact Us</h2>
+
+          <div class="energy-meter-wrapper" id="energy-meter-wrapper">
+            <div class="energy-meter card-dark" id="energy-meter" aria-label="Live energy consumption dashboard">
+              <p class="energy-meter__eyebrow">Dashboard</p>
+              <div class="energy-chart-wrap">
+                <svg class="energy-chart" id="energy-chart" viewBox="0 0 400 150" preserveAspectRatio="none" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="fill-hvac" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="var(--green-400)" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="var(--green-400)" stop-opacity="0"/>
+                    </linearGradient>
+                    <linearGradient id="fill-lighting" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="var(--green-200)" stop-opacity="0.22"/>
+                      <stop offset="100%" stop-color="var(--green-200)" stop-opacity="0"/>
+                    </linearGradient>
+                    <linearGradient id="fill-equipment" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="var(--green-600)" stop-opacity="0.26"/>
+                      <stop offset="100%" stop-color="var(--green-600)" stop-opacity="0"/>
+                    </linearGradient>
+                    <filter id="glow-hvac" x="-10%" y="-100%" width="120%" height="300%">
+                      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <filter id="glow-lighting" x="-10%" y="-100%" width="120%" height="300%">
+                      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <filter id="glow-equipment" x="-10%" y="-100%" width="120%" height="300%">
+                      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <clipPath id="chart-clip">
+                      <rect id="chart-clip-rect" x="0" y="-10" width="0" height="170"/>
+                    </clipPath>
+                  </defs>
+                  <line class="chart-grid" x1="0" y1="37" x2="400" y2="37"/>
+                  <line class="chart-grid" x1="0" y1="75" x2="400" y2="75"/>
+                  <line class="chart-grid" x1="0" y1="113" x2="400" y2="113"/>
+                  <line class="chart-grid chart-grid--v" x1="100" y1="-10" x2="100" y2="160"/>
+                  <line class="chart-grid chart-grid--v" x1="200" y1="-10" x2="200" y2="160"/>
+                  <line class="chart-grid chart-grid--v" x1="300" y1="-10" x2="300" y2="160"/>
+                  <g clip-path="url(#chart-clip)">
+                    <path class="chart-area chart-area--equipment" id="area-equipment" fill="url(#fill-equipment)"/>
+                    <path class="chart-area chart-area--lighting" id="area-lighting" fill="url(#fill-lighting)"/>
+                    <path class="chart-area chart-area--hvac" id="area-hvac" fill="url(#fill-hvac)"/>
+                    <path class="chart-curve chart-curve--equipment" id="curve-equipment" fill="none"/>
+                    <path class="chart-curve chart-curve--lighting" id="curve-lighting" fill="none"/>
+                    <path class="chart-curve chart-curve--hvac" id="curve-hvac" fill="none"/>
+                  </g>
+                </svg>
+              </div>
+              <div class="energy-legend">
+                <button class="energy-legend-item" data-curve="hvac" type="button">
+                  <span class="energy-legend-item__swatch energy-legend-item__swatch--hvac"></span>
+                  <span class="energy-legend-item__name">HVAC</span>
+                </button>
+                <button class="energy-legend-item" data-curve="lighting" type="button">
+                  <span class="energy-legend-item__swatch energy-legend-item__swatch--lighting"></span>
+                  <span class="energy-legend-item__name">Lighting</span>
+                </button>
+                <button class="energy-legend-item" data-curve="equipment" type="button">
+                  <span class="energy-legend-item__swatch energy-legend-item__swatch--equipment"></span>
+                  <span class="energy-legend-item__name">Equipment</span>
+                </button>
+              </div>
+              <p class="energy-meter__hint">Hover a category to isolate</p>
+            </div>
+          </div>
+
+          <article class="contact-card card-light">
+            <p class="contact-card__eyebrow">District Partnerships</p>
+            <p class="contact-card__desc">We're expanding to our first clients and are looking for forward-thinking school districts to join our mission of agentic energy optimization.</p>
+            <p class="contact-card__desc contact-card__desc--strong">Be part of the next generation of agentic energy management for schools.</p>
+            <p class="contact-card__email">partnerships@edviroenergy.com</p>
+            <a class="contact-card__email-btn" href="mailto:partnerships@edviroenergy.com">Email Us</a>
+          </article>
+        </div>
       </section>
     </main>
 
-    <footer class="m-footer">
-      <p>&copy; 2026 Edviro Energy. All rights reserved.</p>
+    <footer class="site-footer">
+      <p class="site-footer__text">&copy; 2026 Edviro Energy. All rights reserved.</p>
     </footer>
 
-    <script type="module" src="/src/mobile.js"></script>
+    <script type="module" src="/src/main-mobile.js"></script>
   </body>
 </html>
