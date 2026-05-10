@@ -239,12 +239,12 @@ const WIRE_AMP  = 0.65;
 const WIRE_CENTER_X = 0.5;
 
 const WIRE_DOC_STEP = 0.0005;
-const WIRE_INITIAL_REACH = 0.182;
+const WIRE_INITIAL_REACH = 0.187;
 const WIRE_SCROLL_DELAY = 0.16;
 
 const wireState = { progress: 0 };
 
-const WIRE_ORIGIN_DOC_Y = 0.35 * stableVH / Math.max(1, document.querySelector('#scroll-wrapper')?.scrollHeight || stableVH);
+const WIRE_ORIGIN_DOC_Y = 0.45 * stableVH / Math.max(1, document.querySelector('#scroll-wrapper')?.scrollHeight || stableVH);
 
 const basePhase = Math.PI / 2 - WIRE_ORIGIN_DOC_Y * Math.PI * WIRE_FREQ;
 
@@ -319,8 +319,12 @@ function drawWires(time) {
   const wireEnd = revealFrac;
   if (wireEnd <= wireStart) return;
 
-  const firstStep = Math.ceil(wireStart / WIRE_DOC_STEP);
-  const lastStep = Math.floor(wireEnd / WIRE_DOC_STEP);
+  const drawStart = Math.max(wireStart, visTop);
+  const drawEnd   = Math.min(wireEnd,   visBottom);
+  if (drawEnd <= drawStart) return;
+
+  const firstStep = Math.ceil(drawStart / WIRE_DOC_STEP);
+  const lastStep  = Math.floor(drawEnd  / WIRE_DOC_STEP);
 
   const midDocY = (wireStart + wireEnd) * 0.5;
   const midScreenFrac = Math.max(0, Math.min(1, (midDocY - visTop) / visRange));
@@ -338,11 +342,6 @@ function drawWires(time) {
     for (let step = firstStep; step <= lastStep; step++) {
       const docY = step * WIRE_DOC_STEP;
       const screenFrac = (docY - visTop) / visRange;
-
-      if (screenFrac < 0 || screenFrac > 1) {
-        started = false;
-        continue;
-      }
 
       const wx = wireX(docY, wire.xShift, wire.phaseOffset);
       const cx = wx * W;
@@ -909,9 +908,8 @@ if (joinPanel && energyMeterEl) {
     });
   });
 
-  // Energy meter is hidden on mobile (display:none), skip continuous updates
-
-  // Tilt effect removed on mobile — energy meter is hidden and mouse events are irrelevant
+  // Energy meter is hidden
+  // Tilt effect is hidden
 }
 
 // --- Resize ---
@@ -935,7 +933,7 @@ window.addEventListener('resize', () => {
 
 
 // --- Main tick ---
-gsap.ticker.lagSmoothing(500, 33);
+gsap.ticker.lagSmoothing(100, 16);
 
 let lastCounterVisible = false;
 gsap.ticker.add((time) => {
