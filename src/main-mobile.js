@@ -238,8 +238,8 @@ const WIRE_FREQ = 8;
 const WIRE_AMP  = 0.65;
 const WIRE_CENTER_X = 0.5;
 
-const WIRE_DOC_STEP = 0.002;
-const WIRE_INITIAL_REACH = 0.195;
+const WIRE_DOC_STEP = 0.0005;
+const WIRE_INITIAL_REACH = 0.182;
 const WIRE_SCROLL_DELAY = 0.16;
 
 const wireState = { progress: 0 };
