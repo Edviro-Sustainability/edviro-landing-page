@@ -135,8 +135,8 @@ if (sceneCardsOverlay && sceneCards.length === 3) {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      minHeight: '90vh',
-      padding: '8rem 1rem 2rem',
+      minHeight: '55vh',
+      padding: '3rem 1rem 2rem',
     });
     wrapper.appendChild(card);
     if (insertRef) {
@@ -234,13 +234,13 @@ fetch('/site-config.json')
 const GREEN_BASE = [0x0f / 255, 0x83 / 255, 0x39 / 255]; // #0f8339
 const GREEN_HOT  = [0x54 / 255, 0xd3 / 255, 0x6b / 255]; // #54d36b
 
-const WIRE_FREQ = 8;
+const WIRE_FREQ = 9;
 const WIRE_AMP  = 0.65;
 const WIRE_CENTER_X = 0.5;
 
 const WIRE_DOC_STEP = 0.0005;
-const WIRE_INITIAL_REACH = 0.187;
-const WIRE_SCROLL_DELAY = 0.16;
+const WIRE_INITIAL_REACH = 0.19;
+const WIRE_SCROLL_DELAY = 0.12;
 
 const wireState = { progress: 0 };
 
@@ -710,7 +710,7 @@ if (sceneCardWrappers.length === 3) {
 
     gsap.set(card, { autoAlpha: 0, xPercent: xOffset, force3D: true });
 
-    const startOffset = 30 - i * 5;
+    const startOffset = i === 0 ? 30 : 55 + (i - 1) * 5;
     const endOffset = startOffset - 40;
     gsap.to(card, {
       autoAlpha: 1,
