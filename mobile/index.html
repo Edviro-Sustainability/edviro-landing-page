@@ -32,13 +32,10 @@
 
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="manifest" href="/site.webmanifest">
-
-    <link rel="preconnect" href="https://dash.edviroenergy.com" />
-    <link rel="dns-prefetch" href="https://dash.edviroenergy.com" />
 
     <script type="application/ld+json">
     {
@@ -126,70 +123,118 @@
           "provider": { "@id": "https://edviroenergy.com/#organization" }
         },
         {
-          "@type": "Service",
-          "name": "Identify — Energy Optimization Discovery",
-          "serviceType": "Energy Auditing",
-          "description": "Stream 15-minute interval data into live dashboards, detect anomalies in real-time, and simulate operational and capital changes to surface the highest-value energy optimizations for school districts.",
-          "provider": { "@id": "https://edviroenergy.com/#organization" }
-        },
-        {
-          "@type": "Service",
-          "name": "Delegate — Agentic Action and Work Order Routing",
-          "serviceType": "Facilities Management Automation",
-          "description": "Dispatch AI agents to directly resolve setpoint, schedule, and tariff fixes, or route context-rich work orders to the right facilities staff and vendors when human action is required.",
-          "provider": { "@id": "https://edviroenergy.com/#organization" }
-        },
-        {
-          "@type": "Service",
-          "name": "Verify — Measurement and Verification (M&V)",
-          "serviceType": "Energy Savings Verification",
-          "description": "Measurement and verification closes the loop, comparing pre- and post-action interval consumption data to confirm each delegated action delivers real, measurable savings on the next utility bill.",
-          "provider": { "@id": "https://edviroenergy.com/#organization" }
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is agentic energy management?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Agentic energy management uses AI agents to autonomously identify, act on, and verify energy optimizations — rather than simply presenting a dashboard for humans to review. Edviro's agents can directly fix HVAC setpoints, adjust equipment schedules, and correct tariff configurations without human intervention, or escalate to the appropriate facilities staff with full context when human judgment is needed."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does Edviro differ from traditional energy management software?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Traditional energy management software provides dashboards and alerts — a human still has to review findings and manually act. Edviro automates the full cycle: AI agents act on identified optimizations, route work orders to the right people, and verify that savings actually materialize on utility bills through measurement and verification (M&V). The result is end-to-end automation rather than a monitoring tool."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What types of energy savings does Edviro identify for school districts?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Edviro identifies savings across HVAC setpoints and scheduling, lighting controls, plug-load equipment scheduling, demand charge optimization, tariff rate corrections, and utility overbilling detection. During the pilot phase, overbilling corrections alone uncovered hundreds of thousands of dollars in recoverable costs across a small number of school campuses."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What is measurement and verification (M&V) in energy management?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Measurement and verification (M&V) is the process of confirming that energy-saving actions produced measurable reductions on utility bills. After an agent acts on an optimization, Edviro's platform compares pre- and post-action interval consumption data against a baseline to calculate realized kWh and dollar savings, verified against the actual utility bill."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does Edviro detect utility overbilling for schools?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Edviro ingests 15-minute interval meter data and reconciles it against the district's tariff schedules and rate structures. Discrepancies between metered consumption and billed charges surface automatically as billing anomalies, which are then investigated and resolved through the platform's delegation workflow. Over $400,000 in overbilling was uncovered during the pilot phase."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How can a school district get started with Edviro?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "School districts can schedule a 30-minute consultation at https://edviroenergy.com/consultation or email partnerships@edviroenergy.com. Edviro is currently expanding beyond its initial pilot and is onboarding forward-thinking districts interested in agentic energy optimization."
+              }
+            }
+          ]
         }
       ]
     }
     </script>
-
-    <style>
-      body.is-site-loading {
-        background: #f7f8f7;
-      }
-      body.is-site-loading > *:not(.site-loader) {
-        opacity: 0 !important;
-        visibility: hidden !important;
-      }
-      body.is-site-loading .site-loader {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100vw; height: 100vh;
-        z-index: 4;
-        display: grid;
-        place-items: center;
-        opacity: 1 !important;
-        visibility: visible !important;
-      }
-      .site-loader__spinner {
-        width: 2.8rem; height: 2.8rem;
-        border: 3px solid rgba(17, 23, 17, 0.3);
-        border-top-color: #16a34a;
-        border-radius: 50%;
-        animation: _ldr 900ms linear infinite;
-      }
-      @keyframes _ldr {
-        to { transform: rotate(360deg); }
-      }
-    </style>
   </head>
   <body class="is-site-loading">
 
+    <noscript>
+      <div style="max-width:760px;margin:2rem auto;padding:1.5rem;font-family:system-ui,sans-serif;line-height:1.6;color:#111">
+        <h1>Edviro &mdash; Agentic Energy Management for School Districts</h1>
+        <p>Edviro is a B2B SaaS platform that helps K-12 school districts identify, delegate, and verify energy savings using AI agents and facilities staff collaboration. Over $400,000 in savings verified during the pilot phase.</p>
+
+        <h2>How It Works: The Three-Phase Pipeline</h2>
+
+        <h3>1. Identify</h3>
+        <p>Stream 15-minute interval utility data into live dashboards, detect anomalies in real-time, and simulate operational and capital changes to surface the highest-value energy optimizations. Edviro finds savings opportunities in HVAC scheduling, lighting controls, equipment runtime, demand charges, tariff structures, and utility overbilling.</p>
+
+        <h3>2. Delegate</h3>
+        <p>Dispatch AI agents to directly resolve setpoint, schedule, and tariff fixes, or route context-rich work orders to the right facilities staff and vendors when human action is needed. Agents act autonomously on approved optimization categories and escalate everything else with full context attached.</p>
+
+        <h3>3. Verify (Measurement &amp; Verification)</h3>
+        <p>Measurement and verification (M&amp;V) closes the loop. After each action, Edviro compares pre- and post-action interval consumption data against a baseline to calculate realized kWh and dollar savings, confirmed against the actual utility bill. Every dollar claimed is backed by data.</p>
+
+        <h2>Platform Statistics</h2>
+        <ul>
+          <li><strong>7 schools</strong> (sites) currently monitored</li>
+          <li><strong>1 district partner</strong></li>
+          <li><strong>16 usage point meters</strong> tracked</li>
+          <li><strong>Over $400,000 in savings</strong> identified and verified during pilot</li>
+        </ul>
+
+        <h2>Frequently Asked Questions</h2>
+
+        <h3>What is agentic energy management?</h3>
+        <p>Agentic energy management uses AI agents to autonomously identify, act on, and verify energy optimizations &mdash; rather than simply presenting a dashboard for humans to review. Edviro's agents can directly fix HVAC setpoints, adjust equipment schedules, and correct tariff configurations, or escalate to facilities staff with full context when human judgment is needed.</p>
+
+        <h3>How does Edviro differ from traditional energy management software?</h3>
+        <p>Traditional energy management software provides dashboards and alerts &mdash; humans still have to review findings and manually act. Edviro automates the full cycle: AI agents act on identified optimizations, route work orders to the right people, and verify that savings materialize on utility bills through M&amp;V.</p>
+
+        <h3>How does Edviro detect utility overbilling?</h3>
+        <p>Edviro ingests 15-minute interval meter data and reconciles it against the district's tariff schedules and rate structures. Discrepancies between metered consumption and billed charges surface automatically as billing anomalies. During the pilot, overbilling detection alone uncovered over $400,000 in recoverable costs.</p>
+
+        <h2>About Edviro</h2>
+        <p>Edviro Energy was founded in 2025 by Hursh Shah (energy systems and data analytics) and Tanuj Siripurapu (full-stack software engineering) &mdash; two college students who grew fed up watching their hometown high schools lose thousands of dollars to energy inefficiencies, overbilling, and operational oversights.</p>
+
+        <h2>Contact &amp; Partnerships</h2>
+        <ul>
+          <li>Email: <a href="mailto:partnerships@edviroenergy.com">partnerships@edviroenergy.com</a></li>
+          <li>Schedule a consultation: <a href="https://edviroenergy.com/consultation">edviroenergy.com/consultation</a></li>
+          <li>Dashboard: <a href="https://dash.edviroenergy.com">dash.edviroenergy.com</a></li>
+        </ul>
+      </div>
+    </noscript>
 
     <canvas id="webgl"></canvas>
-    
+
     <div id="site-loader" class="site-loader" role="status" aria-live="polite" aria-label="Loading site">
       <span class="site-loader__spinner" aria-hidden="true"></span>
     </div>
-    
-    <div class="scroll-phrase" role="presentation">
+
+    <div class="scroll-phrase" aria-hidden="true">
       <p class="scroll-phrase__line">
         <span class="scroll-phrase__row">
           <span class="scroll-phrase__word">Take</span>
@@ -219,7 +264,7 @@
         <span class="team-card__dot" aria-hidden="true"></span>
       </button>
     </div>
-    
+
     <nav class="site-nav" id="site-nav" aria-label="Site navigation">
       <div class="site-nav__brand" aria-hidden="true">
         <span class="nav-brand">Edviro</span>
@@ -250,67 +295,6 @@
       </div>
     </nav>
 
-    <noscript>
-      <div style="max-width:760px;margin:2rem auto;padding:1.5rem;font-family:system-ui,sans-serif;line-height:1.6;color:#111">
-        <h1>Edviro &mdash; Agentic Energy Management for School Districts</h1>
-        <p>Edviro is a B2B SaaS platform that helps K-12 school districts identify, delegate, and verify energy savings using AI agents and facilities staff collaboration. Over $400,000 in savings verified during the pilot phase.</p>
-
-        <h2>How It Works: The Three-Phase Pipeline</h2>
-
-        <h3>1. Identify</h3>
-        <p>Stream 15-minute interval utility data into live dashboards, detect anomalies in real-time, and simulate operational and capital changes to surface the highest-value energy optimizations. Edviro finds savings opportunities in HVAC scheduling, lighting controls, equipment runtime, demand charges, tariff structures, and utility overbilling.</p>
-
-        <h3>2. Delegate</h3>
-        <p>Dispatch AI agents to directly resolve setpoint, schedule, and tariff fixes, or route context-rich work orders to the right facilities staff and vendors when human action is needed. Agents act autonomously on approved optimization categories and escalate everything else with full context attached.</p>
-
-        <h3>3. Verify (Measurement &amp; Verification)</h3>
-        <p>Measurement and verification (M&amp;V) closes the loop. After each action, Edviro compares pre- and post-action interval consumption data against a baseline to calculate realized kWh and dollar savings, confirmed against the actual utility bill. Every dollar claimed is backed by data.</p>
-
-        <h2>Platform Statistics</h2>
-        <ul>
-          <li><strong>7 schools</strong> (sites) currently monitored</li>
-          <li><strong>1 district partner</strong></li>
-          <li><strong>16 usage point meters</strong> tracked</li>
-          <li><strong>Over $400,000 in savings</strong> identified and verified during pilot</li>
-        </ul>
-
-        <h2>Use Cases</h2>
-        <ul>
-          <li><strong>HVAC optimization</strong> &mdash; Detect and correct setpoints running outside programmed schedules; identify equipment operating after occupancy hours</li>
-          <li><strong>Utility overbilling detection</strong> &mdash; Reconcile 15-minute interval meter data against tariff schedules to find billing anomalies and demand charge overcharges</li>
-          <li><strong>Schedule optimization</strong> &mdash; Align equipment operation with actual occupancy patterns across all campuses</li>
-          <li><strong>Work order automation</strong> &mdash; Generate evidence-backed work orders and verify that vendor-completed work delivered the promised savings</li>
-          <li><strong>District-wide reporting</strong> &mdash; Track kWh and dollar savings across all sites from a single dashboard</li>
-        </ul>
-
-        <h2>Frequently Asked Questions</h2>
-
-        <h3>What is agentic energy management?</h3>
-        <p>Agentic energy management uses AI agents to autonomously identify, act on, and verify energy optimizations &mdash; rather than simply presenting a dashboard for humans to review. Edviro's agents can directly fix HVAC setpoints, adjust equipment schedules, and correct tariff configurations, or escalate to facilities staff with full context when human judgment is needed.</p>
-
-        <h3>How does Edviro differ from traditional energy management software?</h3>
-        <p>Traditional energy management software provides dashboards and alerts &mdash; humans still have to review findings and manually act. Edviro automates the full cycle: AI agents act on identified optimizations, route work orders to the right people, and verify that savings materialize on utility bills through M&amp;V. The result is end-to-end automation rather than a monitoring tool.</p>
-
-        <h3>How does Edviro detect utility overbilling?</h3>
-        <p>Edviro ingests 15-minute interval meter data and reconciles it against the district's tariff schedules and rate structures. Discrepancies between metered consumption and billed charges surface automatically as billing anomalies. During the pilot, overbilling detection alone uncovered over $400,000 in recoverable costs.</p>
-
-        <h3>What is measurement and verification (M&amp;V)?</h3>
-        <p>M&amp;V is the process of confirming that energy-saving actions produced measurable reductions on utility bills. Edviro compares pre- and post-action interval consumption data against a baseline to calculate realized kWh and dollar savings, verified against the actual utility bill &mdash; not just modeled estimates.</p>
-
-        <h2>About Edviro</h2>
-        <p>Edviro Energy was founded in 2025 by two college students &mdash; Hursh Shah (energy systems and data analytics) and Tanuj Siripurapu (full-stack software engineering) &mdash; who grew fed up watching their hometown high schools lose thousands of dollars to energy inefficiencies, overbilling, and operational oversights that modern software and API tools could fix.</p>
-        <p>The pilot with local school districts uncovered hundreds of thousands of dollars in overbilling and inefficiency. The agentic platform now handles the full cycle end-to-end.</p>
-
-        <h2>Contact &amp; Partnerships</h2>
-        <p>Edviro is currently expanding to its first client districts and is looking for forward-thinking school districts to join the mission of agentic energy optimization.</p>
-        <ul>
-          <li>Email: <a href="mailto:partnerships@edviroenergy.com">partnerships@edviroenergy.com</a></li>
-          <li>Schedule a 30-minute consultation: <a href="https://edviroenergy.com/consultation">edviroenergy.com/consultation</a></li>
-          <li>Dashboard: <a href="https://dash.edviroenergy.com">dash.edviroenergy.com</a></li>
-        </ul>
-      </div>
-    </noscript>
-
     <main id="content">
       <section class="panel">
         <h1 class="title" aria-label="Edviro Agentic Energy Management">
@@ -322,63 +306,61 @@
           </span>
         </h1>
       </section>
-      
-      <div class="scene-cards-overlay" role="region" aria-label="Agentic energy pipeline">
+
+      <div class="scene-cards-overlay" aria-hidden="true">
         <article class="scene-card card-dark scene-card--one">
-          <h3 class="scene-card__label">Identify</h3>
+          <p class="scene-card__label">Identify</p>
           <p class="scene-card__sublabel">We watch your live data, catch the anomalies, and simulate fixes to find the ones worth doing.</p>
         </article>
         <article class="scene-card card-dark scene-card--two">
-          <h3 class="scene-card__label">Delegate</h3>
+          <p class="scene-card__label">Delegate</p>
           <p class="scene-card__sublabel">Agents act on the fix, or hand it to the right person with all the context they need.</p>
         </article>
         <article class="scene-card card-dark scene-card--three">
-          <h3 class="scene-card__label">Verify</h3>
+          <p class="scene-card__label">Verify</p>
           <p class="scene-card__sublabel">M&amp;V confirms the savings actually show up on the next bill.</p>
         </article>
       </div>
-      
-      <section class="panel invisible" id="services-section" aria-label="Services"></section>
+
+      <section class="panel invisible" id="services-section"></section>
 
       <div id="mobile-counter" class="mobile-counter" aria-hidden="true">
         <p class="mobile-counter__line">over</p>
         <p class="mobile-counter__line">$400k</p>
         <p class="mobile-counter__line">saved</p>
-     </div>
-      
+      </div>
+
       <section class="panel container panel--stats" id="about-section" aria-label="District footprint summary">
-        <h2 class="sr-only">About Edviro</h2>
-        <p class="insight-card card-light"> Our pilot with local school districts started by uncovering hundreds of thousands in overbilling and inefficiency. Now our agentic platform takes it end-to-end: simulating fixes, dispatching agents to act on or delegate them, and verifying every dollar of savings shows up on the next bill.
-        </p>
+        <p class="insight-card card-light">Our pilot with local school districts started by uncovering hundreds of thousands in overbilling and inefficiency. Now our agentic platform takes it end-to-end: simulating fixes, dispatching agents to act on or delegate them, and verifying every dollar of savings shows up on the next bill.</p>
         <div class="stats-grid" role="list">
           <article class="stats-card card-dark" role="listitem" data-stat="schools">
             <p class="stats-card__label">Schools</p>
-            <p class="stats-card__value">7 <span class="stats-card__unit">Sites</span></p>
+            <p class="stats-card__value">7</p>
           </article>
           <article class="stats-card card-dark" role="listitem" data-stat="districts">
             <p class="stats-card__label">Districts</p>
-            <p class="stats-card__value">1 <span class="stats-card__unit">Partners</span></p>
+            <p class="stats-card__value">1</p>
           </article>
           <article class="stats-card card-dark" role="listitem" data-stat="usagePoints">
             <p class="stats-card__label">Usage Points</p>
-            <p class="stats-card__value">16 <span class="stats-card__unit">Meters</span></p>
+            <p class="stats-card__value">16</p>
           </article>
         </div>
       </section>
-      
-      <section class="panel container panel--team" id="team-section" aria-label="Our team">
+
+      <section class="panel container panel--team" id="team-section">
         <div class="team-grid">
           <h2 class="team-grid__title text-gradient section-title-line">Meet The Team</h2>
           <article class="team-grid__card" data-member="hursh"></article>
           <article class="team-grid__card" data-member="tanuj"></article>
-          <p class="team-grid__subtitle card-light">Edviro Energy is run by two passionate college students who grew fed up with seeing their hometown high schools lose thousands of valuable taxpayer money to inefficiencies, overbillings, and simple oversights that can be fixed with proper dashboarding and modern-day API tools.</p>
+          <p class="team-grid__subtitle card-light">Edviro Energy is run by two passionate college students who grew fed up with seeing their hometown high schools lose thousands of valuable tax payer money to inefficiences, overbillings, and simple oversights that can be fixed with proper dashboarding and modern day API tools</p>
         </div>
       </section>
-      
+
       <section class="panel container panel--contact" id="contact-section" aria-label="Partnership invitations">
         <div class="contact-showcase">
           <h2 class="contact-showcase__title text-gradient section-title-line">Contact Us</h2>
-          
+
           <div class="energy-meter-wrapper" id="energy-meter-wrapper">
             <div class="energy-meter card-dark" id="energy-meter" aria-label="Live energy consumption dashboard">
               <p class="energy-meter__eyebrow">Dashboard</p>
@@ -443,6 +425,7 @@
                   <span class="energy-legend-item__name">Equipment</span>
                 </button>
               </div>
+              <p class="energy-meter__hint">Hover a category to isolate</p>
             </div>
           </div>
 
@@ -451,16 +434,16 @@
             <p class="contact-card__desc">We're expanding to our first clients and are looking for forward-thinking school districts to join our mission of agentic energy optimization.</p>
             <p class="contact-card__desc contact-card__desc--strong">Be part of the next generation of agentic energy management for schools.</p>
             <p class="contact-card__email">partnerships@edviroenergy.com</p>
-            <a class="contact-card__email-btn" href="https://calendly.com/tanuj-edviroenergy/30min" target="_blank" rel="noopener noreferrer" aria-label="Schedule a 30-minute call with Edviro Energy">Schedule a call</a>
+            <a class="contact-card__email-btn" href="mailto:partnerships@edviroenergy.com">Email Us</a>
           </article>
         </div>
       </section>
     </main>
-    
-    <footer class="site-footer" role="contentinfo">
+
+    <footer class="site-footer">
       <p class="site-footer__text">&copy; 2026 Edviro Energy. All rights reserved.</p>
     </footer>
 
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/main-mobile.js"></script>
   </body>
 </html>

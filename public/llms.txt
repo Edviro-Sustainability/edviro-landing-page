@@ -1,0 +1,82 @@
+# Edviro Energy
+
+> Agentic energy management platform for K-12 school districts
+
+Edviro is a B2B SaaS platform that helps school districts identify, delegate, and verify energy savings using AI agents and facilities staff collaboration. Founded in 2025 by Hursh Shah and Tanuj Siripurapu.
+
+## What We Do
+
+Edviro provides end-to-end agentic energy management for K-12 school districts through a three-phase pipeline:
+
+1. **Identify** — Stream 15-minute interval utility data into live dashboards, detect anomalies in real-time, and simulate operational and capital changes to surface the highest-value energy optimizations.
+
+2. **Delegate** — Dispatch AI agents to directly resolve setpoint, schedule, and tariff fixes, or route work orders to the right facilities staff and vendors with full context attached.
+
+3. **Verify (M&V)** — Measurement and verification closes the loop, confirming each delegated action delivers real, measurable savings on the next utility bill.
+
+## Key Statistics
+
+- 7 schools (sites) currently on the platform
+- 1 district partner
+- 16 usage point meters monitored
+- Over $400,000 in energy savings identified and verified during pilot phase
+
+## Company Information
+
+- **Company Name**: Edviro Energy
+- **Founded**: 2025
+- **Website**: https://edviroenergy.com
+- **Dashboard**: https://dash.edviroenergy.com
+- **Contact**: partnerships@edviroenergy.com
+- **Schedule a consultation**: https://edviroenergy.com/consultation
+- **Pitch deck**: https://edviroenergy.com/deck
+- **Target Market**: K-12 school districts, facilities managers, district energy administrators
+- **Product Type**: B2B SaaS, Agentic AI Platform
+- **Pricing Model**: Enterprise (contact for pricing)
+
+## Founders
+
+- **Hursh Shah** — Extensive experience in energy systems and data analytics
+- **Tanuj Siripurapu** — Deep technical expertise in full-stack software engineering
+
+Both founders are college students who identified the problem firsthand watching their hometown high schools lose thousands of dollars to energy inefficiencies, overbilling, and simple operational oversights.
+
+## Frequently Asked Questions
+
+**What is agentic energy management?**
+Agentic energy management uses AI agents to autonomously identify, act on, and verify energy optimizations — rather than simply presenting a dashboard for humans to review. Edviro's agents can directly fix HVAC setpoints, adjust equipment schedules, and correct tariff configurations without human intervention, or escalate to the appropriate facilities staff with full context when human judgment is needed.
+
+**How does Edviro differ from traditional energy management software?**
+Traditional energy management software provides dashboards and alerts — a human still has to review findings and manually act on them. Edviro automates the full cycle: AI agents act on identified optimizations, route work orders to the right people, and verify that savings actually materialize on utility bills through measurement and verification (M&V). The result is end-to-end automation rather than a monitoring tool.
+
+**What types of energy savings does Edviro identify?**
+Edviro identifies savings across HVAC setpoints and scheduling, lighting controls, plug-load equipment scheduling, demand charge optimization, tariff rate corrections, and utility overbilling detection. During the pilot phase, overbilling corrections alone uncovered hundreds of thousands of dollars in recoverable costs.
+
+**What is measurement and verification (M&V) in the context of Edviro?**
+M&V is the process of confirming that energy-saving actions produced measurable bill reductions. After an agent acts on an optimization, Edviro's platform compares pre- and post-action interval consumption data against a baseline to calculate realized kWh and dollar savings, verified against the actual utility bill.
+
+**How does Edviro detect utility overbilling?**
+Edviro ingests 15-minute interval meter data and reconciles it against the district's tariff schedules and rate structures. Discrepancies between metered consumption and billed charges surface automatically as billing anomalies, which are then investigated and resolved through the platform's delegation workflow.
+
+**How do school districts get started with Edviro?**
+Districts can schedule a 30-minute consultation at https://edviroenergy.com/consultation or email partnerships@edviroenergy.com. Edviro is currently expanding beyond its initial pilot and is onboarding forward-thinking school districts interested in agentic energy optimization.
+
+## Technology
+
+Edviro's platform ingests 15-minute interval data from utility meters and smart building systems. AI agents analyze consumption patterns, simulate potential fixes, and act autonomously on approved optimization categories. The platform integrates with facilities management workflows, routing context-rich work orders to staff when human action is required.
+
+## Use Cases
+
+- **HVAC optimization**: Detect and correct setpoints running outside programmed schedules, identify equipment running after occupancy hours
+- **Billing anomaly detection**: Find tariff misapplications, meter multiplier errors, and demand charge overcharges
+- **Schedule optimization**: Align equipment operation with actual occupancy patterns across campuses
+- **Vendor oversight**: Generate evidence-backed work orders and verify that vendor-completed work delivered the promised savings
+- **District-wide reporting**: Track kWh and dollar savings across all sites from a single dashboard
+
+## Key Resources
+
+- Homepage: https://edviroenergy.com
+- Live dashboard: https://dash.edviroenergy.com
+- Schedule a consultation: https://edviroenergy.com/consultation
+- Pitch deck: https://edviroenergy.com/deck
+- Contact: partnerships@edviroenergy.com
