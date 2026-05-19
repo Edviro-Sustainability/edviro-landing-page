@@ -43,12 +43,12 @@ Object.assign(scrollWrapper.style, {
   height: '100vh',
   overflowX: 'hidden',
   overflowY: 'auto',
-  WebkitOverflowScrolling: 'touch',
 });
 Object.assign(document.documentElement.style, { overflow: 'hidden', height: '100%' });
 Object.assign(document.body.style, { overflow: 'hidden', height: '100%' });
 
 ScrollTrigger.defaults({ scroller: scrollWrapper });
+ScrollTrigger.normalizeScroll({ target: scrollWrapper, momentum: 0.1 });
 ScrollTrigger.scrollerProxy(scrollWrapper, {
   scrollTop(value) {
     if (arguments.length) { scrollWrapper.scrollTop = value; }
