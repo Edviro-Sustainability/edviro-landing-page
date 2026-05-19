@@ -58,7 +58,11 @@ ScrollTrigger.scrollerProxy(scrollWrapper, {
     return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
   },
 });
-scrollWrapper.addEventListener('scroll', () => ScrollTrigger.update());
+let latestScrollTop = 0;
+scrollWrapper.addEventListener('scroll', () => {
+  latestScrollTop = scrollWrapper.scrollTop;
+  ScrollTrigger.update();
+});
 
 let stableVH = document.documentElement.clientHeight || window.innerHeight;
 // Use large viewport on iOS so the site extends behind Safari's address bar
@@ -239,12 +243,12 @@ const WIRE_AMP  = 0.65;
 const WIRE_CENTER_X = 0.5;
 
 const WIRE_DOC_STEP = 0.0005;
-const WIRE_INITIAL_REACH = 0.19;
 const WIRE_SCROLL_DELAY = 0.12;
 
 const wireState = { progress: 0 };
 
 const WIRE_ORIGIN_DOC_Y = 0.45 * stableVH / Math.max(1, document.querySelector('#scroll-wrapper')?.scrollHeight || stableVH);
+const WIRE_INITIAL_REACH = WIRE_ORIGIN_DOC_Y + 1 / WIRE_FREQ;
 
 const basePhase = Math.PI / 2 - WIRE_ORIGIN_DOC_Y * Math.PI * WIRE_FREQ;
 
@@ -281,7 +285,7 @@ function resizeWireCanvas() {
   if (!wireCanvas) return;
   const dpr = Math.min(devicePixelRatio, 1.5);
   const w = window.innerWidth;
-  const h = stableVH;
+  const h = scrollWrapper?.clientHeight || stableVH;
   if (wireCanvas.width === Math.round(w * dpr) && wireCanvas.height === Math.round(h * dpr)) return;
   wireCanvas.width = Math.round(w * dpr);
   wireCanvas.height = Math.round(h * dpr);
@@ -299,8 +303,8 @@ function drawWires(time) {
 
   wireCtx.clearRect(0, 0, W, H);
 
-  const scrollY = scrollWrapper.scrollTop || 0;
-  const viewH = stableVH;
+  const scrollY = latestScrollTop;
+  const viewH = scrollWrapper.clientHeight || stableVH;
   const docH = Math.max(1, scrollWrapper.scrollHeight);
   const maxDocScroll = Math.max(1, docH - viewH);
   const scrollFrac = scrollY / maxDocScroll;
@@ -345,7 +349,7 @@ function drawWires(time) {
 
       const wx = wireX(docY, wire.xShift, wire.phaseOffset);
       const cx = wx * W;
-      const cy = screenFrac * H;
+      const cy = screenFrac * viewH * dpr;
 
       if (!started) {
         wireCtx.moveTo(cx, cy);
@@ -918,9 +922,10 @@ window.addEventListener('resize', () => {
   clearTimeout(resizeDebounce);
   resizeDebounce = setTimeout(() => {
     const currentWidth = window.innerWidth;
-    if (currentWidth !== lastKnownWidth) {
+    const currentHeight = scrollWrapper.clientHeight || window.innerHeight;
+    if (currentWidth !== lastKnownWidth || currentHeight !== stableVH) {
       lastKnownWidth = currentWidth;
-      stableVH = window.innerHeight;
+      stableVH = currentHeight;
       setStableVH();
     }
     resizeWireCanvas();
