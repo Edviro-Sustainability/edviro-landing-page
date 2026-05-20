@@ -253,9 +253,9 @@ const WIRE_INITIAL_REACH = WIRE_ORIGIN_DOC_Y + 1 / WIRE_FREQ;
 const basePhase = Math.PI / 2 - WIRE_ORIGIN_DOC_Y * Math.PI * WIRE_FREQ;
 
 const WIRE_BUNDLE = [
-  { xShift: -0.12, phaseOffset: basePhase,        width: 20 },
-  { xShift:  0.0,  phaseOffset: basePhase - 0.02, width: 20 },
-  { xShift:  0.12, phaseOffset: basePhase - 0.04, width: 20 },
+  { xShift: -0.12, phaseOffset: basePhase,        width: 20, pulsePhase: 0 },
+  { xShift:  0.0,  phaseOffset: basePhase - 0.02, width: 20, pulsePhase: (2 * Math.PI) / 3 },
+  { xShift:  0.12, phaseOffset: basePhase - 0.04, width: 20, pulsePhase: (4 * Math.PI) / 3 },
 ];
 
 function smoothstep(edge0, edge1, x) {
@@ -263,14 +263,11 @@ function smoothstep(edge0, edge1, x) {
   return t * t * (3 - 2 * t);
 }
 
-function shaderColor(px, py, time, W, H, docY) {
+function shaderColor(px, py, time, W, H, docY, pulsePhase) {
   const wx = (px / W) * 9;
   const wy = (docY != null ? docY : py / H) * 4;
-  const flow = (((wx + wy) * 0.42 - time * 0.2) % 1 + 1) % 1;
-  const bandA = smoothstep(0, 0.08, flow) * (1 - smoothstep(0.08, 0.26, flow));
-  const bandB = smoothstep(0.55, 0.72, flow) * (1 - smoothstep(0.72, 0.9, flow));
-  const pulse = 0.5 + 0.5 * Math.sin(time * 1.5 + wy * 2.2);
-  const glow = Math.max(bandA, Math.max(bandB, 0.45 * pulse));
+  const pulse = 0.5 + 0.5 * Math.sin(time * 2.5 + wy * 2.2 + (pulsePhase || 0));
+  const glow = 0.75 * pulse;
   const r = Math.round(GREEN_BASE[0] * 255 + (GREEN_HOT[0] - GREEN_BASE[0]) * 255 * glow);
   const g = Math.round(GREEN_BASE[1] * 255 + (GREEN_HOT[1] - GREEN_BASE[1]) * 255 * glow);
   const b = Math.round(GREEN_BASE[2] * 255 + (GREEN_HOT[2] - GREEN_BASE[2]) * 255 * glow);
@@ -339,7 +336,7 @@ function drawWires(time) {
     wireCtx.lineJoin = 'round';
 
     const midWx = wireX(midDocY, wire.xShift, wire.phaseOffset);
-    wireCtx.strokeStyle = shaderColor(midWx * W, midScreenFrac * H, time, W, H, midDocY);
+    wireCtx.strokeStyle = shaderColor(midWx * W, midScreenFrac * H, time, W, H, midDocY, wire.pulsePhase);
 
     wireCtx.beginPath();
     let started = false;
