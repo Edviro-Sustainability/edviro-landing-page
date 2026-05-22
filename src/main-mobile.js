@@ -363,7 +363,7 @@ function drawWires(time) {
 
   wireCtx.clearRect(0, 0, W, H);
 
-  const scrollY = canvasScrollTop;
+  const scrollY = latestScrollTop;
   const viewH = scrollWrapper.clientHeight || stableVH;
   const docH = Math.max(1, scrollWrapper.scrollHeight);
   const maxDocScroll = Math.max(1, docH - viewH);
@@ -1006,10 +1006,20 @@ window.addEventListener('resize', () => {
 // --- Main tick ---
 gsap.ticker.lagSmoothing(500, 33);
 
-const CANVAS_SCROLL_LERP = 0.25;
+const SCROLL_LERP = 0.25;
 let lastCounterVisible = false;
 gsap.ticker.add((time) => {
-  canvasScrollTop += (latestScrollTop - canvasScrollTop) * CANVAS_SCROLL_LERP;
+  const prev = _liveY;
+  if (_isTouching) {
+    _liveY += (_targetY - _liveY) * SCROLL_LERP;
+  } else {
+    _liveY = _targetY;
+  }
+  if (Math.abs(_liveY - prev) > 0.01) {
+    scrollWrapper.scrollTop = _liveY;
+    latestScrollTop = _liveY;
+    ScrollTrigger.update();
+  }
   drawWires(time);
 
   if (mobileCounterEl) {
