@@ -42,32 +42,84 @@ Object.assign(scrollWrapper.style, {
   width: '100vw',
   height: '100vh',
   overflowX: 'hidden',
-  overflowY: 'auto',
+  overflowY: 'hidden',
+  touchAction: 'none',
 });
 Object.assign(document.documentElement.style, { overflow: 'hidden', height: '100%' });
 Object.assign(document.body.style, { overflow: 'hidden', height: '100%' });
 
 ScrollTrigger.defaults({ scroller: scrollWrapper });
-ScrollTrigger.normalizeScroll({
-  target: scrollWrapper,
-  momentum: self => Math.min(4.5, 0.35 + Math.abs(self.velocityY) / 600),
-  speed: 1,
-});
+// --- Virtual smooth scroll ---
+let _targetY = 0;
+let _liveY = 0;
+let _isTouching = false;
+let _touchLastY = 0;
+let _touchVelY = 0;
+let _touchTime = 0;
+let _momentumTween = null;
+const getScrollMax = () => Math.max(0, scrollWrapper.scrollHeight - scrollWrapper.clientHeight);
+
+scrollWrapper.addEventListener('touchstart', (e) => {
+  _momentumTween?.kill();
+  _momentumTween = null;
+  _isTouching = true;
+  _touchLastY = e.touches[0].clientY;
+  _touchVelY = 0;
+  _touchTime = performance.now();
+}, { passive: true });
+
+scrollWrapper.addEventListener('touchmove', (e) => {
+  const y = e.touches[0].clientY;
+  const now = performance.now();
+  const dt = Math.max(1, now - _touchTime);
+  const delta = _touchLastY - y;
+  _touchVelY = _touchVelY * 0.65 + (delta / dt) * 0.35;
+  _touchLastY = y;
+  _touchTime = now;
+  _targetY = Math.max(0, Math.min(getScrollMax(), _targetY + delta));
+}, { passive: true });
+
+scrollWrapper.addEventListener('touchend', () => {
+  _isTouching = false;
+  _targetY = _liveY;
+  const vel = _touchVelY;
+  if (Math.abs(vel) < 0.04) return;
+  const dist = vel * 380;
+  const obj = { y: _targetY };
+  const endY = Math.max(0, Math.min(getScrollMax(), _targetY + dist));
+  _momentumTween = gsap.to(obj, {
+    y: endY,
+    duration: Math.min(2.2, 0.55 + Math.abs(vel) * 0.45),
+    ease: 'power4.out',
+    onUpdate() { _targetY = obj.y; },
+    onComplete() { _momentumTween = null; },
+  });
+}, { passive: true });
+
+scrollWrapper.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  _momentumTween?.kill();
+  _momentumTween = null;
+  _targetY = Math.max(0, Math.min(getScrollMax(), _targetY + e.deltaY));
+}, { passive: false });
+
 ScrollTrigger.scrollerProxy(scrollWrapper, {
   scrollTop(value) {
-    if (arguments.length) { scrollWrapper.scrollTop = value; }
-    return scrollWrapper.scrollTop;
+    if (arguments.length) {
+      _momentumTween?.kill();
+      _momentumTween = null;
+      _targetY = value;
+      _liveY = value;
+      scrollWrapper.scrollTop = value;
+    }
+    return _liveY;
   },
   getBoundingClientRect() {
     return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
   },
 });
+
 let latestScrollTop = 0;
-let canvasScrollTop = 0;
-scrollWrapper.addEventListener('scroll', () => {
-  latestScrollTop = scrollWrapper.scrollTop;
-  ScrollTrigger.update();
-}, { passive: true });
 
 let stableVH = document.documentElement.clientHeight || window.innerHeight;
 // Use large viewport on iOS so the site extends behind Safari's address bar
@@ -165,6 +217,12 @@ if (sceneCardsOverlay && sceneCards.length === 3) {
 }
 
 function resetScrollPosition() {
+  _momentumTween?.kill();
+  _momentumTween = null;
+  _targetY = 0;
+  _liveY = 0;
+  _isTouching = false;
+  latestScrollTop = 0;
   scrollWrapper.scrollTop = 0;
   window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   document.documentElement.scrollTop = 0;
@@ -636,13 +694,19 @@ maybeUnlockScroll();
       if (document.body.classList.contains('is-scroll-locked')) return;
       triggerFlow(activeNavIndex >= 0 ? activeNavIndex : i, i);
       setActiveNav(i);
-      if (i === 0) {
-        scrollWrapper.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+      const navTarget = i === 0 ? 0 : (navSections[i]?.offsetTop ?? 0);
+      _momentumTween?.kill();
+      if (prefersReducedMotion) {
+        _targetY = navTarget; _liveY = navTarget;
+        scrollWrapper.scrollTop = navTarget; latestScrollTop = navTarget;
+        ScrollTrigger.update();
       } else {
-        const section = navSections[i];
-        if (!section) return;
-        const top = section.offsetTop;
-        scrollWrapper.scrollTo({ top, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+        const navObj = { y: _liveY };
+        _momentumTween = gsap.to(navObj, {
+          y: navTarget, duration: 0.75, ease: 'power3.inOut',
+          onUpdate() { _targetY = navObj.y; },
+          onComplete() { _momentumTween = null; },
+        });
       }
     });
   });
