@@ -48,7 +48,11 @@ Object.assign(document.documentElement.style, { overflow: 'hidden', height: '100
 Object.assign(document.body.style, { overflow: 'hidden', height: '100%' });
 
 ScrollTrigger.defaults({ scroller: scrollWrapper });
-ScrollTrigger.normalizeScroll({ target: scrollWrapper, momentum: self => Math.min(3, Math.abs(self.velocityY) / 1000) });
+ScrollTrigger.normalizeScroll({
+  target: scrollWrapper,
+  momentum: self => Math.min(4.5, 0.35 + Math.abs(self.velocityY) / 600),
+  speed: 1,
+});
 ScrollTrigger.scrollerProxy(scrollWrapper, {
   scrollTop(value) {
     if (arguments.length) { scrollWrapper.scrollTop = value; }
@@ -59,10 +63,11 @@ ScrollTrigger.scrollerProxy(scrollWrapper, {
   },
 });
 let latestScrollTop = 0;
+let canvasScrollTop = 0;
 scrollWrapper.addEventListener('scroll', () => {
   latestScrollTop = scrollWrapper.scrollTop;
   ScrollTrigger.update();
-});
+}, { passive: true });
 
 let stableVH = document.documentElement.clientHeight || window.innerHeight;
 // Use large viewport on iOS so the site extends behind Safari's address bar
@@ -300,7 +305,7 @@ function drawWires(time) {
 
   wireCtx.clearRect(0, 0, W, H);
 
-  const scrollY = latestScrollTop;
+  const scrollY = canvasScrollTop;
   const viewH = scrollWrapper.clientHeight || stableVH;
   const docH = Math.max(1, scrollWrapper.scrollHeight);
   const maxDocScroll = Math.max(1, docH - viewH);
@@ -684,7 +689,7 @@ const scrollState = { progress: 0 };
 const cameraScrollTimeline = gsap.timeline({
   defaults: { ease: 'none' },
   scrollTrigger: {
-    trigger: '#content', start: 'top top', end: 'bottom bottom', scrub: true, invalidateOnRefresh: true,
+    trigger: '#content', start: 'top top', end: 'bottom bottom', scrub: 0.5, invalidateOnRefresh: true,
     onUpdate: (self) => { scrollState.progress = self.progress; }
   }
 });
@@ -722,7 +727,7 @@ if (sceneCardWrappers.length === 3) {
         trigger: sceneCardWrappers[i],
         start: `top ${startOffset}%`,
         end: `top ${endOffset}%`,
-        scrub: true,
+        scrub: 0.5,
         invalidateOnRefresh: true
       }
     });
@@ -741,7 +746,7 @@ if (sectionTitleLines.length > 0) {
         trigger: titleLine,
         start: 'top 84%',
         end: 'top 64%',
-        scrub: true,
+        scrub: 0.3,
         invalidateOnRefresh: true
       }
     });
@@ -780,7 +785,7 @@ if (statsPanel && statsCards.length === 3) {
       trigger: statsPanel,
       start: 'top 85%',
       end: 'top 35%',
-      scrub: true,
+      scrub: 0.5,
       invalidateOnRefresh: true
     }
   });
@@ -935,10 +940,12 @@ window.addEventListener('resize', () => {
 
 
 // --- Main tick ---
-gsap.ticker.lagSmoothing(100, 16);
+gsap.ticker.lagSmoothing(500, 33);
 
+const CANVAS_SCROLL_LERP = 0.25;
 let lastCounterVisible = false;
 gsap.ticker.add((time) => {
+  canvasScrollTop += (latestScrollTop - canvasScrollTop) * CANVAS_SCROLL_LERP;
   drawWires(time);
 
   if (mobileCounterEl) {
