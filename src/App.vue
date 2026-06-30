@@ -1,18 +1,23 @@
 <script setup lang="ts">
+import { RouterView } from 'vue-router'
+import { useHead } from '@unhead/vue'
 import SiteNav from './components/SiteNav.vue'
-import HeroSection from './components/HeroSection.vue'
-import TheLoop from './components/TheLoop.vue'
-import WhoItsFor from './components/WhoItsFor.vue'
-import VisibilityMV from './components/VisibilityMV.vue'
-import ResultsSection from './components/ResultsSection.vue'
-import TeamSection from './components/TeamSection.vue'
-import CtaSection from './components/CtaSection.vue'
 import SiteFooter from './components/SiteFooter.vue'
+import hankenLatin from '@/assets/fonts/hanken-grotesk-300-latin.woff2'
+import plexMonoLatin from '@/assets/fonts/ibm-plex-mono-400-latin.woff2'
 
 // Theme / content configuration (defaults from the original design component).
 const accentColor = '#1C3F33'
-const demoSpeed = 1
-const showProofMetrics = true
+
+// Preload the primary latin font subsets (hashed URLs resolved by Vite) so the
+// above-the-fold type renders without a flash. Applied on every route.
+useHead({
+  htmlAttrs: { lang: 'en' },
+  link: [
+    { rel: 'preload', as: 'font', type: 'font/woff2', href: hankenLatin, crossorigin: 'anonymous' },
+    { rel: 'preload', as: 'font', type: 'font/woff2', href: plexMonoLatin, crossorigin: 'anonymous' },
+  ],
+})
 </script>
 
 <template>
@@ -21,13 +26,7 @@ const showProofMetrics = true
     :style="{ '--accent': accentColor }"
   >
     <SiteNav />
-    <HeroSection :demo-speed="demoSpeed" />
-    <TheLoop />
-    <WhoItsFor />
-    <VisibilityMV />
-    <ResultsSection v-if="showProofMetrics" />
-    <TeamSection />
-    <CtaSection />
+    <RouterView />
     <SiteFooter />
   </div>
 </template>

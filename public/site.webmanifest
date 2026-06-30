@@ -1,0 +1,15 @@
+{
+  "name": "Edviro — Autonomous building energy management",
+  "short_name": "Edviro",
+  "description": "Edviro connects your meters, controls, and utility data, catches energy waste as it starts, fixes it, and proves the savings.",
+  "start_url": "/",
+  "id": "/",
+  "icons": [
+    { "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "theme_color": "#1C3F33",
+  "background_color": "#F4F2EC",
+  "display": "standalone"
+}

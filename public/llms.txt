@@ -1,0 +1,39 @@
+# Edviro
+
+> Edviro is autonomous building energy management. It connects your meters, controls, and utility data, watches every building 24/7, catches energy waste as it starts, fixes it, and proves the savings with audit-grade measurement and verification (M&V). Backed by Y Combinator.
+
+## What Edviro does
+
+Edviro closes the loop on building energy where most tools stop at a dashboard:
+
+- Ingest: connect bills, meters, weather, tariffs, BMS, work orders, and sensors into one live model. Nothing to rip out.
+- Detect: learn each building's normal load, schedules, and equipment, then flag drift, anomalies, and waste in real time.
+- Act: raise work orders, guide facilities teams in the app, and adjust setpoints and schedules, after testing each change first.
+- Verify: confirm every change in the meter data and on the utility bill with audit-grade M&V.
+
+## Who it is for
+
+- School facilities and K-12 districts: continuous energy audits, automatic fault detection, and work orders for the team that runs the building.
+- Commercial real estate and offices: occupancy-aware HVAC and lighting using existing WiFi routers, cutting energy and peak demand charges while keeping tenants comfortable.
+- Construction teams: independent baselining and audit-grade M&V built into the build, so savings claims hold up for owners and lenders.
+
+## Key pages
+
+- [Home](https://edviroenergy.com/): Overview of autonomous building energy management.
+- [Energy management for schools](https://edviroenergy.com/solutions/schools): For K-12 facilities teams and districts.
+- [Energy management for real estate](https://edviroenergy.com/solutions/real-estate): Occupancy-aware control for commercial buildings.
+- [M&V for construction](https://edviroenergy.com/solutions/construction): Independent baselining and audit-grade verification for new builds.
+- [Measurement & Verification](https://edviroenergy.com/measurement-and-verification): How Edviro proves savings against a learned baseline.
+- [FAQ](https://edviroenergy.com/faq): Answers to common questions about autonomous energy management and M&V.
+- [About](https://edviroenergy.com/about): The team and mission behind Edviro.
+
+## Results
+
+- Over $400K saved for clients to date.
+- 7 school sites live, with 29 more expanding.
+- 24/7 autonomous monitoring across every site.
+
+## Contact
+
+- Email: founders@edviroenergy.com
+- Book a demo: https://calendly.com/hursh-edviroenergy/new-meeting
