@@ -79,7 +79,7 @@ usePageSeo({
     <section style="padding: 30px 32px 60px;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <h2 style="margin: 0 0 40px; font-weight: 400; font-size: clamp(28px, 3.6vw, 42px); line-height: 1.08; letter-spacing: -0.03em; max-width: 620px;">Built for the people who run the building.</h2>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
+        <div class="r-cols-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
           <div style="border-top: 1.5px solid #1A1B14; padding-top: 18px;">
             <h3 style="margin: 0 0 10px; font-size: 19px; font-weight: 600;">Plugs into what you already have</h3>
             <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #6B6C5E;">Your meters, your BMS, your utility bills. Edviro connects them all into one live model of every school.</p>
@@ -101,7 +101,7 @@ usePageSeo({
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <p style="margin: 0 0 18px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8E907F;">What Edviro catches</p>
         <h2 style="margin: 0 0 36px; font-weight: 400; font-size: clamp(28px, 3.8vw, 44px); line-height: 1.06; letter-spacing: -0.03em; color: #F8F7F1; max-width: 640px;">Waste hides in every school. Edviro finds it in the data.</h2>
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: #2D2E22; border: 1px solid #2D2E22; border-radius: 16px; overflow: hidden;">
+        <div class="r-cols-2" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: #2D2E22; border: 1px solid #2D2E22; border-radius: 16px; overflow: hidden;">
           <div style="background: #1F2017; padding: 26px;">
             <div style="font-size: 17px; font-weight: 600; color: #F4F2EC; margin-bottom: 8px;">Boiler short-cycling</div>
             <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #C9CABA;">Detects a boiler starting 14 times an hour and dispatches a guided work order to reset the firing differential.</p>

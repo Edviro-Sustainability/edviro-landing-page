@@ -87,7 +87,7 @@ usePageSeo({
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <p style="margin: 0 0 18px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8E907F;">How Edviro verifies</p>
         <h2 style="margin: 0 0 40px; font-weight: 400; font-size: clamp(28px, 3.8vw, 44px); line-height: 1.06; letter-spacing: -0.03em; color: #F8F7F1; max-width: 640px;">A baseline that learns, and proof that updates itself.</h2>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #2D2E22; border: 1px solid #2D2E22; border-radius: 16px; overflow: hidden;">
+        <div class="r-cols-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #2D2E22; border: 1px solid #2D2E22; border-radius: 16px; overflow: hidden;">
           <div style="background: #1F2017; padding: 28px;">
             <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6FCF97; margin-bottom: 14px;">01 / Baseline</div>
             <h3 style="margin: 0 0 8px; font-size: 18px; font-weight: 600; color: #F4F2EC;">Learn the building</h3>
@@ -114,7 +114,7 @@ usePageSeo({
     <section style="padding: 56px 32px 20px;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <h2 style="margin: 0 0 28px; font-weight: 400; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.1; letter-spacing: -0.025em;">Where M&amp;V matters most</h2>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
+        <div class="r-cols-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
           <RouterLink to="/solutions/schools" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #E3E0D5; border-radius: 16px; padding: 24px; background: #FBFAF6; display: block;">
             <div style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">Schools &rarr;</div>
             <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #6B6C5E;">Show the board verified savings across every site, not quarterly estimates.</p>

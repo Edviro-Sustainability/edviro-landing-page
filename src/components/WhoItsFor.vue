@@ -17,7 +17,7 @@ const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transp
       <p style="margin: 0 0 22px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8A8A7C;">Who it's for</p>
 
       <!-- tab bar -->
-      <div style="display: flex; gap: 30px; border-bottom: 1px solid #E3E0D5; margin-bottom: 44px;">
+      <div style="display: flex; flex-wrap: wrap; gap: 30px; border-bottom: 1px solid #E3E0D5; margin-bottom: 44px;">
         <button
           type="button"
           style="appearance: none; background: none; border: none; padding: 0 0 14px; margin-bottom: -1px; font-family: inherit; font-size: 17px; cursor: pointer; transition: color 0.2s ease;"
@@ -39,7 +39,7 @@ const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transp
       </div>
 
       <!-- SCHOOLS PANEL -->
-      <div v-if="activeTab === 'schools'" style="display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 64px; align-items: center;">
+      <div v-if="activeTab === 'schools'" class="r-split" style="display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 64px; align-items: center;">
         <div>
           <h2 style="margin: 0 0 22px; font-weight: 400; font-size: clamp(30px, 3.6vw, 44px); line-height: 1.07; letter-spacing: -0.03em;">Built for the people who run the building.</h2>
           <div style="display: flex; flex-direction: column; gap: 22px;">
@@ -89,7 +89,7 @@ const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transp
       </div>
 
       <!-- REAL ESTATE PANEL -->
-      <div v-if="activeTab === 'realestate'" style="display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 64px; align-items: center;">
+      <div v-if="activeTab === 'realestate'" class="r-split" style="display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 64px; align-items: center;">
         <div>
           <h2 style="margin: 0 0 22px; font-weight: 400; font-size: clamp(30px, 3.6vw, 44px); line-height: 1.07; letter-spacing: -0.03em;">Built for the buildings people work in.</h2>
           <div style="display: flex; flex-direction: column; gap: 22px;">
@@ -139,7 +139,7 @@ const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transp
       </div>
 
       <!-- CONSTRUCTION PANEL -->
-      <div v-if="activeTab === 'construction'" style="display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 64px; align-items: center;">
+      <div v-if="activeTab === 'construction'" class="r-split" style="display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 64px; align-items: center;">
         <div>
           <h2 style="margin: 0 0 22px; font-weight: 400; font-size: clamp(30px, 3.6vw, 44px); line-height: 1.07; letter-spacing: -0.03em;">Baselining and M&amp;V, built into the build.</h2>
           <div style="display: flex; flex-direction: column; gap: 22px;">

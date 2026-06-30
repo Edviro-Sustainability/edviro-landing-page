@@ -3,7 +3,7 @@
 <template>
   <!-- VISIBILITY / M&V -->
   <section id="mv" style="padding: 116px 32px; background: #16170F; color: #F4F2EC; scroll-margin-top: 80px;">
-    <div style="max-width: 1180px; margin: 0 auto; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;">
+    <div class="r-split" style="max-width: 1180px; margin: 0 auto; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;">
       <div>
         <p style="margin: 0 0 18px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8E907F;">Visibility &amp; M&amp;V</p>
         <h2 style="margin: 0 0 22px; font-weight: 400; font-size: clamp(34px, 4.4vw, 50px); line-height: 1.05; letter-spacing: -0.03em; color: #F8F7F1;">Proof your board can read.</h2>

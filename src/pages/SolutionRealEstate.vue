@@ -79,7 +79,7 @@ usePageSeo({
     <section style="padding: 30px 32px 60px;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <h2 style="margin: 0 0 40px; font-weight: 400; font-size: clamp(28px, 3.6vw, 42px); line-height: 1.08; letter-spacing: -0.03em; max-width: 620px;">Built for the buildings people work in.</h2>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
+        <div class="r-cols-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
           <div style="border-top: 1.5px solid #1A1B14; padding-top: 18px;">
             <h3 style="margin: 0 0 10px; font-size: 19px; font-weight: 600;">Connects your whole stack</h3>
             <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #6B6C5E;">BMS, meters, submeters, and the WiFi routers already on every floor, pulled into one live model.</p>
@@ -98,7 +98,7 @@ usePageSeo({
 
     <!-- EXAMPLE -->
     <section style="padding: 50px 32px; background: #16170F; color: #F4F2EC;">
-      <div style="max-width: 1180px; margin: 0 auto; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center;">
+      <div class="r-split" style="max-width: 1180px; margin: 0 auto; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center;">
         <div>
           <p style="margin: 0 0 18px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8E907F;">In practice</p>
           <h2 style="margin: 0 0 18px; font-weight: 400; font-size: clamp(26px, 3.4vw, 40px); line-height: 1.08; letter-spacing: -0.03em; color: #F8F7F1;">An empty wing shouldn't cost a full floor.</h2>

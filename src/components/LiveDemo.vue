@@ -168,7 +168,7 @@ onBeforeUnmount(() => {
 
 <template>
   <!-- LIVE DEMO -->
-  <div style="margin-top: 58px;">
+  <div class="r-hide-mobile" style="margin-top: 58px;">
     <div style="display: flex; justify-content: center; width: 100%;">
       <div ref="wrap" style="position: relative; width: 100%; max-width: 1120px;" :style="{ height: stageH + 'px' }">
         <div style="position: absolute; top: 0; left: 0; width: 1120px; height: 460px; transform-origin: top left;" :style="{ transform: 'scale(' + scale + ')' }">

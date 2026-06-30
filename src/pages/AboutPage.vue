@@ -39,7 +39,7 @@ usePageSeo({
     <!-- MISSION / APPROACH -->
     <section style="padding: 20px 32px 40px;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
+        <div class="r-cols-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
           <div style="border-top: 1.5px solid #1A1B14; padding-top: 18px;">
             <h2 style="margin: 0 0 10px; font-size: 19px; font-weight: 600;">Hands-on from the start</h2>
             <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #6B6C5E;">Edviro began working directly with school facilities teams, learning what they actually need to run buildings well.</p>

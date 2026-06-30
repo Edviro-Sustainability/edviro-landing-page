@@ -11,7 +11,7 @@ import tanujImg from '@/assets/img/tanuj.png'
         <p style="margin: 0 0 18px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8A8A7C;">The team</p>
         <h2 style="margin: 0; font-weight: 400; font-size: clamp(34px, 4.4vw, 50px); line-height: 1.05; letter-spacing: -0.03em;">Built for this.</h2>
       </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px;">
+      <div class="r-split" style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px;">
         <div style="background: #FBFAF6; border: 1px solid #E3E0D5; border-radius: 18px; padding: 32px; display: flex; gap: 22px;">
           <img :src="hurshImg" alt="Hursh" style="flex: none; width: 64px; height: 64px; border-radius: 16px; object-fit: cover; object-position: 50% 18%;" />
           <div>

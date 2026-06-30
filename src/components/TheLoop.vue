@@ -10,7 +10,7 @@
         <p style="margin: 24px 0 0; max-width: 560px; font-size: 18px; line-height: 1.6; color: #55564C;">Every signal runs through a live model of your building. It doesn't just flag problems. It fixes them, then checks its own work in the meter data.</p>
       </div>
 
-      <div style="margin-top: 56px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #E3E0D5; border: 1px solid #E3E0D5; border-radius: 18px; overflow: hidden;">
+      <div class="r-cols-4" style="margin-top: 56px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #E3E0D5; border: 1px solid #E3E0D5; border-radius: 18px; overflow: hidden;">
         <div style="background: #FBFAF6; padding: 30px 26px;">
           <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--accent); margin-bottom: 18px;">01 / Ingest</div>
           <h3 style="margin: 0 0 10px; font-size: 20px; font-weight: 600; letter-spacing: -0.01em;">Connect what you have</h3>

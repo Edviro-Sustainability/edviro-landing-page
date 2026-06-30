@@ -277,3 +277,38 @@
   ::selection { background: #1C3F33; color: #F4F2EC; }
   @keyframes glide { to { stroke-dashoffset: -100; } }
   @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+/* ---------------------------------------------------------------------------
+   Responsive helpers
+   The design components use inline styles for layout, so these rules override
+   the inline `grid-template-columns`/`display` at mobile breakpoints with
+   `!important`. Desktop layout is untouched (no rules apply above the queries).
+--------------------------------------------------------------------------- */
+.r-nav-toggle { display: none; }
+.r-nav-panel { display: none; }
+
+/* Wide tablets: dense 4-up grids drop to 2-up. */
+@media (max-width: 1024px) {
+  .r-cols-4 { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* Tablets / large phones: two-column splits stack, nav collapses to a menu. */
+@media (max-width: 860px) {
+  .r-split { grid-template-columns: 1fr !important; gap: 36px !important; }
+  .r-nav-desktop { display: none !important; }
+  .r-nav-toggle { display: inline-flex !important; }
+  .r-nav-panel.is-open { display: block !important; }
+}
+
+/* Phones: multi-column card grids become single column; hide the scaled demo. */
+@media (max-width: 768px) {
+  .r-cols-2,
+  .r-cols-3 { grid-template-columns: 1fr !important; }
+  .r-hide-mobile { display: none !important; }
+  .r-pad-x { padding-left: 20px !important; padding-right: 20px !important; }
+}
+
+/* Small phones: even the 2-up dense grid becomes single column. */
+@media (max-width: 560px) {
+  .r-cols-4 { grid-template-columns: 1fr !important; }
+}
