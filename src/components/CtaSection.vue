@@ -7,7 +7,7 @@
       <h2 style="margin: 0; font-weight: 400; font-size: clamp(34px, 5vw, 56px); line-height: 1.05; letter-spacing: -0.035em; color: #F8F7F1;">See what Edviro finds in your own buildings.</h2>
       <p style="margin: 24px auto 0; max-width: 560px; font-size: 18px; line-height: 1.6; color: rgba(244,242,236,0.78);">We'll connect a few of your sites and show you what it catches in the first week. No audit, no rip-and-replace.</p>
       <div style="margin-top: 34px; display: flex; flex-direction: column; align-items: center; gap: 14px;">
-        <a href="https://calendly.com/hursh-edviroenergy/new-meeting" target="_blank" rel="noopener" class="cta-btn" style="font-size: 16px; font-weight: 600; text-decoration: none; color: var(--accent); background: #F4F2EC; padding: 15px 34px; border-radius: 999px;">Book a demo</a>
+        <a href="https://calendly.com/tanuj-edviroenergy/30min" target="_blank" rel="noopener" class="cta-btn" style="font-size: 16px; font-weight: 600; text-decoration: none; color: var(--accent); background: #F4F2EC; padding: 15px 34px; border-radius: 999px;">Book a demo</a>
         <a href="mailto:founders@edviroenergy.com" class="cta-email" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.04em; color: rgba(244,242,236,0.7); text-decoration: none;">founders@edviroenergy.com</a>
       </div>
     </div>
