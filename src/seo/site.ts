@@ -14,7 +14,7 @@ export const DEFAULT_OG_IMAGE = '/og-image.png'
 export const LOGO_PATH = '/logo-icon.png'
 
 export const CONTACT_EMAIL = 'founders@edviroenergy.com'
-export const CALENDLY_URL = 'https://calendly.com/hursh-edviroenergy/new-meeting'
+export const CALENDLY_URL = 'https://calendly.com/tanuj-edviroenergy/30min'
 
 /** Join a root-relative path with the canonical site origin. */
 export function absoluteUrl(path: string): string {
