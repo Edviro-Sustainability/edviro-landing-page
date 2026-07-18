@@ -1,7 +1,7 @@
 {
-  "name": "Edviro — Autonomous building energy management",
+  "name": "Edviro — AI for building operations",
   "short_name": "Edviro",
-  "description": "Edviro connects your meters, controls, and utility data, catches energy waste as it starts, fixes it, and proves the savings.",
+  "description": "Edviro puts AI across your fragmented building data, catches energy waste as it starts, fixes it, proves the savings, and builds a digital twin for capital planning.",
   "start_url": "/",
   "id": "/",
   "icons": [

@@ -30,8 +30,8 @@ usePageSeo({
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <div style="max-width: 820px;">
           <p style="margin: 0 0 22px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8A8A7C;">About Edviro</p>
-          <h1 style="margin: 0; font-weight: 400; font-size: clamp(36px, 5.4vw, 62px); line-height: 1.05; letter-spacing: -0.035em;">Making the built environment <span style="color: var(--accent);">run like software</span>.</h1>
-          <p style="margin: 26px 0 0; max-width: 640px; font-size: 19px; line-height: 1.6; color: #55564C;">Buildings waste enormous amounts of energy, and the people who run them are handed dashboards instead of answers. Edviro exists to close that gap, turning meters, controls, and utility data into autonomous action that cuts waste and proves the savings.</p>
+          <h1 style="margin: 0; font-weight: 400; font-size: clamp(36px, 5.4vw, 62px); line-height: 1.05; letter-spacing: -0.035em;">Bringing AI to the people who <span style="color: var(--accent);">run the buildings</span>.</h1>
+          <p style="margin: 26px 0 0; max-width: 640px; font-size: 19px; line-height: 1.6; color: #55564C;">Buildings waste enormous amounts of energy, and the people who run them are handed dashboards instead of answers. Edviro exists to close that gap, turning scattered bills, meters, controls, and work orders into action that cuts waste, proves the savings, and informs the next capital decision.</p>
         </div>
       </div>
     </section>

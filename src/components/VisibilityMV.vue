@@ -8,7 +8,7 @@
         <p style="margin: 0 0 18px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8E907F;">Visibility &amp; M&amp;V</p>
         <h2 style="margin: 0 0 22px; font-weight: 400; font-size: clamp(34px, 4.4vw, 50px); line-height: 1.05; letter-spacing: -0.03em; color: #F8F7F1;">Proof your board can read.</h2>
         <p style="margin: 0 0 18px; font-size: 18px; line-height: 1.65; color: #C9CABA;">Every action is measured against a learned baseline, so you can show exactly what changed, what it saved, and that it's still saving.</p>
-        <p style="margin: 0; font-size: 18px; line-height: 1.65; color: #C9CABA;">Board-ready reports and audit-grade measurement and verification, generated automatically.</p>
+        <p style="margin: 0; font-size: 18px; line-height: 1.65; color: #C9CABA;">Board-ready reports and audit-grade measurement and verification, generated automatically. And every verified fix updates the digital twin, so your next capital decision starts from better data.</p>
       </div>
 
       <div style="background: #1F2017; border: 1px solid #2D2E22; border-radius: 20px; padding: 28px;">

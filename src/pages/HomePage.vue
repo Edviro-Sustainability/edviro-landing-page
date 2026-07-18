@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import HeroSection from '@/components/HeroSection.vue'
 import TheLoop from '@/components/TheLoop.vue'
+import DigitalTwinSection from '@/components/DigitalTwinSection.vue'
 import WhoItsFor from '@/components/WhoItsFor.vue'
 import VisibilityMV from '@/components/VisibilityMV.vue'
 import ResultsSection from '@/components/ResultsSection.vue'
@@ -13,10 +14,10 @@ const demoSpeed = 1
 const showProofMetrics = true
 
 usePageSeo({
-  title: 'Edviro — Autonomous building energy management',
+  title: 'Edviro — AI for building operations',
   titleTemplate: null,
   description:
-    'Edviro connects your meters, controls, and utility data, watches every building 24/7, catches energy waste as it starts, fixes it, and proves the savings. Backed by Y Combinator.',
+    'Edviro puts AI across your fragmented building data — bills, meters, BMS, and work orders — then catches waste, fixes it, proves the savings, and builds a digital twin for capital planning. Backed by Y Combinator.',
   path: '/',
   jsonLd: [organizationLd(), websiteLd(), softwareApplicationLd()],
 })
@@ -26,6 +27,7 @@ usePageSeo({
   <main>
     <HeroSection :demo-speed="demoSpeed" />
     <TheLoop />
+    <DigitalTwinSection />
     <WhoItsFor />
     <VisibilityMV />
     <ResultsSection v-if="showProofMetrics" />

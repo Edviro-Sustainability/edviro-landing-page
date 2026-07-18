@@ -34,6 +34,11 @@ const faqs: FaqItem[] = [
     answer:
       'Edviro forecasts demand spikes and pre-cools or shifts load off the tariff peak before charges land, then verifies the avoided demand charge in the meter data so the savings are provable.',
   },
+  {
+    question: 'How does Edviro help prioritize capital projects across a portfolio?',
+    answer:
+      'Everything Edviro learns about each building builds a digital twin. Candidate projects, retrofits, equipment replacements, controls upgrades, are simulated against the twin and ranked by modeled payback from your real usage, so capex goes to the projects that pay back first.',
+  },
 ]
 
 usePageSeo({

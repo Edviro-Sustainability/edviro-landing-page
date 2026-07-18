@@ -34,6 +34,11 @@ const faqs: FaqItem[] = [
     answer:
       'Edviro produces lender-ready, audit-grade M&V that supports performance guarantees, utility incentives, and green financing, because every claim is tied to measured data against an independent baseline.',
   },
+  {
+    question: 'How does the as-built digital twin compare to the design model?',
+    answer:
+      'As metered data comes in, Edviro builds a digital twin of the building as it actually performs and checks it against the design model continuously. Variance surfaces during the build, when it is cheap to correct, instead of after handover, and the owner inherits a calibrated twin for future capital planning.',
+  },
 ]
 
 usePageSeo({

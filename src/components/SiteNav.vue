@@ -23,6 +23,7 @@ const close = () => {
         <div style="display: flex; gap: 28px; font-size: 14.5px; color: #55564C;">
           <RouterLink :to="{ path: '/', hash: '#loop' }" class="nav-link" style="text-decoration: none; color: inherit;">The loop</RouterLink>
           <RouterLink :to="{ path: '/', hash: '#how' }" class="nav-link" style="text-decoration: none; color: inherit;">Who it's for</RouterLink>
+          <RouterLink to="/capital-planning" class="nav-link" style="text-decoration: none; color: inherit;">Capital planning</RouterLink>
           <RouterLink to="/measurement-and-verification" class="nav-link" style="text-decoration: none; color: inherit;">M&amp;V</RouterLink>
           <RouterLink to="/faq" class="nav-link" style="text-decoration: none; color: inherit;">FAQ</RouterLink>
           <RouterLink to="/about" class="nav-link" style="text-decoration: none; color: inherit;">About</RouterLink>
@@ -55,6 +56,7 @@ const close = () => {
       <div style="display: flex; flex-direction: column;">
         <RouterLink :to="{ path: '/', hash: '#loop' }" class="mobile-link" style="text-decoration: none; color: #1A1B14; font-size: 17px; padding: 13px 4px; border-bottom: 1px solid #E7E4D9;" @click="close">The loop</RouterLink>
         <RouterLink :to="{ path: '/', hash: '#how' }" class="mobile-link" style="text-decoration: none; color: #1A1B14; font-size: 17px; padding: 13px 4px; border-bottom: 1px solid #E7E4D9;" @click="close">Who it's for</RouterLink>
+        <RouterLink to="/capital-planning" class="mobile-link" style="text-decoration: none; color: #1A1B14; font-size: 17px; padding: 13px 4px; border-bottom: 1px solid #E7E4D9;" @click="close">Capital planning</RouterLink>
         <RouterLink to="/measurement-and-verification" class="mobile-link" style="text-decoration: none; color: #1A1B14; font-size: 17px; padding: 13px 4px; border-bottom: 1px solid #E7E4D9;" @click="close">M&amp;V</RouterLink>
         <RouterLink to="/faq" class="mobile-link" style="text-decoration: none; color: #1A1B14; font-size: 17px; padding: 13px 4px; border-bottom: 1px solid #E7E4D9;" @click="close">FAQ</RouterLink>
         <RouterLink to="/about" class="mobile-link" style="text-decoration: none; color: #1A1B14; font-size: 17px; padding: 13px 4px;" @click="close">About</RouterLink>

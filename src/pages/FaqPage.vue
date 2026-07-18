@@ -14,7 +14,7 @@ const faqs: FaqItem[] = [
   {
     question: 'What is Edviro?',
     answer:
-      'Edviro is an autonomous building energy management platform. It connects your meters, controls, and utility data, watches every building around the clock, catches energy waste as it starts, fixes it, and proves the savings with audit-grade measurement and verification. Edviro is backed by Y Combinator.',
+      'Edviro brings AI into building operations. It pulls together the data scattered across your bills, meters, BMS, work orders, and sensors, catches energy waste as it starts, fixes it, and proves the savings with audit-grade measurement and verification. All of that data compounds into a digital twin of each building, used for capital planning and intervention simulation. Edviro is backed by Y Combinator.',
   },
   {
     question: 'What is autonomous building energy management?',
@@ -22,9 +22,9 @@ const faqs: FaqItem[] = [
       'Autonomous building energy management is software that does more than show a dashboard. It continuously monitors a building, detects waste and faults in real time, takes or recommends corrective action, and verifies the result in the meter data, closing the loop without waiting for a person to investigate.',
   },
   {
-    question: 'How is Edviro different from a building management system (BMS) or a dashboard?',
+    question: 'How is Edviro different from utility tracking, monitoring software, or a BMS dashboard?',
     answer:
-      'Most tools stop at a dashboard that shows you data. Edviro closes the loop: it learns each building, detects drift and waste, acts by raising work orders or adjusting setpoints and schedules, and then verifies the savings. It works on top of your existing BMS rather than replacing it.',
+      'Utility tracking and monitoring tools stop at charts: they show you the waste, and the fixing stays on your plate. Edviro is the execution layer on top of that data. It detects the problem, raises the work order or adjusts the setpoints and schedules itself, and then verifies the result in the meter data. It works on top of your existing BMS rather than replacing it.',
   },
   {
     question: 'Do I need to replace my existing equipment or controls?',
@@ -45,6 +45,16 @@ const faqs: FaqItem[] = [
     question: 'How does Edviro prove the savings are real?',
     answer:
       'Every change is measured against a learned baseline and confirmed in the meter data and on the bill. Edviro generates board-ready, audit-grade measurement and verification (M&V) automatically, and flags any change that did not save as expected.',
+  },
+  {
+    question: 'What is the digital twin, and what is it for?',
+    answer:
+      'Everything Edviro ingests and every fix it verifies builds a living model of each building, a digital twin. You can run interventions against it before spending money: replace a boiler versus keep tuning it, add a wing, change a schedule, or absorb a rate change. Each simulation returns projected savings and payback from your real usage.',
+  },
+  {
+    question: 'How does Edviro help with capital planning?',
+    answer:
+      'Instead of ranking capital projects by equipment age or gut feel, Edviro simulates each candidate project against the digital twin and ranks them by modeled payback. When budget or bond season comes, you bring the board a prioritized list with the data behind it, and verified results on projects already funded.',
   },
   {
     question: 'Who is Edviro for?',

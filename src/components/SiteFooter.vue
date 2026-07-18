@@ -10,7 +10,7 @@ import logoIcon from '@/assets/img/logo-icon.png'
         <img :src="logoIcon" alt="Edviro" style="width: 20px; height: 20px; border-radius: 6px; display: block;" />
         <span style="font-size: 17px; font-weight: 600; letter-spacing: -0.02em; color: #F4F2EC;">Edviro</span>
       </div>
-      <div style="font-size: 13px;">Autonomous energy management for the built environment.</div>
+      <div style="font-size: 13px;">AI for the people who run the built environment.</div>
       <a href="mailto:founders@edviroenergy.com" class="footer-email" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #8E907F; text-decoration: none;">founders@edviroenergy.com</a>
     </div>
   </footer>

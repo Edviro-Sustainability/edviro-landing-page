@@ -5,10 +5,10 @@
  */
 export const SITE_URL = 'https://edviroenergy.com'
 export const SITE_NAME = 'Edviro'
-export const SITE_TAGLINE = 'Autonomous building energy management'
+export const SITE_TAGLINE = 'AI for building operations'
 
 export const DEFAULT_DESCRIPTION =
-  'Edviro connects your meters, controls, and utility data, watches every building 24/7, catches energy waste as it starts, fixes it, and proves the savings with audit-grade M&V.'
+  'Edviro puts AI across your fragmented building data — bills, meters, BMS, and work orders — then catches waste, fixes it, proves the savings with audit-grade M&V, and builds a digital twin for capital planning.'
 
 export const DEFAULT_OG_IMAGE = '/og-image.png'
 export const LOGO_PATH = '/logo-icon.png'

@@ -30,6 +30,11 @@ const faqs: FaqItem[] = [
       'Edviro effectively performs a continuous energy audit. Instead of waiting for a quarterly or annual audit, it catches drift, faults, and waste the moment they start and verifies every correction against a learned baseline.',
   },
   {
+    question: 'Can Edviro help with capital planning and bond season?',
+    answer:
+      'Yes. Everything Edviro learns about your schools builds a digital twin of each building. You can simulate capital projects against it, replace a boiler versus keep tuning it, or model what a new wing does to demand charges, and walk into budget or bond season with projects ranked by modeled payback from your own data.',
+  },
+  {
     question: 'How quickly can a district see results?',
     answer:
       'Edviro typically connects a few sites and shows what it catches within the first week, with no upfront audit and no rip-and-replace. To date Edviro has saved clients over $400K, with 7 school sites live and 29 more expanding.',

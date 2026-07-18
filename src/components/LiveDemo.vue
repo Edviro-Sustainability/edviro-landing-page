@@ -60,6 +60,14 @@ const POOL: PoolItem[] = [
     alert: { src: 'Tariff · District', title: 'Rate change lands next billing cycle', detail: 'new peak window', sev: '#6E6E5E', sevLabel: 'INFO' },
     action: { type: 'Re-optimize', title: 'All schedules re-tuned to new tariff', result: 'Forecast $3.1k / mo saved', tag: 'Acted', green: true },
   },
+  {
+    alert: { src: 'Twin · Boiler plant', title: 'Replace Boiler #2, or keep tuning it?', detail: 'capital review', sev: '#6E6E5E', sevLabel: 'PLAN' },
+    action: { type: 'Simulation', title: 'Both options run against the digital twin', result: 'Tune-up wins: $2.1k/yr, 4-mo payback', tag: 'Simulated', green: true },
+  },
+  {
+    alert: { src: 'Twin · Jefferson ES', title: 'New wing lands next fall', detail: 'load forecast', sev: '#6E6E5E', sevLabel: 'PLAN' },
+    action: { type: 'Simulation', title: 'Addition modeled against current tariff', result: 'Demand charges projected before design lock', tag: 'Simulated', green: true },
+  },
 ]
 
 const Y = [96, 230, 364]

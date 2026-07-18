@@ -1,30 +1,35 @@
 # Edviro
 
-> Edviro is autonomous building energy management. It connects your meters, controls, and utility data, watches every building 24/7, catches energy waste as it starts, fixes it, and proves the savings with audit-grade measurement and verification (M&V). Backed by Y Combinator.
+> Edviro brings AI into building operations. It pulls together the data scattered across bills, meters, BMS, work orders, and sensors, catches energy waste as it starts, fixes it, and proves the savings with audit-grade measurement and verification (M&V). All of that data compounds into a digital twin of each building, used for capital planning and intervention simulation. Backed by Y Combinator.
 
 ## What Edviro does
 
-Edviro closes the loop on building energy where most tools stop at a dashboard:
+Utility tracking and monitoring tools stop at charts. Edviro is the execution layer that closes the loop:
 
-- Ingest: connect bills, meters, weather, tariffs, BMS, work orders, and sensors into one live model. Nothing to rip out.
+- Ingest: connect data scattered across bills, meters, weather, tariffs, BMS, work orders, and sensors into one live model. Nothing to rip out.
 - Detect: learn each building's normal load, schedules, and equipment, then flag drift, anomalies, and waste in real time.
 - Act: raise work orders, guide facilities teams in the app, and adjust setpoints and schedules, after testing each change first.
 - Verify: confirm every change in the meter data and on the utility bill with audit-grade M&V.
 
+## Digital twin and capital planning
+
+Everything Edviro ingests and every fix it verifies builds a living digital twin of each building. Facilities teams use it to simulate interventions before spending money — replace a boiler versus keep tuning it, add a new wing, change a schedule, absorb a rate change — and rank capital projects by modeled payback from their own data, then verify results after funding.
+
 ## Who it is for
 
-- School facilities and K-12 districts: continuous energy audits, automatic fault detection, and work orders for the team that runs the building.
-- Commercial real estate and offices: occupancy-aware HVAC and lighting using existing WiFi routers, cutting energy and peak demand charges while keeping tenants comfortable.
-- Construction teams: independent baselining and audit-grade M&V built into the build, so savings claims hold up for owners and lenders.
+- School facilities and K-12 districts: continuous energy audits, automatic fault detection, work orders, and capital plans backed by modeled payback for budget and bond season.
+- Commercial real estate and offices: occupancy-aware HVAC and lighting using existing WiFi routers, cutting energy and peak demand charges, with capex ranked by payback across the portfolio.
+- Construction teams: independent baselining and audit-grade M&V built into the build, with the as-built digital twin checked against the design model.
 
 ## Key pages
 
-- [Home](https://edviroenergy.com/): Overview of autonomous building energy management.
+- [Home](https://edviroenergy.com/): Overview of AI for building operations.
 - [Energy management for schools](https://edviroenergy.com/solutions/schools): For K-12 facilities teams and districts.
 - [Energy management for real estate](https://edviroenergy.com/solutions/real-estate): Occupancy-aware control for commercial buildings.
 - [M&V for construction](https://edviroenergy.com/solutions/construction): Independent baselining and audit-grade verification for new builds.
+- [Capital planning](https://edviroenergy.com/capital-planning): Digital twins, intervention simulation, and capital projects ranked by payback.
 - [Measurement & Verification](https://edviroenergy.com/measurement-and-verification): How Edviro proves savings against a learned baseline.
-- [FAQ](https://edviroenergy.com/faq): Answers to common questions about autonomous energy management and M&V.
+- [FAQ](https://edviroenergy.com/faq): Answers to common questions about Edviro, digital twins, and M&V.
 - [About](https://edviroenergy.com/about): The team and mission behind Edviro.
 
 ## Results

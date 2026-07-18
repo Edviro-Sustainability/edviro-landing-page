@@ -64,6 +64,13 @@ const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transp
                 <div style="font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">A step-by-step work order in your pocket, or an autonomous setpoint change overnight.&nbsp;</div>
               </div>
             </div>
+            <div style="display: flex; gap: 16px;">
+              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">4</span>
+              <div>
+                <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">It backs up your budget asks</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">Every fix feeds a digital twin of each school, so replace-or-repair and bond-season decisions come with modeled payback, not gut feel.</div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -114,6 +121,13 @@ const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transp
                 <div style="font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">Autonomous setbacks and demand management cut energy and peak charges while keeping tenants comfortable.</div>
               </div>
             </div>
+            <div style="display: flex; gap: 16px;">
+              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">4</span>
+              <div>
+                <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">Capex ranked by payback</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">The digital twin simulates retrofits and replacements across the portfolio, so capital goes to the projects that pay back first.</div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -162,6 +176,13 @@ const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transp
               <div>
                 <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">Maintenance agents from day one</div>
                 <div style="font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">The same agents that verify also catch faults and waste, so new buildings run as designed from handover.</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 16px;">
+              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">4</span>
+              <div>
+                <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">Design model vs. as-built twin</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">The as-built digital twin is checked against the design model, so variance surfaces during the build, not after handover.</div>
               </div>
             </div>
           </div>
