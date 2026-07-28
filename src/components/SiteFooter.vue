@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import logoIcon from '@/assets/img/logo-icon.png'
+import { BLOG_URL } from '@/seo/site'
 </script>
 
 <template>
@@ -11,13 +12,16 @@ import logoIcon from '@/assets/img/logo-icon.png'
         <span style="font-size: 17px; font-weight: 600; letter-spacing: -0.02em; color: #F4F2EC;">Edviro</span>
       </div>
       <div style="font-size: 13px;">AI for the people who run the built environment.</div>
-      <a href="mailto:founders@edviroenergy.com" class="footer-email" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #8E907F; text-decoration: none;">founders@edviroenergy.com</a>
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <a :href="BLOG_URL" class="footer-link" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #8E907F; text-decoration: none;">Blog</a>
+        <a href="mailto:founders@edviroenergy.com" class="footer-link" style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #8E907F; text-decoration: none;">founders@edviroenergy.com</a>
+      </div>
     </div>
   </footer>
 </template>
 
 <style scoped>
-.footer-email:hover {
+.footer-link:hover {
   color: #f4f2ec !important;
 }
 </style>

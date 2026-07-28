@@ -15,6 +15,7 @@ export const LOGO_PATH = '/logo-icon.png'
 
 export const CONTACT_EMAIL = 'founders@edviroenergy.com'
 export const CALENDLY_URL = 'https://calendly.com/tanuj-edviroenergy/30min'
+export const BLOG_URL = 'https://blog.edviroenergy.com'
 
 /** Join a root-relative path with the canonical site origin. */
 export function absoluteUrl(path: string): string {
