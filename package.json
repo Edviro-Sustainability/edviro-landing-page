@@ -12,6 +12,7 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "posthog-js": "^1.407.3",
     "vue": "^3.5.38"
   },
   "devDependencies": {

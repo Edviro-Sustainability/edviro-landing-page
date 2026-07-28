@@ -17,6 +17,11 @@ export const CONTACT_EMAIL = 'founders@edviroenergy.com'
 export const CALENDLY_URL = 'https://calendly.com/tanuj-edviroenergy/30min'
 export const BLOG_URL = 'https://blog.edviroenergy.com'
 
+// PostHog project API token — publishable, safe to ship in the client
+// bundle (same convention as the blog's Supabase publishable key).
+export const POSTHOG_KEY = 'phc_wxopt9vg92BkT58Yr3zNmK4aKQ89afVbFDgoj9uin2YL'
+export const POSTHOG_HOST = 'https://us.i.posthog.com'
+
 /** Join a root-relative path with the canonical site origin. */
 export function absoluteUrl(path: string): string {
   if (/^https?:\/\//.test(path)) return path
