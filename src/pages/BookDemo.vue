@@ -2,7 +2,7 @@
 import { onMounted } from 'vue'
 import { useHead } from '@unhead/vue'
 import { usePageSeo } from '@/seo/usePageSeo'
-import { BOOK_DEMO_PATH, BOOKING_URL } from '@/seo/site'
+import { BOOK_DEMO_CONVERSION, BOOK_DEMO_PATH, BOOKING_URL } from '@/seo/site'
 
 usePageSeo({
   title: 'Book a demo',
@@ -13,14 +13,36 @@ usePageSeo({
 })
 
 // The meta refresh is prerendered into the static HTML, so the redirect still
-// happens for crawlers and with JavaScript disabled.
+// happens for crawlers and with JavaScript disabled. It has to lag the scripted
+// redirect below, or it navigates away before the conversion ping is sent.
 useHead({
-  meta: [{ 'http-equiv': 'refresh', content: `0; url=${BOOKING_URL}` }],
+  meta: [{ 'http-equiv': 'refresh', content: `3; url=${BOOKING_URL}` }],
 })
 
 onMounted(() => {
-  // replace() keeps the interstitial out of the back-button history.
-  window.location.replace(BOOKING_URL)
+  let left = false
+  const goToBooking = () => {
+    if (left) return
+    left = true
+    // replace() keeps the interstitial out of the back-button history.
+    window.location.replace(BOOKING_URL)
+  }
+
+  if (!window.gtag) {
+    goToBooking()
+    return
+  }
+
+  // Leaving on event_callback lets Google Ads finish sending the conversion;
+  // event_timeout caps how long that can hold up the redirect.
+  window.gtag('event', 'conversion', {
+    send_to: BOOK_DEMO_CONVERSION,
+    event_callback: goToBooking,
+    event_timeout: 1000,
+  })
+
+  // gtag.js is often blocked, and then the queued command never runs at all.
+  window.setTimeout(goToBooking, 1200)
 })
 </script>
 

@@ -24,6 +24,13 @@ export const BLOG_URL = 'https://blog.edviroenergy.com'
 export const BOOK_DEMO_PATH = '/book-a-demo'
 export const BOOKING_URL = 'https://calendly.com/tanuj-edviroenergy/30min'
 
+/**
+ * Google Ads conversion for a "Book a demo" click. The interstitial at
+ * BOOK_DEMO_PATH is only reachable from a CTA, so its page load is the click.
+ * The Google tag itself loads from index.html.
+ */
+export const BOOK_DEMO_CONVERSION = 'AW-18357307098/d7uNCNjHztgcENqNubFE'
+
 // PostHog project API token — publishable, safe to ship in the client
 // bundle (same convention as the blog's Supabase publishable key).
 export const POSTHOG_KEY = 'phc_wxopt9vg92BkT58Yr3zNmK4aKQ89afVbFDgoj9uin2YL'
