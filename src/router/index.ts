@@ -42,6 +42,12 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/AboutPage.vue'),
   },
   {
+    // Redirects to BOOKING_URL; every "Book a demo" CTA links here.
+    path: '/book-a-demo',
+    name: 'book-a-demo',
+    component: () => import('@/pages/BookDemo.vue'),
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: () => import('@/pages/NotFound.vue'),

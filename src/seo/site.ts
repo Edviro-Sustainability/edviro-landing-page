@@ -14,8 +14,15 @@ export const DEFAULT_OG_IMAGE = '/og-image.png'
 export const LOGO_PATH = '/logo-icon.png'
 
 export const CONTACT_EMAIL = 'founders@edviroenergy.com'
-export const CALENDLY_URL = 'https://calendly.com/tanuj-edviroenergy/30min'
 export const BLOG_URL = 'https://blog.edviroenergy.com'
+
+/**
+ * Every "Book a demo" CTA points at this internal path, which redirects to
+ * BOOKING_URL. Only the redirect page reads BOOKING_URL, so changing
+ * schedulers (or the Calendly event) is a one-line edit below.
+ */
+export const BOOK_DEMO_PATH = '/book-a-demo'
+export const BOOKING_URL = 'https://calendly.com/tanuj-edviroenergy/30min'
 
 // PostHog project API token — publishable, safe to ship in the client
 // bundle (same convention as the blog's Supabase publishable key).

@@ -5,7 +5,7 @@ import PageBreadcrumbs from '@/components/PageBreadcrumbs.vue'
 import FaqList from '@/components/FaqList.vue'
 import { usePageSeo } from '@/seo/usePageSeo'
 import { breadcrumbLd, faqLd, serviceLd, organizationLd, type FaqItem } from '@/seo/jsonld'
-import { CALENDLY_URL } from '@/seo/site'
+import { BOOK_DEMO_PATH } from '@/seo/site'
 
 const breadcrumbs = [
   { name: 'Home', path: '/' },
@@ -74,7 +74,7 @@ usePageSeo({
           <h1 style="margin: 0; font-weight: 400; font-size: clamp(36px, 5.4vw, 62px); line-height: 1.05; letter-spacing: -0.035em;">Baselining and M&amp;V, <span style="color: var(--accent);">built into the build</span>.</h1>
           <p style="margin: 26px 0 0; max-width: 600px; font-size: 19px; line-height: 1.6; color: #55564C;">Edviro sets an independent energy baseline and runs audit-grade measurement and verification from day one, so every savings claim holds up for owners and lenders.</p>
           <div style="margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap;">
-            <a :href="CALENDLY_URL" target="_blank" rel="noopener" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #F4F2EC; background: var(--accent); padding: 13px 26px; border-radius: 999px;">Book a demo</a>
+            <a :href="BOOK_DEMO_PATH" target="_blank" rel="noopener" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #F4F2EC; background: var(--accent); padding: 13px 26px; border-radius: 999px;">Book a demo</a>
             <RouterLink to="/measurement-and-verification" class="outline-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #1A1B14; background: transparent; padding: 13px 24px; border-radius: 999px; border: 1px solid #CFCBBD;">Learn about M&amp;V</RouterLink>
           </div>
         </div>
