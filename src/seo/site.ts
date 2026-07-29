@@ -17,17 +17,23 @@ export const CONTACT_EMAIL = 'founders@edviroenergy.com'
 export const BLOG_URL = 'https://blog.edviroenergy.com'
 
 /**
- * Every "Book a demo" CTA points at this internal path, which redirects to
- * BOOKING_URL. Only the redirect page reads BOOKING_URL, so changing
- * schedulers (or the Calendly event) is a one-line edit below.
+ * Every "Book a demo" CTA points at this page, which explains the demo, the
+ * free bill audit, and pricing. It is also the Google Ads conversion page.
  */
 export const BOOK_DEMO_PATH = '/book-a-demo'
+
+/**
+ * Scheduling links point here rather than straight at BOOKING_URL, so changing
+ * schedulers (or the Calendly event) is a one-line edit below. Only the
+ * redirect page reads BOOKING_URL.
+ */
+export const DEMO_REDIRECT_PATH = '/demo'
 export const BOOKING_URL = 'https://calendly.com/tanuj-edviroenergy/30min'
 
 /**
- * Google Ads conversion for a "Book a demo" click. The interstitial at
- * BOOK_DEMO_PATH is only reachable from a CTA, so its page load is the click.
- * The Google tag itself loads from index.html.
+ * Google Ads conversion, reported when someone reaches BOOK_DEMO_PATH. That
+ * page is only linked from CTAs, so a view of it is a demo-intent click. The
+ * Google tag itself loads from index.html.
  */
 export const BOOK_DEMO_CONVERSION = 'AW-18357307098/d7uNCNjHztgcENqNubFE'
 

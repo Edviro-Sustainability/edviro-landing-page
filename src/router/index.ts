@@ -42,10 +42,17 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/AboutPage.vue'),
   },
   {
-    // Redirects to BOOKING_URL; every "Book a demo" CTA links here.
+    // Every "Book a demo" CTA links here, and reaching it is the Google Ads
+    // conversion. The scheduler itself lives one click further, at /demo.
     path: '/book-a-demo',
     name: 'book-a-demo',
     component: () => import('@/pages/BookDemo.vue'),
+  },
+  {
+    // Thin interstitial that redirects to BOOKING_URL.
+    path: '/demo',
+    name: 'demo',
+    component: () => import('@/pages/DemoRedirect.vue'),
   },
   {
     path: '/:pathMatch(.*)*',

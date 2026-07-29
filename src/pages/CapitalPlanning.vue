@@ -67,7 +67,7 @@ usePageSeo({
           <h1 style="margin: 0; font-weight: 400; font-size: clamp(36px, 5.4vw, 62px); line-height: 1.05; letter-spacing: -0.035em;">Test the project before you spend the budget.</h1>
           <p style="margin: 26px 0 0; max-width: 640px; font-size: 19px; line-height: 1.6; color: #55564C;">Every bill, meter reading, BMS point, and work order Edviro touches builds a digital twin of your building. Use it to simulate replacements, retrofits, and schedule changes, and rank capital projects by real payback before committing a dollar.</p>
           <div style="margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap;">
-            <a :href="BOOK_DEMO_PATH" target="_blank" rel="noopener" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #F4F2EC; background: var(--accent); padding: 13px 26px; border-radius: 999px;">Book a demo</a>
+            <RouterLink :to="BOOK_DEMO_PATH" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #F4F2EC; background: var(--accent); padding: 13px 26px; border-radius: 999px;">Book a demo</RouterLink>
           </div>
         </div>
       </div>

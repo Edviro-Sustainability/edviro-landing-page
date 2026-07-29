@@ -29,7 +29,7 @@ const close = () => {
           <a :href="BLOG_URL" class="nav-link" style="text-decoration: none; color: inherit;">Blog</a>
           <RouterLink to="/about" class="nav-link" style="text-decoration: none; color: inherit;">About</RouterLink>
         </div>
-        <a :href="BOOK_DEMO_PATH" target="_blank" rel="noopener" class="book-btn" style="font-size: 14.5px; font-weight: 500; text-decoration: none; color: #F4F2EC; background: var(--accent); padding: 10px 18px; border-radius: 999px;">Book a demo</a>
+        <RouterLink :to="BOOK_DEMO_PATH" class="book-btn" style="font-size: 14.5px; font-weight: 500; text-decoration: none; color: #F4F2EC; background: var(--accent); padding: 10px 18px; border-radius: 999px;">Book a demo</RouterLink>
       </div>
 
       <!-- Mobile menu toggle -->
@@ -63,7 +63,7 @@ const close = () => {
         <a :href="BLOG_URL" class="mobile-link" style="text-decoration: none; color: #1A1B14; font-size: 17px; padding: 13px 4px; border-bottom: 1px solid #E7E4D9;" @click="close">Blog</a>
         <RouterLink to="/about" class="mobile-link" style="text-decoration: none; color: #1A1B14; font-size: 17px; padding: 13px 4px;" @click="close">About</RouterLink>
       </div>
-      <a :href="BOOK_DEMO_PATH" target="_blank" rel="noopener" class="book-btn" style="display: block; text-align: center; margin-top: 16px; font-size: 15px; font-weight: 500; text-decoration: none; color: #F4F2EC; background: var(--accent); padding: 13px 18px; border-radius: 999px;" @click="close">Book a demo</a>
+      <RouterLink :to="BOOK_DEMO_PATH" class="book-btn" style="display: block; text-align: center; margin-top: 16px; font-size: 15px; font-weight: 500; text-decoration: none; color: #F4F2EC; background: var(--accent); padding: 13px 18px; border-radius: 999px;" @click="close">Book a demo</RouterLink>
     </div>
   </header>
 </template>
