@@ -36,41 +36,6 @@ const steps = [
   },
 ]
 
-const tiers = [
-  {
-    name: 'Visibility',
-    forWho: 'For teams flying blind between monthly bills.',
-    includes: [
-      'One live model per site from bills, meters, weather, and tariffs',
-      'Continuous audit that flags drift, anomalies, and waste as it starts',
-      'Billing and tariff error detection on every statement',
-      'Weekly briefing and benchmarking across your portfolio',
-    ],
-  },
-  {
-    name: 'Operations',
-    forWho: 'For teams who want the fix, not another dashboard.',
-    includes: [
-      'Everything in Visibility',
-      'Building management system, sensor, and work-order integration',
-      'Guided work orders with the step-by-step fix',
-      'Schedule and setpoint optimization, tested before it ships',
-      'Demand-charge management ahead of a peak',
-    ],
-  },
-  {
-    name: 'Capital & M&V',
-    forWho: 'For budget season, bond measures, and proving what you saved.',
-    includes: [
-      'Everything in Operations',
-      'A digital twin of each building',
-      'Intervention simulation before you spend',
-      'Capital projects ranked by modeled payback',
-      'Audit-grade M&V against a learned baseline',
-    ],
-  },
-]
-
 const faqs: FaqItem[] = [
   {
     question: 'What actually happens on the demo call?',
@@ -85,12 +50,12 @@ const faqs: FaqItem[] = [
   {
     question: 'How much does Edviro cost?',
     answer:
-      'Pricing depends on your portfolio, how many sites you connect, and which tier you start at. The free bill audit comes first, so by the time we quote you can see the recoverable spend sitting next to the price.',
+      'Pricing depends on your portfolio, how many sites you connect, and how much of Edviro you turn on. The free bill audit comes first, so by the time we quote you can see the recoverable spend sitting next to the price.',
   },
   {
-    question: 'Do we have to buy every tier?',
+    question: 'Do we have to buy all of it at once?',
     answer:
-      'No. The tiers stack, so you start where the pain is and add the next one when the last has paid for itself. Nothing is bundled, and there is no module you have to buy to unlock the one you wanted.',
+      'No. You start where the pain is and add the rest when the last step has paid for itself. Nothing is bundled, and there is no module you have to buy to unlock the one you wanted.',
   },
   {
     question: 'Do we need new hardware or a new building management system?',
@@ -107,7 +72,7 @@ const faqs: FaqItem[] = [
 usePageSeo({
   title: 'Demo, free bill audit & pricing',
   description:
-    'Book a 30-minute Edviro demo on your own data, get a free audit of your last 12 months of utility bills, and see tiered pricing you can start small on.',
+    'Book a 30-minute Edviro demo on your own data, get a free audit of your last 12 months of utility bills, and see how pricing works if you want to start small.',
   path: BOOK_DEMO_PATH,
   jsonLd: [
     organizationLd(),
@@ -115,7 +80,7 @@ usePageSeo({
     serviceLd({
       name: 'Edviro demo, free utility bill audit, and pricing',
       description:
-        'A 30-minute consultation on your own portfolio, a free estimate of recoverable spend read from twelve months of utility bills, and tiered pricing by connected site.',
+        'A 30-minute consultation on your own portfolio, a free estimate of recoverable spend read from twelve months of utility bills, and pricing quoted per connected site.',
       path: BOOK_DEMO_PATH,
       areaServed: 'United States',
     }),
@@ -141,7 +106,7 @@ onMounted(() => {
         <div style="max-width: 780px;">
           <p style="margin: 0 0 22px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8A8A7C;">Demo, free audit &amp; pricing</p>
           <h1 style="margin: 0; font-weight: 400; font-size: clamp(36px, 5.4vw, 62px); line-height: 1.05; letter-spacing: -0.035em;">See what we would find in your buildings <span style="color: var(--accent);">before you pay us anything</span>.</h1>
-          <p style="margin: 26px 0 0; max-width: 620px; font-size: 19px; line-height: 1.6; color: #55564C;">A 30-minute consultation on your own portfolio, a free read of your last twelve months of utility bills, and tiered pricing you can start small on.</p>
+          <p style="margin: 26px 0 0; max-width: 620px; font-size: 19px; line-height: 1.6; color: #55564C;">A 30-minute consultation on your own portfolio, a free read of your last twelve months of utility bills, and pricing you can start small on.</p>
           <div style="margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap;">
             <a :href="DEMO_REDIRECT_PATH" target="_blank" rel="noopener" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #F4F2EC; background: var(--accent); padding: 13px 26px; border-radius: 999px;">Book a 30-minute demo</a>
             <a :href="auditMailto" class="outline-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #1A1B14; background: transparent; padding: 13px 24px; border-radius: 999px; border: 1px solid #CFCBBD;">Get the free bill audit</a>
@@ -210,21 +175,8 @@ onMounted(() => {
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <p style="margin: 0 0 18px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8A8A7C;">Pricing</p>
         <h2 style="margin: 0 0 20px; font-weight: 400; font-size: clamp(28px, 3.8vw, 44px); line-height: 1.06; letter-spacing: -0.03em; max-width: 640px;">Pay for the part you are actually using.</h2>
-        <p style="margin: 0 0 40px; max-width: 660px; font-size: 17.5px; line-height: 1.62; color: #55564C;">Three tiers, priced by the sites you connect. Start where the pain is and add the next tier when the last one has paid for itself.</p>
-        <div class="r-cols-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
-          <div v-for="(tier, i) in tiers" :key="tier.name" :style="{ display: 'flex', flexDirection: 'column', border: i === 1 ? '1.5px solid #1A1B14' : '1px solid #E3E0D5', borderRadius: '16px', padding: '28px', background: i === 1 ? '#EFEDE4' : 'transparent' }">
-            <p style="margin: 0 0 6px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A8A7C;">Tier {{ i + 1 }}</p>
-            <h3 style="margin: 0 0 10px; font-size: 22px; font-weight: 600; letter-spacing: -0.01em;">{{ tier.name }}</h3>
-            <p style="margin: 0 0 20px; font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">{{ tier.forWho }}</p>
-            <ul style="margin: 0 0 24px; padding: 0; list-style: none; display: grid; gap: 12px; border-top: 1px solid #E3E0D5; padding-top: 20px;">
-              <li v-for="line in tier.includes" :key="line" style="font-size: 15px; line-height: 1.55; color: #55564C; display: grid; grid-template-columns: 16px 1fr; gap: 10px;">
-                <span aria-hidden="true" style="color: var(--accent); font-size: 15px; line-height: 1.55;">&#8594;</span>
-                <span>{{ line }}</span>
-              </li>
-            </ul>
-            <p style="margin: auto 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #8A8A7C;">Quoted per connected site</p>
-          </div>
-        </div>
+        <p style="margin: 0 0 20px; max-width: 660px; font-size: 17.5px; line-height: 1.62; color: #55564C;">Edviro is quoted per connected site and scoped to what you actually turn on, so a team that wants to see where money is leaking is not paying for capital planning. Start where the pain is and expand when the last step has paid for itself.</p>
+        <p style="margin: 0; max-width: 660px; font-size: 17.5px; line-height: 1.62; color: #55564C;">We work out the number on the call, once we know your portfolio and which sites you want connected. The free bill audit comes first, so you see the recoverable spend before you see a price.</p>
       </div>
     </section>
 
@@ -252,7 +204,7 @@ onMounted(() => {
               </div>
               <div>
                 <h4 style="margin: 0 0 8px; font-size: 16px; font-weight: 600;">No unverifiable savings</h4>
-                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #6B6C5E;">Every tier reports against a learned baseline, so the savings show up on the bill.</p>
+                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #6B6C5E;">Everything reports against a learned baseline, so the savings show up on the bill.</p>
               </div>
             </div>
           </div>

@@ -29,7 +29,7 @@ Everything Edviro ingests and every fix it verifies builds a living digital twin
 - [M&V for construction](https://edviroenergy.com/solutions/construction): Independent baselining and audit-grade verification for new builds.
 - [Capital planning](https://edviroenergy.com/capital-planning): Digital twins, intervention simulation, and capital projects ranked by payback.
 - [Measurement & Verification](https://edviroenergy.com/measurement-and-verification): How Edviro proves savings against a learned baseline.
-- [Demo, free bill audit & pricing](https://edviroenergy.com/book-a-demo): What the demo covers, the free utility bill audit, and how the tiers are priced.
+- [Demo, free bill audit & pricing](https://edviroenergy.com/book-a-demo): What the demo covers, the free utility bill audit, and how pricing works.
 - [FAQ](https://edviroenergy.com/faq): Answers to common questions about Edviro, digital twins, and M&V.
 - [About](https://edviroenergy.com/about): The team and mission behind Edviro.
 
@@ -37,8 +37,8 @@ Everything Edviro ingests and every fix it verifies builds a living digital twin
 
 - Demo: a 30-minute consultation with the founders run against your own portfolio, tariffs, and systems, not a slide deck. Edviro then connects a few of your sites and shows what it catches in the first week.
 - Free bill audit: send twelve months of utility bills, or set up a utility data-sharing connection such as PG&E Share My Data, and Edviro returns an estimate of annual recoverable spend, demand-charge exposure, tariff and billing errors, and the fixes ranked by payback. No software to install and no commitment.
-- Tiered pricing, quoted per connected site, so teams only pay for the part they use: Visibility (ingestion, continuous audit, anomaly and billing-error detection, weekly briefing), Operations (adds BMS and work-order integration, guided fixes, schedule and setpoint optimization, demand-charge management), and Capital & M&V (adds the digital twin, intervention simulation, projects ranked by modeled payback, audit-grade M&V).
-- Tiers stack rather than bundle: start at one tier and add the next when the last has paid for itself. No per-seat licensing and no hardware install project before the first findings.
+- Pricing is quoted per connected site and scoped to what you turn on, so teams only pay for the part they use. Exact pricing is worked out on the demo call, after the free bill audit.
+- Start where the pain is and expand when the last step has paid for itself. Nothing is bundled, there is no per-seat licensing, and there is no hardware install project before the first findings.
 
 ## Results
 
