@@ -31,26 +31,30 @@ export const DEMO_REDIRECT_PATH = '/demo'
 export const BOOKING_URL = 'https://calendly.com/tanuj-edviroenergy/30min'
 
 /**
- * Google Ads conversion, reported when someone clicks a booking button on
- * BOOK_DEMO_PATH and heads for the scheduler. The Google tag itself loads from
- * index.html.
+ * Where Calendly returns invitees after they book. Reaching it is the confirmed
+ * booking, so the ad conversions below are reported from this page rather than
+ * from the click that opened the scheduler.
  */
-export const BOOK_DEMO_CONVERSION = 'AW-18357307098/d7uNCNjHztgcENqNubFE'
+export const DEMO_BOOKED_PATH = '/demo-booked'
+
+/*
+ * Ad conversions. All three tags load from index.html, and all three are reported
+ * from DEMO_BOOKED_PATH so they count confirmed bookings. The IDs are unchanged
+ * from when they fired on the click, so nothing needs recreating in the ad
+ * dashboards — but the Google conversion action is still *named* for a click
+ * there, and its history mixes both definitions.
+ */
+export const DEMO_BOOKED_CONVERSION = 'AW-18357307098/d7uNCNjHztgcENqNubFE'
+export const DEMO_BOOKED_LINKEDIN_CONVERSION = 27472820
 
 /**
- * OpenAI Ads (ChatGPT) standard event reported on the same click. This must stay
- * identical to the event name on the conversion event configured in OpenAI Ads
- * Manager, or the conversion is not counted. Note it fires when the scheduler is
- * opened, not when a booking is confirmed, so it reads slightly high. The pixel
- * itself loads from index.html.
+ * OpenAI Ads standard events. The taxonomy has a name for each half of the
+ * funnel, so unlike Google and LinkedIn no second conversion has to be created:
+ * the click "requests contact" and the redirect back confirms the appointment.
+ * These must match the conversion events configured in OpenAI Ads Manager.
  */
-export const BOOK_DEMO_OPENAI_EVENT = 'appointment_scheduled'
-
-/**
- * LinkedIn event-specific conversion reported on the same click. The Insight Tag
- * that defines window.lintrk loads at the end of the body in index.html.
- */
-export const BOOK_DEMO_LINKEDIN_CONVERSION = 27472820
+export const DEMO_CLICK_OPENAI_EVENT = 'lead_created'
+export const DEMO_BOOKED_OPENAI_EVENT = 'appointment_scheduled'
 
 // PostHog project API token — publishable, safe to ship in the client
 // bundle (same convention as the blog's Supabase publishable key).

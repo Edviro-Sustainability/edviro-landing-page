@@ -3,13 +3,7 @@ import FaqList from '@/components/FaqList.vue'
 import PageBreadcrumbs from '@/components/PageBreadcrumbs.vue'
 import { usePageSeo } from '@/seo/usePageSeo'
 import { breadcrumbLd, faqLd, organizationLd, serviceLd, type FaqItem } from '@/seo/jsonld'
-import {
-  BOOK_DEMO_CONVERSION,
-  BOOK_DEMO_LINKEDIN_CONVERSION,
-  BOOK_DEMO_OPENAI_EVENT,
-  BOOK_DEMO_PATH,
-  DEMO_REDIRECT_PATH,
-} from '@/seo/site'
+import { BOOK_DEMO_PATH, DEMO_CLICK_OPENAI_EVENT, DEMO_REDIRECT_PATH } from '@/seo/site'
 
 const breadcrumbs = [
   { name: 'Home', path: '/' },
@@ -87,18 +81,15 @@ usePageSeo({
 })
 
 /**
- * Reports the Google Ads, OpenAI Ads, and LinkedIn conversions when someone
- * clicks through to the scheduler. Every booking button opens /demo in a new tab,
- * so this page is never unloaded and the beacons have time to leave. That is why
- * Google's snippet for this conversion — which cancels the click, waits for an
- * event_callback, then sets window.location — is not used verbatim: it would
- * replace the current tab instead of opening one. All three tags load from
- * index.html.
+ * Reports opening the scheduler as demand for contact, not as a booking — the
+ * confirmed booking is reported from /demo-booked when Calendly redirects back.
+ * Only OpenAI Ads gets this softer signal, because its taxonomy has a separate
+ * standard event for it; the Google and LinkedIn conversions would need second
+ * conversion actions created in their dashboards to be told apart from a booking.
+ * The pixel loads from index.html.
  */
-function reportDemoConversion(): void {
-  window.gtag?.('event', 'conversion', { send_to: BOOK_DEMO_CONVERSION })
-  window.oaiq?.('measure', BOOK_DEMO_OPENAI_EVENT, { type: 'customer_action' })
-  window.lintrk?.('track', { conversion_id: BOOK_DEMO_LINKEDIN_CONVERSION })
+function reportDemoIntent(): void {
+  window.oaiq?.('measure', DEMO_CLICK_OPENAI_EVENT, { type: 'customer_action' })
 }
 </script>
 
@@ -114,7 +105,7 @@ function reportDemoConversion(): void {
           <h1 style="margin: 0; font-weight: 400; font-size: clamp(36px, 5.4vw, 62px); line-height: 1.05; letter-spacing: -0.035em;">See what we would find in your buildings <span style="color: var(--accent);">before you pay us anything</span>.</h1>
           <p style="margin: 26px 0 0; max-width: 620px; font-size: 19px; line-height: 1.6; color: #55564C;">A 30-minute consultation on your own portfolio, a free read of your last twelve months of utility bills, and pricing you can start small on.</p>
           <div style="margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap;">
-            <a :href="DEMO_REDIRECT_PATH" target="_blank" rel="noopener" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #F4F2EC; background: var(--accent); padding: 13px 26px; border-radius: 999px;" @click="reportDemoConversion">Book a 30-minute demo</a>
+            <a :href="DEMO_REDIRECT_PATH" target="_blank" rel="noopener" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #F4F2EC; background: var(--accent); padding: 13px 26px; border-radius: 999px;" @click="reportDemoIntent">Book a 30-minute demo</a>
           </div>
         </div>
       </div>
@@ -159,7 +150,7 @@ function reportDemoConversion(): void {
           <div>
             <h3 style="margin: 0 0 14px; font-size: 18px; font-weight: 600; color: #F4F2EC;">What you send</h3>
             <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.62; color: #C9CABA;">Twelve months of utility bills as PDFs, or a utility data-sharing connection such as PG&amp;E Share My Data. That is the whole ask, and we set it up on the demo call. Nothing to install, and no access to your control system.</p>
-            <a :href="DEMO_REDIRECT_PATH" target="_blank" rel="noopener" class="audit-btn" style="display: inline-block; font-size: 15px; font-weight: 500; text-decoration: none; color: #16170F; background: #F4F2EC; padding: 13px 26px; border-radius: 999px;" @click="reportDemoConversion">Book a demo to get yours</a>
+            <a :href="DEMO_REDIRECT_PATH" target="_blank" rel="noopener" class="audit-btn" style="display: inline-block; font-size: 15px; font-weight: 500; text-decoration: none; color: #16170F; background: #F4F2EC; padding: 13px 26px; border-radius: 999px;" @click="reportDemoIntent">Book a demo to get yours</a>
           </div>
           <div>
             <h3 style="margin: 0 0 14px; font-size: 18px; font-weight: 600; color: #F4F2EC;">What you get back</h3>
@@ -225,7 +216,7 @@ function reportDemoConversion(): void {
         <h2 style="margin: 0; font-weight: 400; font-size: clamp(34px, 5vw, 56px); line-height: 1.05; letter-spacing: -0.035em; color: #F8F7F1;">Book the thirty minutes.</h2>
         <p style="margin: 24px auto 0; max-width: 560px; font-size: 18px; line-height: 1.6; color: rgba(244,242,236,0.78);">Bring a utility bill. We will show you what Edviro finds in your own buildings, and what it costs to keep finding it.</p>
         <div style="margin-top: 34px; display: flex; justify-content: center;">
-          <a :href="DEMO_REDIRECT_PATH" target="_blank" rel="noopener" class="cta-btn" style="font-size: 16px; font-weight: 600; text-decoration: none; color: var(--accent); background: #F4F2EC; padding: 15px 34px; border-radius: 999px;" @click="reportDemoConversion">Pick a time</a>
+          <a :href="DEMO_REDIRECT_PATH" target="_blank" rel="noopener" class="cta-btn" style="font-size: 16px; font-weight: 600; text-decoration: none; color: var(--accent); background: #F4F2EC; padding: 15px 34px; border-radius: 999px;" @click="reportDemoIntent">Pick a time</a>
         </div>
       </div>
     </section>

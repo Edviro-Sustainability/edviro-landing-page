@@ -42,9 +42,8 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/AboutPage.vue'),
   },
   {
-    // Every "Book a demo" CTA links here. Clicking through from this page to the
-    // scheduler is the Google Ads conversion, and the scheduler itself lives one
-    // click further, at /demo.
+    // Every "Book a demo" CTA links here. The scheduler lives one click further,
+    // at /demo, and Calendly returns invitees to /demo-booked.
     path: '/book-a-demo',
     name: 'book-a-demo',
     component: () => import('@/pages/BookDemo.vue'),
@@ -54,6 +53,13 @@ export const routes: RouteRecordRaw[] = [
     path: '/demo',
     name: 'demo',
     component: () => import('@/pages/DemoRedirect.vue'),
+  },
+  {
+    // Calendly's post-booking redirect target, where the ad conversions for a
+    // confirmed booking are reported.
+    path: '/demo-booked',
+    name: 'demo-booked',
+    component: () => import('@/pages/DemoBooked.vue'),
   },
   {
     path: '/:pathMatch(.*)*',
