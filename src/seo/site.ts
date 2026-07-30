@@ -17,8 +17,18 @@ export const CONTACT_EMAIL = 'founders@edviroenergy.com'
 export const BLOG_URL = 'https://blog.edviroenergy.com'
 
 /**
- * Every "Book a demo" CTA points at this page, which explains the demo, the
- * free bill audit, and pricing. It is also the Google Ads conversion page.
+ * Public profiles, used for the footer links and Organization `sameAs`. The X
+ * account is Hursh's personal profile rather than a brand account, so swap it
+ * here if Edviro ever gets its own.
+ */
+export const LINKEDIN_URL = 'https://www.linkedin.com/company/edviro/'
+export const X_URL = 'https://x.com/hursheybar2'
+export const X_HANDLE = '@hursheybar2'
+export const SOCIAL_URLS = [LINKEDIN_URL, X_URL]
+
+/**
+ * Every "Book a demo" CTA points at this page, which explains the demo and
+ * pricing.
  */
 export const BOOK_DEMO_PATH = '/book-a-demo'
 

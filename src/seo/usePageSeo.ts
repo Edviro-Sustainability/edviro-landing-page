@@ -4,6 +4,7 @@ import {
   SITE_TAGLINE,
   DEFAULT_DESCRIPTION,
   DEFAULT_OG_IMAGE,
+  X_HANDLE,
   absoluteUrl,
   canonicalUrl,
 } from './site'
@@ -65,6 +66,7 @@ export function usePageSeo(opts: PageSeoOptions): void {
       { property: 'og:locale', content: 'en_US' },
 
       { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:site', content: X_HANDLE },
       { name: 'twitter:title', content: opts.title },
       { name: 'twitter:description', content: description },
       { name: 'twitter:image', content: image },

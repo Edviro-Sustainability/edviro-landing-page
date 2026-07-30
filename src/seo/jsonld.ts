@@ -6,6 +6,7 @@ import {
   absoluteUrl,
   canonicalUrl,
   LOGO_PATH,
+  SOCIAL_URLS,
 } from './site'
 
 export type JsonLd = Record<string, unknown>
@@ -25,6 +26,7 @@ export function organizationLd(): JsonLd {
     logo: absoluteUrl(LOGO_PATH),
     description: DEFAULT_DESCRIPTION,
     email: CONTACT_EMAIL,
+    sameAs: SOCIAL_URLS,
     foundingDate: '2024',
     founder: [
       { '@type': 'Person', name: 'Hursh', jobTitle: 'Founder & CEO' },

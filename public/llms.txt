@@ -29,15 +29,16 @@ Everything Edviro ingests and every fix it verifies builds a living digital twin
 - [M&V for construction](https://edviroenergy.com/solutions/construction): Independent baselining and audit-grade verification for new builds.
 - [Capital planning](https://edviroenergy.com/capital-planning): Digital twins, intervention simulation, and capital projects ranked by payback.
 - [Measurement & Verification](https://edviroenergy.com/measurement-and-verification): How Edviro proves savings against a learned baseline.
-- [Demo, free bill audit & pricing](https://edviroenergy.com/book-a-demo): What the demo covers, the free utility bill audit, and how pricing works.
+- [Demo & pricing](https://edviroenergy.com/book-a-demo): What the demo covers and how pricing works.
 - [FAQ](https://edviroenergy.com/faq): Answers to common questions about Edviro, digital twins, and M&V.
 - [About](https://edviroenergy.com/about): The team and mission behind Edviro.
 
 ## Getting started, and pricing
 
-- Demo: a 30-minute consultation with the founders run against your own portfolio, tariffs, and systems, not a slide deck. Edviro then connects a few of your sites and shows what it catches in the first week.
-- Free bill audit: send twelve months of utility bills, or set up a utility data-sharing connection such as PG&E Share My Data, and Edviro returns an estimate of annual recoverable spend, demand-charge exposure, tariff and billing errors, and the fixes ranked by payback. No software to install and no commitment.
-- Pricing is quoted per connected site and scoped to what you turn on, so teams only pay for the part they use. Exact pricing is worked out on the demo call, after the free bill audit.
+- Demo: a 30-minute walkthrough with the founders covering how Edviro reads bills and interval data, what it flags, and what it hands a facilities team to fix. Nothing to install or send beforehand. These calls typically involve a director of maintenance, operations, facilities, sustainability, business, or finance, though anyone is welcome.
+- Then a scoping conversation about which sites and systems you run, and a quote based on exactly what the school needs.
+- After that, Edviro gathers your bills and meter data, starts reading your sites, and returns an initial report on what it found.
+- Pricing is quoted per connected site and scoped to what you turn on, so teams only pay for the part they use. Exact pricing is worked out on the demo call.
 - Start where the pain is and expand when the last step has paid for itself. Nothing is bundled, there is no per-seat licensing, and there is no hardware install project before the first findings.
 
 ## Results
@@ -50,3 +51,5 @@ Everything Edviro ingests and every fix it verifies builds a living digital twin
 
 - Email: founders@edviroenergy.com
 - Book a demo: https://edviroenergy.com/book-a-demo
+- LinkedIn: https://www.linkedin.com/company/edviro/
+- X: https://x.com/hursheybar2
