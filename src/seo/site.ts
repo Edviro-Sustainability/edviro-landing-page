@@ -50,9 +50,9 @@ export const DEMO_BOOKED_PATH = '/demo-booked'
 /*
  * Ad conversions. All three tags load from index.html, and all three are reported
  * from DEMO_BOOKED_PATH so they count confirmed bookings. The IDs are unchanged
- * from when they fired on the click, so nothing needs recreating in the ad
- * dashboards — but the Google conversion action is still *named* for a click
- * there, and its history mixes both definitions.
+ * from when they fired on the click that opened the scheduler, so the Google
+ * action's history mixes both definitions — but it is now the page-load
+ * conversion for the booking confirmation, matching how it is reported here.
  */
 export const DEMO_BOOKED_CONVERSION = 'AW-18357307098/d7uNCNjHztgcENqNubFE'
 export const DEMO_BOOKED_LINKEDIN_CONVERSION = 27472820
