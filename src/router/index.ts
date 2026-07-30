@@ -42,8 +42,9 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/AboutPage.vue'),
   },
   {
-    // Every "Book a demo" CTA links here, and reaching it is the Google Ads
-    // conversion. The scheduler itself lives one click further, at /demo.
+    // Every "Book a demo" CTA links here. Clicking through from this page to the
+    // scheduler is the Google Ads conversion, and the scheduler itself lives one
+    // click further, at /demo.
     path: '/book-a-demo',
     name: 'book-a-demo',
     component: () => import('@/pages/BookDemo.vue'),

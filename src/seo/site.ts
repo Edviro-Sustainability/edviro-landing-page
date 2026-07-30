@@ -31,11 +31,26 @@ export const DEMO_REDIRECT_PATH = '/demo'
 export const BOOKING_URL = 'https://calendly.com/tanuj-edviroenergy/30min'
 
 /**
- * Google Ads conversion, reported when someone reaches BOOK_DEMO_PATH. That
- * page is only linked from CTAs, so a view of it is a demo-intent click. The
- * Google tag itself loads from index.html.
+ * Google Ads conversion, reported when someone clicks a booking button on
+ * BOOK_DEMO_PATH and heads for the scheduler. The Google tag itself loads from
+ * index.html.
  */
 export const BOOK_DEMO_CONVERSION = 'AW-18357307098/d7uNCNjHztgcENqNubFE'
+
+/**
+ * OpenAI Ads (ChatGPT) standard event reported on the same click. This must stay
+ * identical to the event name on the conversion event configured in OpenAI Ads
+ * Manager, or the conversion is not counted. Note it fires when the scheduler is
+ * opened, not when a booking is confirmed, so it reads slightly high. The pixel
+ * itself loads from index.html.
+ */
+export const BOOK_DEMO_OPENAI_EVENT = 'appointment_scheduled'
+
+/**
+ * LinkedIn event-specific conversion reported on the same click. The Insight Tag
+ * that defines window.lintrk loads at the end of the body in index.html.
+ */
+export const BOOK_DEMO_LINKEDIN_CONVERSION = 27472820
 
 // PostHog project API token — publishable, safe to ship in the client
 // bundle (same convention as the blog's Supabase publishable key).
