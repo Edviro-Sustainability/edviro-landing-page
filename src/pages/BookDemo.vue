@@ -4,19 +4,12 @@ import FaqList from '@/components/FaqList.vue'
 import PageBreadcrumbs from '@/components/PageBreadcrumbs.vue'
 import { usePageSeo } from '@/seo/usePageSeo'
 import { breadcrumbLd, faqLd, organizationLd, serviceLd, type FaqItem } from '@/seo/jsonld'
-import {
-  BOOK_DEMO_CONVERSION,
-  BOOK_DEMO_PATH,
-  CONTACT_EMAIL,
-  DEMO_REDIRECT_PATH,
-} from '@/seo/site'
+import { BOOK_DEMO_CONVERSION, BOOK_DEMO_PATH, DEMO_REDIRECT_PATH } from '@/seo/site'
 
 const breadcrumbs = [
   { name: 'Home', path: '/' },
   { name: 'Demo, audit & pricing', path: BOOK_DEMO_PATH },
 ]
-
-const auditMailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Free bill audit')}`
 
 const steps = [
   {
@@ -109,7 +102,6 @@ onMounted(() => {
           <p style="margin: 26px 0 0; max-width: 620px; font-size: 19px; line-height: 1.6; color: #55564C;">A 30-minute consultation on your own portfolio, a free read of your last twelve months of utility bills, and pricing you can start small on.</p>
           <div style="margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap;">
             <a :href="DEMO_REDIRECT_PATH" target="_blank" rel="noopener" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #F4F2EC; background: var(--accent); padding: 13px 26px; border-radius: 999px;">Book a 30-minute demo</a>
-            <a :href="auditMailto" class="outline-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #1A1B14; background: transparent; padding: 13px 24px; border-radius: 999px; border: 1px solid #CFCBBD;">Get the free bill audit</a>
           </div>
         </div>
       </div>
@@ -153,8 +145,8 @@ onMounted(() => {
         <div class="r-split" style="display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 40px; align-items: start;">
           <div>
             <h3 style="margin: 0 0 14px; font-size: 18px; font-weight: 600; color: #F4F2EC;">What you send</h3>
-            <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.62; color: #C9CABA;">Twelve months of utility bills as PDFs, or a utility data-sharing connection such as PG&amp;E Share My Data. That is the whole ask. Nothing to install, and no access to your control system.</p>
-            <a :href="auditMailto" class="audit-btn" style="display: inline-block; font-size: 15px; font-weight: 500; text-decoration: none; color: #16170F; background: #F4F2EC; padding: 13px 26px; border-radius: 999px;">Email us your bills</a>
+            <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.62; color: #C9CABA;">Twelve months of utility bills as PDFs, or a utility data-sharing connection such as PG&amp;E Share My Data. That is the whole ask, and we set it up on the demo call. Nothing to install, and no access to your control system.</p>
+            <a :href="DEMO_REDIRECT_PATH" target="_blank" rel="noopener" class="audit-btn" style="display: inline-block; font-size: 15px; font-weight: 500; text-decoration: none; color: #16170F; background: #F4F2EC; padding: 13px 26px; border-radius: 999px;">Book a demo to get yours</a>
           </div>
           <div>
             <h3 style="margin: 0 0 14px; font-size: 18px; font-weight: 600; color: #F4F2EC;">What you get back</h3>
@@ -219,9 +211,8 @@ onMounted(() => {
       <div style="max-width: 820px; margin: 0 auto; width: 100%; text-align: center;">
         <h2 style="margin: 0; font-weight: 400; font-size: clamp(34px, 5vw, 56px); line-height: 1.05; letter-spacing: -0.035em; color: #F8F7F1;">Book the thirty minutes.</h2>
         <p style="margin: 24px auto 0; max-width: 560px; font-size: 18px; line-height: 1.6; color: rgba(244,242,236,0.78);">Bring a utility bill. We will show you what Edviro finds in your own buildings, and what it costs to keep finding it.</p>
-        <div style="margin-top: 34px; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+        <div style="margin-top: 34px; display: flex; justify-content: center;">
           <a :href="DEMO_REDIRECT_PATH" target="_blank" rel="noopener" class="cta-btn" style="font-size: 16px; font-weight: 600; text-decoration: none; color: var(--accent); background: #F4F2EC; padding: 15px 34px; border-radius: 999px;">Pick a time</a>
-          <a :href="auditMailto" class="cta-email" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.04em; color: rgba(244,242,236,0.7); text-decoration: none;">{{ CONTACT_EMAIL }}</a>
         </div>
       </div>
     </section>
@@ -233,13 +224,7 @@ onMounted(() => {
 .audit-btn:hover {
   filter: brightness(1.12);
 }
-.outline-btn:hover {
-  border-color: #1a1b14 !important;
-}
 .cta-btn:hover {
   filter: brightness(1.06);
-}
-.cta-email:hover {
-  color: #f4f2ec !important;
 }
 </style>
