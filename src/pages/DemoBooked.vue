@@ -41,8 +41,10 @@ function claimReport(key: string): boolean {
 onMounted(() => {
   const params = new URLSearchParams(window.location.search)
 
-  const fullName = params.get('invitee_full_name')?.trim()
-  if (fullName) firstName.value = fullName.split(/\s+/)[0] ?? ''
+  firstName.value =
+    params.get('invitee_first_name')?.trim() ||
+    params.get('invitee_full_name')?.trim().split(/\s+/)[0] ||
+    ''
 
   const start = params.get('event_start_time')
   if (start) {
@@ -60,6 +62,18 @@ onMounted(() => {
   }
 
   if (!claimReport(`edviro:booking-reported:${window.location.search}`)) return
+
+  // Enhanced conversions. The conversion action is configured with the
+  // "JavaScript variables" method reading edviroBookingEmail, and the
+  // gtag('set') covers the in-page-code path; both hash the address before
+  // sending. Email only: Calendly's redirect carries no postal code or
+  // country, and Google ignores name/address unless all four of first name,
+  // last name, postal code, and country are present.
+  const email = params.get('invitee_email')?.trim().toLowerCase()
+  if (email) {
+    window.edviroBookingEmail = email
+    window.gtag?.('set', 'user_data', { email })
+  }
 
   // Reaching this page means Calendly confirmed the booking. Tags come from
   // index.html; each call is optional so a blocked tag cannot break the others.
