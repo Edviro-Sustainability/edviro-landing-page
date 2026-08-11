@@ -19,10 +19,15 @@ defineProps<{ demoSpeed?: number }>()
           <a href="#loop" class="outline-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #1A1B14; background: transparent; padding: 13px 24px; border-radius: 999px; border: 1px solid #CFCBBD;">See how it works</a>
         </div>
         <div style="margin-top: 26px; display: flex; justify-content: center;">
-          <span style="display: inline-flex; align-items: center; gap: 9px; font-size: 13.5px; font-weight: 600; color: #1A1B14; background: #FFFFFF; border: 1px solid #E3E0D5; padding: 7px 15px 7px 9px; border-radius: 0;">
+          <a
+            href="https://www.ycombinator.com/companies/edviro"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="display: inline-flex; align-items: center; gap: 9px; font-size: 13.5px; font-weight: 600; color: #1A1B14; background: #FFFFFF; border: 1px solid #E3E0D5; padding: 7px 15px 7px 9px; border-radius: 0; text-decoration: none;"
+          >
             <span style="width: 19px; height: 19px; border-radius: 4px; background: #FB651E; color: #fff; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">Y</span>
             Backed by Y Combinator
-          </span>
+          </a>
         </div>
       </div>
 
