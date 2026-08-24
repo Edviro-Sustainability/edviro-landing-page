@@ -10,7 +10,9 @@ import CtaSection from '@/components/CtaSection.vue'
 import { usePageSeo } from '@/seo/usePageSeo'
 import { organizationLd, websiteLd, softwareApplicationLd } from '@/seo/jsonld'
 
-const demoSpeed = 1
+// 0.5 = half speed; the hero demo's step timers scale as 560ms / demoSpeed.
+// Slowed from 1 because the card copy was unreadable at full pace.
+const demoSpeed = 0.5
 const showProofMetrics = true
 
 usePageSeo({
