@@ -22,6 +22,11 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/SolutionConstruction.vue'),
   },
   {
+    path: '/solutions/data-centers',
+    name: 'solutions-data-centers',
+    component: () => import('@/pages/SolutionDataCenters.vue'),
+  },
+  {
     path: '/measurement-and-verification',
     name: 'measurement-and-verification',
     component: () => import('@/pages/MeasurementVerification.vue'),

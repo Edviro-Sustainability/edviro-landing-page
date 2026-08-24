@@ -59,7 +59,7 @@ const faqs: FaqItem[] = [
   {
     question: 'Who is Edviro for?',
     answer:
-      'Edviro is built for the people who run buildings: school facilities teams and K-12 districts, commercial real estate and office operators, and construction teams that need independent baselining and M&V for new builds.',
+      'Edviro is built for the people who run buildings: school facilities teams and K-12 districts, construction teams that need independent baselining and M&V for new builds, and data center operators who need to know how much cooling headroom a site actually has.',
   },
   {
     question: 'How does occupancy-based control work?',

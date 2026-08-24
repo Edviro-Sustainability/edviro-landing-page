@@ -1,5 +1,30 @@
 # edviro-landing-page
 
+The Edviro marketing site (Vue 3 + Vite).
+
+## The Edviro ecosystem
+
+Edviro is a K-12 school-district energy management platform. Six repos, one shared data plane:
+
+| Repo | What it is |
+|------|-----------|
+| `flask-server` | Python backend — Cloud Run API + nightly Fargate ML pipeline |
+| `edviro-dashboard` | React operator dashboard (Netlify-hosted, Supabase-backed) |
+| `edviro-caseagent` | Cloudflare Worker — LLM ResolutionAgent that works anomaly cases end-to-end |
+| `edviro-mobile-app` | React Native app — district energy views via Supabase under RLS |
+| `edviro-landing-page` | Marketing site — this repo |
+| `edviro-blog` | Astro blog |
+
+**Shared data plane:** Supabase (Postgres + Auth + Storage + Edge Functions). District-scoped RLS is the authorization boundary; backend jobs use the service role.
+
+**Architecture source of truth:** the [Edviro Architecture](https://app.notion.com/p/3a1e1e5ee06481c7ab24f4e8db322027) Notion page and its component pages, mirrored as the Monoid canvas "Edviro Architecture" (id `cab10eba-96ba-49ef-aec0-22959c08e5c2`). Agents: fetch pages via the Notion MCP; explore component relationships via the Monoid MCP (`get_canvas`, `get_node_context`).
+
+## Docs map
+
+This repo has no dedicated Notion component page; start from the [Edviro Architecture](https://app.notion.com/p/3a1e1e5ee06481c7ab24f4e8db322027) index. Product positioning lives in the "What is Edviro?" Notion page.
+
+## Vue template notes
+
 This template should help get you started developing with Vue 3 in Vite.
 
 ## Recommended IDE Setup

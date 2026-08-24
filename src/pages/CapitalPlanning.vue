@@ -119,9 +119,9 @@ usePageSeo({
             <div style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">Schools &rarr;</div>
             <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #6B6C5E;">Walk into budget and bond season with a ranked project list and the data behind it.</p>
           </RouterLink>
-          <RouterLink to="/solutions/real-estate" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #E3E0D5; border-radius: 16px; padding: 24px; background: #FBFAF6; display: block;">
-            <div style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">Real estate &rarr;</div>
-            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #6B6C5E;">Prioritize capex across the portfolio by modeled payback, building by building.</p>
+          <RouterLink to="/solutions/data-centers" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #E3E0D5; border-radius: 16px; padding: 24px; background: #FBFAF6; display: block;">
+            <div style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">Data centers &rarr;</div>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #6B6C5E;">Find how many racks a site can take before cooling is the constraint — simulated before you commit.</p>
           </RouterLink>
           <RouterLink to="/solutions/construction" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #E3E0D5; border-radius: 16px; padding: 24px; background: #FBFAF6; display: block;">
             <div style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">Construction &rarr;</div>

@@ -69,7 +69,7 @@ export function softwareApplicationLd(): JsonLd {
     audience: {
       '@type': 'BusinessAudience',
       audienceType:
-        'Facilities managers, building owners, commercial real estate operators, and construction teams',
+        'Facilities managers, building owners, data center operators, and construction teams',
     },
   }
 }
