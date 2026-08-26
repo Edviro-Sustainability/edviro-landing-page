@@ -47,6 +47,14 @@ export const BOOKING_URL = 'https://calendly.com/tanuj-edviroenergy/30min'
  */
 export const DEMO_BOOKED_PATH = '/demo-booked'
 
+/**
+ * Public IUSD community sustainability dashboard demo (edviro-community-template,
+ * deployed as an assets-only Cloudflare Worker). The landing page only forwards
+ * this vanity path via the generated Netlify _redirects file.
+ */
+export const IUSD_DEMO_PATH = '/iusd-sustainability-demo'
+export const IUSD_DEMO_URL = 'https://edviro-community-iusd.tanujsiripurapu.workers.dev'
+
 /*
  * Ad conversions. All three tags load from index.html, and all three are reported
  * from DEMO_BOOKED_PATH so they count confirmed bookings. The IDs are unchanged
