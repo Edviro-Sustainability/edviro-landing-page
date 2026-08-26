@@ -37,7 +37,7 @@ const faqs: FaqItem[] = [
   {
     question: 'How quickly can a district see results?',
     answer:
-      'Edviro typically connects a few sites and shows what it catches within the first week, with no upfront audit and no rip-and-replace. To date Edviro has saved clients over $400K, with 7 school sites live and 29 more expanding.',
+      'Edviro typically connects a few sites and shows what it catches within the first week, with no upfront audit and no rip-and-replace. To date Edviro has saved clients over $400K, with 34 school sites live and expanding.',
   },
 ]
 

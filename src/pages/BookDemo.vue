@@ -57,7 +57,7 @@ const faqs: FaqItem[] = [
   {
     question: 'Can we start with a single site?',
     answer:
-      'Yes. Most teams connect a few sites, see what Edviro finds in the first week, then expand. To date Edviro has saved clients over $400K, with 7 school sites live and 29 more expanding.',
+      'Yes. Most teams connect a few sites, see what Edviro finds in the first week, then expand. To date Edviro has saved clients over $400K, with 34 school sites live and expanding.',
   },
 ]
 

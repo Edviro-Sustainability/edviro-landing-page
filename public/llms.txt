@@ -44,7 +44,8 @@ Everything Edviro ingests and every fix it verifies builds a living digital twin
 ## Results
 
 - Over $400K saved for clients to date.
-- 7 school sites live, with 29 more expanding.
+- 34 school sites live and expanding.
+- Featured customers include Palo Alto Unified School District and Los Gatos-Saratoga Union High School District.
 - 24/7 autonomous monitoring across every site.
 
 ## Contact

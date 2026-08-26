@@ -14,8 +14,8 @@
           <div style="margin-top: 12px; font-size: 14.5px; color: #6B6C5E; line-height: 1.45;">saved for clients to date</div>
         </div>
         <div style="border-top: 1.5px solid #1A1B14; padding-top: 18px;">
-          <div style="font-size: clamp(40px, 4.5vw, 58px); font-weight: 300; line-height: 1; letter-spacing: -0.04em;">7</div>
-          <div style="margin-top: 12px; font-size: 14.5px; color: #6B6C5E; line-height: 1.45;">school sites live, with 29 more expanding</div>
+          <div style="font-size: clamp(40px, 4.5vw, 58px); font-weight: 300; line-height: 1; letter-spacing: -0.04em;">34</div>
+          <div style="margin-top: 12px; font-size: 14.5px; color: #6B6C5E; line-height: 1.45;">school sites live and expanding</div>
         </div>
         <div style="border-top: 1.5px solid #1A1B14; padding-top: 18px;">
           <div style="font-size: clamp(40px, 4.5vw, 58px); font-weight: 300; line-height: 1; letter-spacing: -0.04em;">24/7</div>

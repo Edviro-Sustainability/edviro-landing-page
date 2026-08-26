@@ -5,6 +5,7 @@ import DigitalTwinSection from '@/components/DigitalTwinSection.vue'
 import WhoItsFor from '@/components/WhoItsFor.vue'
 import VisibilityMV from '@/components/VisibilityMV.vue'
 import ResultsSection from '@/components/ResultsSection.vue'
+import FeaturedCustomers from '@/components/FeaturedCustomers.vue'
 import TeamSection from '@/components/TeamSection.vue'
 import CtaSection from '@/components/CtaSection.vue'
 import { usePageSeo } from '@/seo/usePageSeo'
@@ -33,6 +34,7 @@ usePageSeo({
     <WhoItsFor />
     <VisibilityMV />
     <ResultsSection v-if="showProofMetrics" />
+    <FeaturedCustomers />
     <TeamSection />
     <CtaSection />
   </main>
