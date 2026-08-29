@@ -1,0 +1,48 @@
+---
+description: Supabase schema changes ship only as committed migrations through edviro-dashboard CI — never applied out-of-band
+alwaysApply: true
+---
+
+# Supabase schema changes: committed migrations only
+
+The shared Supabase data plane's schema is git-owned. The ONLY source of
+schema changes is committed files in `edviro-dashboard/supabase/migrations/`,
+applied by CI:
+
+- Staging branch DB — applies automatically on push to edviro-dashboard's
+  `staging` branch (Supabase GitHub App).
+- Production — applies only via the dispatch-only `db-push-prod` workflow,
+  after the code that depends on the migration is deployed.
+- Local / CI e2e databases — `supabase db reset --local` (exempt from these
+  rules).
+
+FORBIDDEN against production or the staging branch, from ANY repo:
+
+- Supabase MCP `apply_migration` — never sanctioned, against any target
+- DDL through MCP `execute_sql` (create / alter / drop / grant / revoke /
+  truncate / comment)
+- `supabase db push`, `supabase migration repair`, psql DDL, or hand-edits
+  to `supabase_migrations.schema_migrations`
+
+Invariants:
+
+1. Commit before apply — a migration file must be committed on
+   edviro-dashboard `staging` before any shared database records its
+   version. An applied-but-uncommitted migration bricks every other
+   agent's staging pushes (db-drift-check: "applied versions with NO
+   matching file").
+2. Versions applied to production are permanent — never rename those
+   files. Only prod-pending files may be restamped; afterwards recreate
+   the staging branch (`edviro-dashboard/scripts/staging.sh down && up`).
+3. MCP `execute_sql` is for reads; data seeding/QA writes are allowed on
+   the staging branch only.
+
+Need a schema change while working in another repo? Write the migration
+file in edviro-dashboard, commit it there, let CI apply it — then continue
+your work against the applied schema.
+
+History: 2026-08-27 (laptop `db push`) and 2026-08-29 (MCP `apply_migration`
+of an uncommitted file) each bricked all staging deploys for every agent. A
+user-level Cursor hook (`~/.cursor/hooks/guard-supabase-ddl.py`) now denies
+these calls at the tool level — if it blocks you, fix your approach, don't
+work around it.
