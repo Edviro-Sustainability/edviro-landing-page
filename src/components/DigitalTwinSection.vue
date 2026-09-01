@@ -31,7 +31,7 @@ import { RouterLink } from 'vue-router'
       </div>
 
       <div style="margin-top: 36px;">
-        <RouterLink to="/capital-planning" class="twin-link" style="display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; text-decoration: none; color: #EDF0EE; border: 1px solid #39443E; padding: 13px 24px; border-radius: 999px;">How capital planning works &rarr;</RouterLink>
+        <RouterLink to="/capital-planning/" class="twin-link" style="display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; text-decoration: none; color: #EDF0EE; border: 1px solid #39443E; padding: 13px 24px; border-radius: 999px;">How capital planning works &rarr;</RouterLink>
       </div>
     </div>
   </section>

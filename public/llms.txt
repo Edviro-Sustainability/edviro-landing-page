@@ -24,14 +24,14 @@ Everything Edviro ingests and every fix it verifies builds a living digital twin
 ## Key pages
 
 - [Home](https://edviroenergy.com/): Overview of AI for building operations.
-- [Energy management for schools](https://edviroenergy.com/solutions/schools): For K-12 facilities teams and districts.
-- [Energy management for real estate](https://edviroenergy.com/solutions/real-estate): Occupancy-aware control for commercial buildings.
-- [M&V for construction](https://edviroenergy.com/solutions/construction): Independent baselining and audit-grade verification for new builds.
-- [Capital planning](https://edviroenergy.com/capital-planning): Digital twins, intervention simulation, and capital projects ranked by payback.
-- [Measurement & Verification](https://edviroenergy.com/measurement-and-verification): How Edviro proves savings against a learned baseline.
-- [Demo & pricing](https://edviroenergy.com/book-a-demo): What the demo covers and how pricing works.
-- [FAQ](https://edviroenergy.com/faq): Answers to common questions about Edviro, digital twins, and M&V.
-- [About](https://edviroenergy.com/about): The team and mission behind Edviro.
+- [Energy management for schools](https://edviroenergy.com/solutions/schools/): For K-12 facilities teams and districts.
+- [Energy management for real estate](https://edviroenergy.com/solutions/real-estate/): Occupancy-aware control for commercial buildings.
+- [M&V for construction](https://edviroenergy.com/solutions/construction/): Independent baselining and audit-grade verification for new builds.
+- [Capital planning](https://edviroenergy.com/capital-planning/): Digital twins, intervention simulation, and capital projects ranked by payback.
+- [Measurement & Verification](https://edviroenergy.com/measurement-and-verification/): How Edviro proves savings against a learned baseline.
+- [Demo & pricing](https://edviroenergy.com/book-a-demo/): What the demo covers and how pricing works.
+- [FAQ](https://edviroenergy.com/faq/): Answers to common questions about Edviro, digital twins, and M&V.
+- [About](https://edviroenergy.com/about/): The team and mission behind Edviro.
 
 ## Getting started, and pricing
 
@@ -51,6 +51,6 @@ Everything Edviro ingests and every fix it verifies builds a living digital twin
 ## Contact
 
 - Email: founders@edviroenergy.com
-- Book a demo: https://edviroenergy.com/book-a-demo
+- Book a demo: https://edviroenergy.com/book-a-demo/
 - LinkedIn: https://www.linkedin.com/company/edviro/
 - X: https://x.com/hursheybar2

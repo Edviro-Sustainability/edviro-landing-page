@@ -9,7 +9,7 @@ import { BOOK_DEMO_PATH } from '@/seo/site'
 
 const breadcrumbs = [
   { name: 'Home', path: '/' },
-  { name: 'Capital Planning', path: '/capital-planning' },
+  { name: 'Capital Planning', path: '/capital-planning/' },
 ]
 
 const faqs: FaqItem[] = [
@@ -39,7 +39,7 @@ usePageSeo({
   title: 'Capital Planning & Intervention Simulation',
   description:
     'Edviro builds a digital twin of each building from your bills, meters, BMS, and work orders, then simulates interventions — replacements, retrofits, schedule changes — so you can rank capital projects by real payback before spending a dollar.',
-  path: '/capital-planning',
+  path: '/capital-planning/',
   jsonLd: [
     organizationLd(),
     breadcrumbLd(breadcrumbs),
@@ -47,7 +47,7 @@ usePageSeo({
       name: 'Edviro capital planning and intervention simulation',
       description:
         'Digital-twin-based simulation of building interventions and capital projects, ranked by projected payback and verified after the fact.',
-      path: '/capital-planning',
+      path: '/capital-planning/',
       serviceType: 'Capital planning',
     }),
     faqLd(faqs),
@@ -115,15 +115,15 @@ usePageSeo({
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <h2 style="margin: 0 0 28px; font-weight: 400; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.1; letter-spacing: -0.025em;">Where simulation matters most</h2>
         <div class="r-cols-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
-          <RouterLink to="/solutions/schools" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
+          <RouterLink to="/solutions/schools/" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
             <div style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">Schools &rarr;</div>
             <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #5F6B65;">Walk into budget and bond season with a ranked project list and the data behind it.</p>
           </RouterLink>
-          <RouterLink to="/solutions/data-centers" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
+          <RouterLink to="/solutions/data-centers/" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
             <div style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">Data centers &rarr;</div>
             <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #5F6B65;">Find how many racks a site can take before cooling is the constraint — simulated before you commit.</p>
           </RouterLink>
-          <RouterLink to="/solutions/construction" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
+          <RouterLink to="/solutions/construction/" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
             <div style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">Construction &rarr;</div>
             <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #5F6B65;">Compare the as-built twin to the design model and catch variance before handover.</p>
           </RouterLink>

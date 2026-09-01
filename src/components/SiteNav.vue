@@ -23,11 +23,11 @@ const close = () => {
         <div style="display: flex; gap: 28px; font-size: 14.5px; color: #4B5550;">
           <RouterLink :to="{ path: '/', hash: '#loop' }" class="nav-link" style="text-decoration: none; color: inherit;">The loop</RouterLink>
           <RouterLink :to="{ path: '/', hash: '#how' }" class="nav-link" style="text-decoration: none; color: inherit;">Who it's for</RouterLink>
-          <RouterLink to="/capital-planning" class="nav-link" style="text-decoration: none; color: inherit;">Capital planning</RouterLink>
-          <RouterLink to="/measurement-and-verification" class="nav-link" style="text-decoration: none; color: inherit;">M&amp;V</RouterLink>
-          <RouterLink to="/faq" class="nav-link" style="text-decoration: none; color: inherit;">FAQ</RouterLink>
+          <RouterLink to="/capital-planning/" class="nav-link" style="text-decoration: none; color: inherit;">Capital planning</RouterLink>
+          <RouterLink to="/measurement-and-verification/" class="nav-link" style="text-decoration: none; color: inherit;">M&amp;V</RouterLink>
+          <RouterLink to="/faq/" class="nav-link" style="text-decoration: none; color: inherit;">FAQ</RouterLink>
           <a :href="BLOG_URL" class="nav-link" style="text-decoration: none; color: inherit;">Blog</a>
-          <RouterLink to="/about" class="nav-link" style="text-decoration: none; color: inherit;">About</RouterLink>
+          <RouterLink to="/about/" class="nav-link" style="text-decoration: none; color: inherit;">About</RouterLink>
         </div>
         <RouterLink :to="BOOK_DEMO_PATH" class="book-btn" style="font-size: 14.5px; font-weight: 500; text-decoration: none; color: #EDF0EE; background: var(--accent); padding: 10px 18px; border-radius: 999px;">Book a demo</RouterLink>
       </div>
@@ -57,11 +57,11 @@ const close = () => {
       <div style="display: flex; flex-direction: column;">
         <RouterLink :to="{ path: '/', hash: '#loop' }" class="mobile-link" style="text-decoration: none; color: #171D1A; font-size: 17px; padding: 13px 4px; border-bottom: 1px solid #DCE3DD;" @click="close">The loop</RouterLink>
         <RouterLink :to="{ path: '/', hash: '#how' }" class="mobile-link" style="text-decoration: none; color: #171D1A; font-size: 17px; padding: 13px 4px; border-bottom: 1px solid #DCE3DD;" @click="close">Who it's for</RouterLink>
-        <RouterLink to="/capital-planning" class="mobile-link" style="text-decoration: none; color: #171D1A; font-size: 17px; padding: 13px 4px; border-bottom: 1px solid #DCE3DD;" @click="close">Capital planning</RouterLink>
-        <RouterLink to="/measurement-and-verification" class="mobile-link" style="text-decoration: none; color: #171D1A; font-size: 17px; padding: 13px 4px; border-bottom: 1px solid #DCE3DD;" @click="close">M&amp;V</RouterLink>
-        <RouterLink to="/faq" class="mobile-link" style="text-decoration: none; color: #171D1A; font-size: 17px; padding: 13px 4px; border-bottom: 1px solid #DCE3DD;" @click="close">FAQ</RouterLink>
+        <RouterLink to="/capital-planning/" class="mobile-link" style="text-decoration: none; color: #171D1A; font-size: 17px; padding: 13px 4px; border-bottom: 1px solid #DCE3DD;" @click="close">Capital planning</RouterLink>
+        <RouterLink to="/measurement-and-verification/" class="mobile-link" style="text-decoration: none; color: #171D1A; font-size: 17px; padding: 13px 4px; border-bottom: 1px solid #DCE3DD;" @click="close">M&amp;V</RouterLink>
+        <RouterLink to="/faq/" class="mobile-link" style="text-decoration: none; color: #171D1A; font-size: 17px; padding: 13px 4px; border-bottom: 1px solid #DCE3DD;" @click="close">FAQ</RouterLink>
         <a :href="BLOG_URL" class="mobile-link" style="text-decoration: none; color: #171D1A; font-size: 17px; padding: 13px 4px; border-bottom: 1px solid #DCE3DD;" @click="close">Blog</a>
-        <RouterLink to="/about" class="mobile-link" style="text-decoration: none; color: #171D1A; font-size: 17px; padding: 13px 4px;" @click="close">About</RouterLink>
+        <RouterLink to="/about/" class="mobile-link" style="text-decoration: none; color: #171D1A; font-size: 17px; padding: 13px 4px;" @click="close">About</RouterLink>
       </div>
       <RouterLink :to="BOOK_DEMO_PATH" class="book-btn" style="display: block; text-align: center; margin-top: 16px; font-size: 15px; font-weight: 500; text-decoration: none; color: #EDF0EE; background: var(--accent); padding: 13px 18px; border-radius: 999px;" @click="close">Book a demo</RouterLink>
     </div>

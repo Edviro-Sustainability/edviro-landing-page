@@ -9,7 +9,7 @@ import { BOOK_DEMO_PATH } from '@/seo/site'
 
 const breadcrumbs = [
   { name: 'Home', path: '/' },
-  { name: 'Measurement & Verification', path: '/measurement-and-verification' },
+  { name: 'Measurement & Verification', path: '/measurement-and-verification/' },
 ]
 
 const faqs: FaqItem[] = [
@@ -39,7 +39,7 @@ usePageSeo({
   title: 'Measurement & Verification (M&V)',
   description:
     'Measurement and verification (M&V) explained: how Edviro learns a building energy baseline, measures every action against it, and generates audit-grade, board-ready proof of savings automatically.',
-  path: '/measurement-and-verification',
+  path: '/measurement-and-verification/',
   jsonLd: [
     organizationLd(),
     breadcrumbLd(breadcrumbs),
@@ -47,7 +47,7 @@ usePageSeo({
       name: 'Edviro measurement and verification (M&V)',
       description:
         'Automated, audit-grade measurement and verification of building energy savings against a learned baseline.',
-      path: '/measurement-and-verification',
+      path: '/measurement-and-verification/',
       serviceType: 'Measurement and verification',
     }),
     faqLd(faqs),
@@ -115,15 +115,15 @@ usePageSeo({
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <h2 style="margin: 0 0 28px; font-weight: 400; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.1; letter-spacing: -0.025em;">Where M&amp;V matters most</h2>
         <div class="r-cols-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
-          <RouterLink to="/solutions/schools" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
+          <RouterLink to="/solutions/schools/" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
             <div style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">Schools &rarr;</div>
             <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #5F6B65;">Show the board verified savings across every site, not quarterly estimates.</p>
           </RouterLink>
-          <RouterLink to="/solutions/data-centers" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
+          <RouterLink to="/solutions/data-centers/" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
             <div style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">Data centers &rarr;</div>
             <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #5F6B65;">Model predictions verified against measured pod telemetry, so headroom numbers are proven, not assumed.</p>
           </RouterLink>
-          <RouterLink to="/solutions/construction" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
+          <RouterLink to="/solutions/construction/" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
             <div style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">Construction &rarr;</div>
             <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #5F6B65;">Lender-ready verification against an independent baseline from day one.</p>
           </RouterLink>

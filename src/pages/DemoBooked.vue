@@ -110,8 +110,8 @@ onMounted(() => {
 
       <p style="margin: 42px 0 14px; font-size: 15.5px; color: #5F6B65;">While you wait:</p>
       <div style="display: flex; gap: 14px; flex-wrap: wrap;">
-        <RouterLink to="/measurement-and-verification" class="outline-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #171D1A; padding: 13px 24px; border-radius: 999px; border: 1px solid #C0CCC3;">How we prove savings</RouterLink>
-        <RouterLink to="/capital-planning" class="outline-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #171D1A; padding: 13px 24px; border-radius: 999px; border: 1px solid #C0CCC3;">Capital planning</RouterLink>
+        <RouterLink to="/measurement-and-verification/" class="outline-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #171D1A; padding: 13px 24px; border-radius: 999px; border: 1px solid #C0CCC3;">How we prove savings</RouterLink>
+        <RouterLink to="/capital-planning/" class="outline-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #171D1A; padding: 13px 24px; border-radius: 999px; border: 1px solid #C0CCC3;">Capital planning</RouterLink>
       </div>
     </div>
   </main>

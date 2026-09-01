@@ -9,8 +9,8 @@ import { BOOK_DEMO_PATH } from '@/seo/site'
 
 const breadcrumbs = [
   { name: 'Home', path: '/' },
-  { name: 'Solutions', path: '/solutions/data-centers' },
-  { name: 'Data centers', path: '/solutions/data-centers' },
+  { name: 'Solutions', path: '/solutions/data-centers/' },
+  { name: 'Data centers', path: '/solutions/data-centers/' },
 ]
 
 const faqs: FaqItem[] = [
@@ -45,7 +45,7 @@ usePageSeo({
   title: 'Thermal headroom modeling for data centers',
   description:
     'Edviro builds a physics-based thermal model of your data center from the telemetry already coming out of the site, quantifies cooling headroom at higher rack densities, and verifies predictions on a live pod.',
-  path: '/solutions/data-centers',
+  path: '/solutions/data-centers/',
   jsonLd: [
     organizationLd(),
     breadcrumbLd(breadcrumbs),
@@ -53,7 +53,7 @@ usePageSeo({
       name: 'Edviro thermal headroom modeling for data centers',
       description:
         'Physics-based thermal modeling, cooling headroom quantification, and density simulation for data centers, verified against measured telemetry.',
-      path: '/solutions/data-centers',
+      path: '/solutions/data-centers/',
       serviceType: 'Thermal capacity modeling',
       areaServed: 'United States',
     }),
@@ -75,7 +75,7 @@ usePageSeo({
           <p style="margin: 26px 0 0; max-width: 600px; font-size: 19px; line-height: 1.6; color: #4B5550;">Edviro builds a physics-based thermal model of your site from the telemetry already coming out of it, answers how much more rack capacity a pod can take before cooling becomes the constraint, and verifies its predictions on a live pod.</p>
           <div style="margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap;">
             <RouterLink :to="BOOK_DEMO_PATH" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #EDF0EE; background: var(--accent); padding: 13px 26px; border-radius: 999px;">Book a demo</RouterLink>
-            <RouterLink to="/capital-planning" class="outline-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #171D1A; background: transparent; padding: 13px 24px; border-radius: 999px; border: 1px solid #C0CCC3;">See decision simulation</RouterLink>
+            <RouterLink to="/capital-planning/" class="outline-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #171D1A; background: transparent; padding: 13px 24px; border-radius: 999px; border: 1px solid #C0CCC3;">See decision simulation</RouterLink>
           </div>
         </div>
       </div>

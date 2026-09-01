@@ -30,14 +30,14 @@ export const SOCIAL_URLS = [LINKEDIN_URL, X_URL]
  * Every "Book a demo" CTA points at this page, which explains the demo and
  * pricing.
  */
-export const BOOK_DEMO_PATH = '/book-a-demo'
+export const BOOK_DEMO_PATH = '/book-a-demo/'
 
 /**
  * Scheduling links point here rather than straight at BOOKING_URL, so changing
  * schedulers (or the Calendly event) is a one-line edit below. Only the
  * redirect page reads BOOKING_URL.
  */
-export const DEMO_REDIRECT_PATH = '/demo'
+export const DEMO_REDIRECT_PATH = '/demo/'
 export const BOOKING_URL = 'https://calendly.com/tanuj-edviroenergy/30min'
 
 /**
@@ -45,7 +45,7 @@ export const BOOKING_URL = 'https://calendly.com/tanuj-edviroenergy/30min'
  * booking, so the ad conversions below are reported from this page rather than
  * from the click that opened the scheduler.
  */
-export const DEMO_BOOKED_PATH = '/demo-booked'
+export const DEMO_BOOKED_PATH = '/demo-booked/'
 
 /**
  * Public IUSD community sustainability dashboard demo (edviro-community-template,
@@ -85,9 +85,15 @@ export function absoluteUrl(path: string): string {
   return `${SITE_URL}${path.startsWith('/') ? '' : '/'}${path}`
 }
 
-/** Canonical URL for a route path (no trailing slash except the root). */
+/**
+ * Canonical URL for a route path — always the trailing-slash form. Pages are
+ * prerendered as directory indexes (ssgOptions.dirStyle 'nested'), and Netlify
+ * 301s the slashless variant to the slashed one, so only the slashed URL
+ * serves a 200. Redirects, rel="canonical", and the sitemap are all
+ * canonicalization signals to Google and must agree on this one URL.
+ */
 export function canonicalUrl(path: string): string {
   if (!path || path === '/') return `${SITE_URL}/`
   const clean = path.replace(/\/+$/, '')
-  return absoluteUrl(clean)
+  return absoluteUrl(`${clean}/`)
 }

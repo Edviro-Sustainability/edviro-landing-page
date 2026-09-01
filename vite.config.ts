@@ -59,8 +59,10 @@ export default defineConfig({
   },
   // Static-site-generation options consumed by `vite-ssg build`.
   ssgOptions: {
-    // `nested` emits /faq/index.html so extensionless canonical URLs (/faq)
-    // resolve on every static host.
+    // `nested` emits /faq/index.html, which Netlify serves at /faq/ and
+    // reaches by 301 from the slashless /faq. Canonical URLs therefore use
+    // the trailing-slash form (canonicalUrl in src/seo/site.ts), matching
+    // the redirect and the sitemap so all canonicalization signals agree.
     dirStyle: 'nested',
     formatting: 'minify',
   },

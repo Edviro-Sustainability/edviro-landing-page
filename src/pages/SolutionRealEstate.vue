@@ -9,8 +9,8 @@ import { BOOK_DEMO_PATH } from '@/seo/site'
 
 const breadcrumbs = [
   { name: 'Home', path: '/' },
-  { name: 'Solutions', path: '/solutions/real-estate' },
-  { name: 'Real estate & offices', path: '/solutions/real-estate' },
+  { name: 'Solutions', path: '/solutions/real-estate/' },
+  { name: 'Real estate & offices', path: '/solutions/real-estate/' },
 ]
 
 const faqs: FaqItem[] = [
@@ -45,7 +45,7 @@ usePageSeo({
   title: 'Energy management for commercial real estate',
   description:
     'Edviro turns the WiFi, BMS, and meters you already have into occupancy-aware HVAC and lighting control, cutting energy and peak demand charges while keeping tenants comfortable.',
-  path: '/solutions/real-estate',
+  path: '/solutions/real-estate/',
   jsonLd: [
     organizationLd(),
     breadcrumbLd(breadcrumbs),
@@ -53,7 +53,7 @@ usePageSeo({
       name: 'Edviro energy management for commercial real estate',
       description:
         'Occupancy-aware HVAC and lighting control for offices and commercial buildings, using existing WiFi, BMS, and meters.',
-      path: '/solutions/real-estate',
+      path: '/solutions/real-estate/',
       areaServed: 'United States',
     }),
     faqLd(faqs),
@@ -74,7 +74,7 @@ usePageSeo({
           <p style="margin: 26px 0 0; max-width: 600px; font-size: 19px; line-height: 1.6; color: #4B5550;">Edviro turns the WiFi, BMS, and meters you already have into occupancy-aware HVAC and lighting control, cutting energy and peak demand charges while keeping tenants comfortable.</p>
           <div style="margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap;">
             <RouterLink :to="BOOK_DEMO_PATH" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #EDF0EE; background: var(--accent); padding: 13px 26px; border-radius: 999px;">Book a demo</RouterLink>
-            <RouterLink to="/measurement-and-verification" class="outline-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #171D1A; background: transparent; padding: 13px 24px; border-radius: 999px; border: 1px solid #C0CCC3;">See how we prove savings</RouterLink>
+            <RouterLink to="/measurement-and-verification/" class="outline-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #171D1A; background: transparent; padding: 13px 24px; border-radius: 999px; border: 1px solid #C0CCC3;">See how we prove savings</RouterLink>
           </div>
         </div>
       </div>

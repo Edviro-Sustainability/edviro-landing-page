@@ -9,8 +9,8 @@ import { BOOK_DEMO_PATH } from '@/seo/site'
 
 const breadcrumbs = [
   { name: 'Home', path: '/' },
-  { name: 'Solutions', path: '/solutions/schools' },
-  { name: 'Schools', path: '/solutions/schools' },
+  { name: 'Solutions', path: '/solutions/schools/' },
+  { name: 'Schools', path: '/solutions/schools/' },
 ]
 
 const faqs: FaqItem[] = [
@@ -45,7 +45,7 @@ usePageSeo({
   title: 'Energy management for schools',
   description:
     'Edviro gives K-12 facilities teams a continuous energy audit, automatic fault detection, and ready-to-act work orders across every site, with no new hardware and no rip-and-replace.',
-  path: '/solutions/schools',
+  path: '/solutions/schools/',
   jsonLd: [
     organizationLd(),
     breadcrumbLd(breadcrumbs),
@@ -53,7 +53,7 @@ usePageSeo({
       name: 'Edviro energy management for schools',
       description:
         'Autonomous energy management for K-12 school facilities: continuous auditing, fault detection, and verified savings.',
-      path: '/solutions/schools',
+      path: '/solutions/schools/',
       areaServed: 'United States',
     }),
     faqLd(faqs),
@@ -74,7 +74,7 @@ usePageSeo({
           <p style="margin: 26px 0 0; max-width: 600px; font-size: 19px; line-height: 1.6; color: #4B5550;">Edviro gives K-12 facilities teams a continuous energy audit, automatic fault detection, and ready-to-act work orders across every site. No new hardware, no rip-and-replace.</p>
           <div style="margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap;">
             <RouterLink :to="BOOK_DEMO_PATH" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #EDF0EE; background: var(--accent); padding: 13px 26px; border-radius: 999px;">Book a demo</RouterLink>
-            <RouterLink to="/measurement-and-verification" class="outline-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #171D1A; background: transparent; padding: 13px 24px; border-radius: 999px; border: 1px solid #C0CCC3;">See how we prove savings</RouterLink>
+            <RouterLink to="/measurement-and-verification/" class="outline-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #171D1A; background: transparent; padding: 13px 24px; border-radius: 999px; border: 1px solid #C0CCC3;">See how we prove savings</RouterLink>
           </div>
         </div>
       </div>

@@ -14,7 +14,7 @@ export interface PageSeoOptions {
   /** Page-specific title (the site name is appended via the template). */
   title: string
   description?: string
-  /** Root-relative path of the current route, e.g. `/faq`. */
+  /** Root-relative path of the current route, e.g. `/faq/`. */
   path: string
   /** Root-relative or absolute social image URL. */
   image?: string

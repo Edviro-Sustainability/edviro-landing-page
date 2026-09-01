@@ -7,7 +7,7 @@ import { breadcrumbLd, faqLd, organizationLd, type FaqItem } from '@/seo/jsonld'
 
 const breadcrumbs = [
   { name: 'Home', path: '/' },
-  { name: 'FAQ', path: '/faq' },
+  { name: 'FAQ', path: '/faq/' },
 ]
 
 const faqs: FaqItem[] = [
@@ -82,7 +82,7 @@ usePageSeo({
   title: 'Edviro FAQ',
   description:
     'Answers to common questions about Edviro: what autonomous building energy management is, how it works with your existing BMS, how it detects and fixes waste, and how it proves savings with M&V.',
-  path: '/faq',
+  path: '/faq/',
   jsonLd: [organizationLd(), breadcrumbLd(breadcrumbs), faqLd(faqs)],
 })
 </script>

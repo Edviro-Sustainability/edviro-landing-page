@@ -9,8 +9,8 @@ import { BOOK_DEMO_PATH } from '@/seo/site'
 
 const breadcrumbs = [
   { name: 'Home', path: '/' },
-  { name: 'Solutions', path: '/solutions/construction' },
-  { name: 'Construction', path: '/solutions/construction' },
+  { name: 'Solutions', path: '/solutions/construction/' },
+  { name: 'Construction', path: '/solutions/construction/' },
 ]
 
 const faqs: FaqItem[] = [
@@ -45,7 +45,7 @@ usePageSeo({
   title: 'Baselining and M&V for construction',
   description:
     'Edviro builds independent baselining and audit-grade measurement and verification (M&V) into the build, so every savings claim holds up for owners and lenders and new buildings run as designed.',
-  path: '/solutions/construction',
+  path: '/solutions/construction/',
   jsonLd: [
     organizationLd(),
     breadcrumbLd(breadcrumbs),
@@ -53,7 +53,7 @@ usePageSeo({
       name: 'Edviro baselining and M&V for construction',
       description:
         'Independent energy baselining and audit-grade measurement and verification for new construction and major retrofits.',
-      path: '/solutions/construction',
+      path: '/solutions/construction/',
       serviceType: 'Measurement and verification',
       areaServed: 'United States',
     }),
@@ -75,7 +75,7 @@ usePageSeo({
           <p style="margin: 26px 0 0; max-width: 600px; font-size: 19px; line-height: 1.6; color: #4B5550;">Edviro sets an independent energy baseline and runs audit-grade measurement and verification from day one, so every savings claim holds up for owners and lenders.</p>
           <div style="margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap;">
             <RouterLink :to="BOOK_DEMO_PATH" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #EDF0EE; background: var(--accent); padding: 13px 26px; border-radius: 999px;">Book a demo</RouterLink>
-            <RouterLink to="/measurement-and-verification" class="outline-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #171D1A; background: transparent; padding: 13px 24px; border-radius: 999px; border: 1px solid #C0CCC3;">Learn about M&amp;V</RouterLink>
+            <RouterLink to="/measurement-and-verification/" class="outline-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #171D1A; background: transparent; padding: 13px 24px; border-radius: 999px; border: 1px solid #C0CCC3;">Learn about M&amp;V</RouterLink>
           </div>
         </div>
       </div>

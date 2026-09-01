@@ -8,14 +8,14 @@ import { CONTACT_EMAIL } from '@/seo/site'
 
 const breadcrumbs = [
   { name: 'Home', path: '/' },
-  { name: 'About', path: '/about' },
+  { name: 'About', path: '/about/' },
 ]
 
 usePageSeo({
   title: 'About Edviro',
   description:
     'Edviro is a Y Combinator-backed team building autonomous energy management for the built environment, starting hands-on with school facilities and applied AI across climate and beyond.',
-  path: '/about',
+  path: '/about/',
   type: 'website',
   jsonLd: [organizationLd(), breadcrumbLd(breadcrumbs)],
 })
