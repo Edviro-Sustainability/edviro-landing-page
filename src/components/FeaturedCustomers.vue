@@ -14,11 +14,11 @@ import lgsuhsdLogo from '@/assets/img/lgsuhsd-logo.png'
       <p
         style="
           margin: 0 0 44px;
-          font-family: 'IBM Plex Mono', monospace;
+          font-weight: 600;
           font-size: 12px;
           letter-spacing: 0.2em;
           text-transform: uppercase;
-          color: #8a8a7c;
+          color: #75817b;
           text-align: center;
         "
       >

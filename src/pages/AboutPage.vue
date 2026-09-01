@@ -29,9 +29,9 @@ usePageSeo({
     <section style="padding: 40px 32px 56px;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <div style="max-width: 820px;">
-          <p style="margin: 0 0 22px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8A8A7C;">About Edviro</p>
+          <p style="margin: 0 0 22px; font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #75817B;">About Edviro</p>
           <h1 style="margin: 0; font-weight: 400; font-size: clamp(36px, 5.4vw, 62px); line-height: 1.05; letter-spacing: -0.035em;">Bringing AI to the people who <span style="color: var(--accent);">run the buildings</span>.</h1>
-          <p style="margin: 26px 0 0; max-width: 640px; font-size: 19px; line-height: 1.6; color: #55564C;">Buildings waste enormous amounts of energy, and the people who run them are handed dashboards instead of answers. Edviro exists to close that gap, turning scattered bills, meters, controls, and work orders into action that cuts waste, proves the savings, and informs the next capital decision.</p>
+          <p style="margin: 26px 0 0; max-width: 640px; font-size: 19px; line-height: 1.6; color: #4B5550;">Buildings waste enormous amounts of energy, and the people who run them are handed dashboards instead of answers. Edviro exists to close that gap, turning scattered bills, meters, controls, and work orders into action that cuts waste, proves the savings, and informs the next capital decision.</p>
         </div>
       </div>
     </section>
@@ -40,17 +40,17 @@ usePageSeo({
     <section style="padding: 20px 32px 40px;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <div class="r-cols-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
-          <div style="border-top: 1.5px solid #1A1B14; padding-top: 18px;">
+          <div style="border-top: 1.5px solid #171D1A; padding-top: 18px;">
             <h2 style="margin: 0 0 10px; font-size: 19px; font-weight: 600;">Hands-on from the start</h2>
-            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #6B6C5E;">Edviro began working directly with school facilities teams, learning what they actually need to run buildings well.</p>
+            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #5F6B65;">Edviro began working directly with school facilities teams, learning what they actually need to run buildings well.</p>
           </div>
-          <div style="border-top: 1.5px solid #1A1B14; padding-top: 18px;">
+          <div style="border-top: 1.5px solid #171D1A; padding-top: 18px;">
             <h2 style="margin: 0 0 10px; font-size: 19px; font-weight: 600;">Applied AI, in the real world</h2>
-            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #6B6C5E;">The team has shipped applied AI across climate, healthcare, and aviation, and brings that rigor to building energy.</p>
+            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #5F6B65;">The team has shipped applied AI across climate, healthcare, and aviation, and brings that rigor to building energy.</p>
           </div>
-          <div style="border-top: 1.5px solid #1A1B14; padding-top: 18px;">
+          <div style="border-top: 1.5px solid #171D1A; padding-top: 18px;">
             <h2 style="margin: 0 0 10px; font-size: 19px; font-weight: 600;">Backed by Y Combinator</h2>
-            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #6B6C5E;">Edviro is a Y Combinator-backed company building autonomous energy management for the built environment.</p>
+            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #5F6B65;">Edviro is a Y Combinator-backed company building autonomous energy management for the built environment.</p>
           </div>
         </div>
       </div>
@@ -61,12 +61,12 @@ usePageSeo({
     <!-- CONTACT -->
     <section style="padding: 10px 32px 90px;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
-        <div style="border: 1px solid #E3E0D5; border-radius: 18px; background: #FBFAF6; padding: 32px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between;">
+        <div style="border: 1px solid #D8DED9; border-radius: 18px; background: #F9FAF9; padding: 32px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between;">
           <div>
             <h2 style="margin: 0 0 6px; font-size: 20px; font-weight: 600;">Get in touch</h2>
-            <p style="margin: 0; font-size: 15.5px; color: #6B6C5E;">Questions, partnerships, or press? We'd love to hear from you.</p>
+            <p style="margin: 0; font-size: 15.5px; color: #5F6B65;">Questions, partnerships, or press? We'd love to hear from you.</p>
           </div>
-          <a :href="`mailto:${CONTACT_EMAIL}`" class="contact-email" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--accent); text-decoration: none; border: 1px solid #CFCBBD; padding: 12px 20px; border-radius: 999px;">{{ CONTACT_EMAIL }}</a>
+          <a :href="`mailto:${CONTACT_EMAIL}`" class="contact-email" style="font-weight: 500; font-size: 14px; color: var(--accent); text-decoration: none; border: 1px solid #C0CCC3; padding: 12px 20px; border-radius: 999px;">{{ CONTACT_EMAIL }}</a>
         </div>
       </div>
     </section>
@@ -77,6 +77,6 @@ usePageSeo({
 
 <style scoped>
 .contact-email:hover {
-  border-color: #1a1b14 !important;
+  border-color: #171D1A !important;
 }
 </style>

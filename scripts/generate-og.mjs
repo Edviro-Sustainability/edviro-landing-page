@@ -1,22 +1,21 @@
-// One-off OG image generator. Run: npm i --no-save satori @resvg/resvg-js wawoff2 && node scripts/generate-og.mjs
+// One-off OG image generator. Run: npm i --no-save satori @resvg/resvg-js && node scripts/generate-og.mjs
 import { readFile, writeFile } from 'node:fs/promises'
 import satori from 'satori'
 import { Resvg } from '@resvg/resvg-js'
-import wawoff2 from 'wawoff2'
 
 const toArrayBuffer = (u8) => u8.buffer.slice(u8.byteOffset, u8.byteOffset + u8.byteLength)
-const ttf = async (path) => toArrayBuffer(await wawoff2.decompress(await readFile(path)))
 
-// Site's woff2 and the variable TTF both trip satori's opentype parser; use a
-// static-weight TTF: curl -A curl "https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300"
-// then download the fonts.gstatic.com URL it returns.
-const grotesk = toArrayBuffer(await readFile('/tmp/hanken-static.ttf'))
-const mono = await ttf('src/assets/fonts/ibm-plex-mono-400-latin.woff2')
+// Site's woff2 and the variable TTF both trip satori's opentype parser, so
+// static-weight TTF instances are vendored in scripts/fonts/. To refresh them:
+// curl -A curl "https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300"
+// then download the fonts.gstatic.com URL it returns (same for wght@600).
+const grotesk = toArrayBuffer(await readFile('scripts/fonts/hanken-grotesk-300.ttf'))
+const groteskSemibold = toArrayBuffer(await readFile('scripts/fonts/hanken-grotesk-600.ttf'))
 const logo = `data:image/png;base64,${(await readFile('src/assets/img/logo-wordmark.png')).toString('base64')}`
 
-const ACCENT = '#1C3F33'
-const INK = '#1A1B14'
-const MUTED = '#8A8A7C'
+const ACCENT = '#16493D'
+const INK = '#171D1A'
+const MUTED = '#75817B'
 
 const el = (type, style, children) => ({ type, props: { style, children } })
 
@@ -24,13 +23,14 @@ const tree = el('div', {
   width: '100%',
   height: '100%',
   display: 'flex',
-  background: '#F4F2EC',
+  background: '#EDF0EE',
   padding: '0 96px',
   fontFamily: 'Hanken Grotesk',
+  fontWeight: 300,
 }, [
   el('div', {
     flex: 1,
-    background: '#FCFBF7',
+    background: '#F9FAF9',
     display: 'flex',
     flexDirection: 'column',
     padding: '56px 64px 48px',
@@ -45,7 +45,7 @@ const tree = el('div', {
     ]),
     el('div', {
       marginTop: 30,
-      fontFamily: 'IBM Plex Mono',
+      fontWeight: 600,
       fontSize: 21,
       letterSpacing: '0.18em',
       color: MUTED,
@@ -57,7 +57,7 @@ const tree = el('div', {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      fontFamily: 'IBM Plex Mono',
+      fontWeight: 600,
       fontSize: 18,
     }, [
       el('div', { color: ACCENT, letterSpacing: '0.1em' }, 'INGEST · DETECT · ACT · VERIFY · SIMULATE'),
@@ -83,7 +83,7 @@ const svg = await satori(tree, {
   height: 630,
   fonts: [
     { name: 'Hanken Grotesk', data: grotesk, weight: 300, style: 'normal' },
-    { name: 'IBM Plex Mono', data: mono, weight: 400, style: 'normal' },
+    { name: 'Hanken Grotesk', data: groteskSemibold, weight: 600, style: 'normal' },
   ],
 })
 

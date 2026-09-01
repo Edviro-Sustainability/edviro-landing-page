@@ -94,9 +94,9 @@ usePageSeo({
     <!-- HERO -->
     <section style="padding: 40px 32px 24px;">
       <div style="max-width: 820px; margin: 0 auto; width: 100%;">
-        <p style="margin: 0 0 22px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8A8A7C;">Frequently asked questions</p>
+        <p style="margin: 0 0 22px; font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #75817B;">Frequently asked questions</p>
         <h1 style="margin: 0; font-weight: 400; font-size: clamp(36px, 5.4vw, 60px); line-height: 1.05; letter-spacing: -0.035em;">Edviro, answered.</h1>
-        <p style="margin: 26px 0 0; max-width: 620px; font-size: 19px; line-height: 1.6; color: #55564C;">What Edviro is, how it works with what you already have, and how it proves the savings.</p>
+        <p style="margin: 26px 0 0; max-width: 620px; font-size: 19px; line-height: 1.6; color: #4B5550;">What Edviro is, how it works with what you already have, and how it proves the savings.</p>
       </div>
     </section>
 

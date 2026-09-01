@@ -69,12 +69,12 @@ usePageSeo({
     <section style="padding: 40px 32px 64px;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <div style="max-width: 760px;">
-          <p style="margin: 0 0 22px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8A8A7C;">For school facilities</p>
+          <p style="margin: 0 0 22px; font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #75817B;">For school facilities</p>
           <h1 style="margin: 0; font-weight: 400; font-size: clamp(36px, 5.4vw, 62px); line-height: 1.05; letter-spacing: -0.035em;">Energy management for schools that <span style="color: var(--accent);">runs itself</span>.</h1>
-          <p style="margin: 26px 0 0; max-width: 600px; font-size: 19px; line-height: 1.6; color: #55564C;">Edviro gives K-12 facilities teams a continuous energy audit, automatic fault detection, and ready-to-act work orders across every site. No new hardware, no rip-and-replace.</p>
+          <p style="margin: 26px 0 0; max-width: 600px; font-size: 19px; line-height: 1.6; color: #4B5550;">Edviro gives K-12 facilities teams a continuous energy audit, automatic fault detection, and ready-to-act work orders across every site. No new hardware, no rip-and-replace.</p>
           <div style="margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap;">
-            <RouterLink :to="BOOK_DEMO_PATH" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #F4F2EC; background: var(--accent); padding: 13px 26px; border-radius: 999px;">Book a demo</RouterLink>
-            <RouterLink to="/measurement-and-verification" class="outline-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #1A1B14; background: transparent; padding: 13px 24px; border-radius: 999px; border: 1px solid #CFCBBD;">See how we prove savings</RouterLink>
+            <RouterLink :to="BOOK_DEMO_PATH" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #EDF0EE; background: var(--accent); padding: 13px 26px; border-radius: 999px;">Book a demo</RouterLink>
+            <RouterLink to="/measurement-and-verification" class="outline-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #171D1A; background: transparent; padding: 13px 24px; border-radius: 999px; border: 1px solid #C0CCC3;">See how we prove savings</RouterLink>
           </div>
         </div>
       </div>
@@ -85,43 +85,43 @@ usePageSeo({
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <h2 style="margin: 0 0 40px; font-weight: 400; font-size: clamp(28px, 3.6vw, 42px); line-height: 1.08; letter-spacing: -0.03em; max-width: 620px;">Built for the people who run the building.</h2>
         <div class="r-cols-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
-          <div style="border-top: 1.5px solid #1A1B14; padding-top: 18px;">
+          <div style="border-top: 1.5px solid #171D1A; padding-top: 18px;">
             <h3 style="margin: 0 0 10px; font-size: 19px; font-weight: 600;">Plugs into what you already have</h3>
-            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #6B6C5E;">Your meters, your BMS, your utility bills. Edviro connects them all into one live model of every school.</p>
+            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #5F6B65;">Your meters, your BMS, your utility bills. Edviro connects them all into one live model of every school.</p>
           </div>
-          <div style="border-top: 1.5px solid #1A1B14; padding-top: 18px;">
+          <div style="border-top: 1.5px solid #171D1A; padding-top: 18px;">
             <h3 style="margin: 0 0 10px; font-size: 19px; font-weight: 600;">Does the audit for you</h3>
-            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #6B6C5E;">A continuous energy consultation for every site. The moment something drifts, Edviro catches it, not at next quarter's audit.</p>
+            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #5F6B65;">A continuous energy consultation for every site. The moment something drifts, Edviro catches it, not at next quarter's audit.</p>
           </div>
-          <div style="border-top: 1.5px solid #1A1B14; padding-top: 18px;">
+          <div style="border-top: 1.5px solid #171D1A; padding-top: 18px;">
             <h3 style="margin: 0 0 10px; font-size: 19px; font-weight: 600;">Hands you the fix, or just does it</h3>
-            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #6B6C5E;">A step-by-step work order in your pocket, or an autonomous setpoint change overnight, tested before it ships.</p>
+            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #5F6B65;">A step-by-step work order in your pocket, or an autonomous setpoint change overnight, tested before it ships.</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- WHAT IT CATCHES -->
-    <section style="padding: 50px 32px; background: #16170F; color: #F4F2EC;">
+    <section style="padding: 50px 32px; background: #101815; color: #EDF0EE;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
-        <p style="margin: 0 0 18px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8E907F;">What Edviro catches</p>
-        <h2 style="margin: 0 0 36px; font-weight: 400; font-size: clamp(28px, 3.8vw, 44px); line-height: 1.06; letter-spacing: -0.03em; color: #F8F7F1; max-width: 640px;">Waste hides in every school. Edviro finds it in the data.</h2>
-        <div class="r-cols-2" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: #2D2E22; border: 1px solid #2D2E22; border-radius: 16px; overflow: hidden;">
-          <div style="background: #1F2017; padding: 26px;">
-            <div style="font-size: 17px; font-weight: 600; color: #F4F2EC; margin-bottom: 8px;">Boiler short-cycling</div>
-            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #C9CABA;">Detects a boiler starting 14 times an hour and dispatches a guided work order to reset the firing differential.</p>
+        <p style="margin: 0 0 18px; font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #79867E;">What Edviro catches</p>
+        <h2 style="margin: 0 0 36px; font-weight: 400; font-size: clamp(28px, 3.8vw, 44px); line-height: 1.06; letter-spacing: -0.03em; color: #F2F5F1; max-width: 640px;">Waste hides in every school. Edviro finds it in the data.</h2>
+        <div class="r-cols-2" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: #26302A; border: 1px solid #26302A; border-radius: 16px; overflow: hidden;">
+          <div style="background: #17201B; padding: 26px;">
+            <div style="font-size: 17px; font-weight: 600; color: #EDF0EE; margin-bottom: 8px;">Boiler short-cycling</div>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #C4CBC5;">Detects a boiler starting 14 times an hour and dispatches a guided work order to reset the firing differential.</p>
           </div>
-          <div style="background: #1F2017; padding: 26px;">
-            <div style="font-size: 17px; font-weight: 600; color: #F4F2EC; margin-bottom: 8px;">Off-hours runtime</div>
-            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #C9CABA;">Flags HVAC and lighting running all weekend in empty buildings and restores the right night setback.</p>
+          <div style="background: #17201B; padding: 26px;">
+            <div style="font-size: 17px; font-weight: 600; color: #EDF0EE; margin-bottom: 8px;">Off-hours runtime</div>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #C4CBC5;">Flags HVAC and lighting running all weekend in empty buildings and restores the right night setback.</p>
           </div>
-          <div style="background: #1F2017; padding: 26px;">
-            <div style="font-size: 17px; font-weight: 600; color: #F4F2EC; margin-bottom: 8px;">Ventilation and comfort</div>
-            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #C9CABA;">Spots CO2 rising in a gym or classroom and corrects the ventilation schedule without overrunning energy.</p>
+          <div style="background: #17201B; padding: 26px;">
+            <div style="font-size: 17px; font-weight: 600; color: #EDF0EE; margin-bottom: 8px;">Ventilation and comfort</div>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #C4CBC5;">Spots CO2 rising in a gym or classroom and corrects the ventilation schedule without overrunning energy.</p>
           </div>
-          <div style="background: #1F2017; padding: 26px;">
-            <div style="font-size: 17px; font-weight: 600; color: #F4F2EC; margin-bottom: 8px;">Demand spikes</div>
-            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #C9CABA;">Pre-cools and shifts load before a demand charge lands, avoiding thousands in peak billing.</p>
+          <div style="background: #17201B; padding: 26px;">
+            <div style="font-size: 17px; font-weight: 600; color: #EDF0EE; margin-bottom: 8px;">Demand spikes</div>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #C4CBC5;">Pre-cools and shifts load before a demand charge lands, avoiding thousands in peak billing.</p>
           </div>
         </div>
       </div>
@@ -138,6 +138,6 @@ usePageSeo({
   filter: brightness(1.12);
 }
 .outline-btn:hover {
-  border-color: #1a1b14 !important;
+  border-color: #171D1A !important;
 }
 </style>

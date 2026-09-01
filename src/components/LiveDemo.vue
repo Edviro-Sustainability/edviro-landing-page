@@ -57,15 +57,15 @@ const POOL: PoolItem[] = [
     action: { type: 'Lighting', title: 'Lighting schedule tightened', result: 'Recurring savings booked', tag: 'Acted', green: true },
   },
   {
-    alert: { src: 'Tariff · District', title: 'Rate change lands next billing cycle', detail: 'new peak window', sev: '#6E6E5E', sevLabel: 'INFO' },
+    alert: { src: 'Tariff · District', title: 'Rate change lands next billing cycle', detail: 'new peak window', sev: '#5F6B65', sevLabel: 'INFO' },
     action: { type: 'Re-optimize', title: 'All schedules re-tuned to new tariff', result: 'Forecast $3.1k / mo saved', tag: 'Acted', green: true },
   },
   {
-    alert: { src: 'Twin · Boiler plant', title: 'Replace Boiler #2, or keep tuning it?', detail: 'capital review', sev: '#6E6E5E', sevLabel: 'PLAN' },
+    alert: { src: 'Twin · Boiler plant', title: 'Replace Boiler #2, or keep tuning it?', detail: 'capital review', sev: '#5F6B65', sevLabel: 'PLAN' },
     action: { type: 'Simulation', title: 'Both options run against the digital twin', result: 'Tune-up wins: $2.1k/yr, 4-mo payback', tag: 'Simulated', green: true },
   },
   {
-    alert: { src: 'Twin · Jefferson ES', title: 'New wing lands next fall', detail: 'load forecast', sev: '#6E6E5E', sevLabel: 'PLAN' },
+    alert: { src: 'Twin · Jefferson ES', title: 'New wing lands next fall', detail: 'load forecast', sev: '#5F6B65', sevLabel: 'PLAN' },
     action: { type: 'Simulation', title: 'Addition modeled against current tariff', result: 'Demand charges projected before design lock', tag: 'Simulated', green: true },
   },
 ]
@@ -78,9 +78,9 @@ function mkAction(a: RawAction) {
     title: a.title,
     result: a.result,
     tag: a.tag,
-    tagColor: a.green ? '#2F7A57' : '#3E6E8E',
-    tagBg: a.green ? 'rgba(47,122,87,0.10)' : 'rgba(62,110,142,0.10)',
-    resultColor: a.green ? '#2F7A57' : '#79796B',
+    tagColor: a.green ? '#338D68' : '#3E6E8E',
+    tagBg: a.green ? 'rgba(51,141,104,0.10)' : 'rgba(62,110,142,0.10)',
+    resultColor: a.green ? '#338D68' : '#6B7871',
   }
 }
 
@@ -181,11 +181,11 @@ onBeforeUnmount(() => {
       <div ref="wrap" style="position: relative; width: 100%; max-width: 1120px;" :style="{ height: stageH + 'px' }">
         <div style="position: absolute; top: 0; left: 0; width: 1120px; height: 460px; transform-origin: top left;" :style="{ transform: 'scale(' + scale + ')' }">
 
-          <div style="position: absolute; left: 24px; top: -2px; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #9A9A8C;">Signals in</div>
-          <div style="position: absolute; right: 24px; top: -2px; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #9A9A8C;">Actions out</div>
+          <div style="position: absolute; left: 24px; top: -2px; font-weight: 600; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #919C95;">Signals in</div>
+          <div style="position: absolute; right: 24px; top: -2px; text-align: right; font-weight: 600; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #919C95;">Actions out</div>
 
           <svg viewBox="0 0 1120 460" style="position: absolute; inset: 0; width: 1120px; height: 460px; overflow: visible;">
-            <g fill="none" stroke="#DDD9CC" stroke-width="1.5">
+            <g fill="none" stroke="#D0D8D1" stroke-width="1.5">
               <path d="M324,96 C404,96 412,230 470,230"></path>
               <path d="M324,230 L470,230"></path>
               <path d="M324,364 C404,364 412,230 470,230"></path>
@@ -204,9 +204,9 @@ onBeforeUnmount(() => {
           </svg>
 
           <div style="position: absolute; left: 560px; top: 230px; transform: translate(-50%, -50%); width: 184px; height: 162px;">
-            <div style="position: absolute; inset: 0; border-radius: 24px; background: color-mix(in oklab, var(--accent) 7%, #fff); border: 1px solid color-mix(in oklab, var(--accent) 28%, #D8D4C7); box-shadow: 0 14px 40px -26px rgba(0,0,0,0.25); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+            <div style="position: absolute; inset: 0; border-radius: 24px; background: color-mix(in oklab, var(--accent) 7%, #fff); border: 1px solid color-mix(in oklab, var(--accent) 28%, #C9D3CB); box-shadow: 0 14px 40px -26px rgba(0,0,0,0.25); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
               <img :src="logoIcon" alt="Edviro" style="width: 26px; height: 26px; border-radius: 8px; display: block;" />
-              <span style="font-size: 21px; font-weight: 600; letter-spacing: -0.02em; color: #1A1B14; line-height: 1;">Edviro</span>
+              <span style="font-size: 21px; font-weight: 600; letter-spacing: -0.02em; color: #171D1A; line-height: 1;">Edviro</span>
             </div>
           </div>
 
@@ -217,14 +217,14 @@ onBeforeUnmount(() => {
             :style="{ top: lane.cardTop + 'px', transform: lane.alertTransform, opacity: lane.alertOpacity }"
           >
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 7px;">
-              <span style="display: flex; align-items: center; gap: 7px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; color: #93937F;">
+              <span style="display: flex; align-items: center; gap: 7px; font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; color: #87938C;">
                 <span style="width: 7px; height: 7px; border-radius: 999px;" :style="{ background: lane.alert.sev }"></span>
                 {{ lane.alert.src }}
               </span>
-              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #B6B5A4;">{{ lane.alert.sevLabel }}</span>
+              <span style="font-weight: 500; font-size: 9.5px; color: #A7B4AB;">{{ lane.alert.sevLabel }}</span>
             </div>
-            <div style="font-size: 14.5px; font-weight: 500; line-height: 1.3; color: #1A1B14;">{{ lane.alert.title }}</div>
-            <div style="margin-top: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #79796B;">{{ lane.alert.detail }}</div>
+            <div style="font-size: 14.5px; font-weight: 500; line-height: 1.3; color: #171D1A;">{{ lane.alert.title }}</div>
+            <div style="margin-top: 5px; font-weight: 500; font-size: 11px; color: #6B7871;">{{ lane.alert.detail }}</div>
           </div>
 
           <div
@@ -234,17 +234,17 @@ onBeforeUnmount(() => {
             :style="{ top: lane.cardTop + 'px', transform: lane.actionTransform, opacity: lane.actionOpacity }"
           >
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 7px;">
-              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; color: #93937F;">{{ lane.action.type }}</span>
-              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px;" :style="{ color: lane.action.tagColor, background: lane.action.tagBg }">{{ lane.action.tag }}</span>
+              <span style="font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; color: #87938C;">{{ lane.action.type }}</span>
+              <span style="font-weight: 600; font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px;" :style="{ color: lane.action.tagColor, background: lane.action.tagBg }">{{ lane.action.tag }}</span>
             </div>
-            <div style="font-size: 14.5px; font-weight: 500; line-height: 1.3; color: #1A1B14;">{{ lane.action.title }}</div>
-            <div style="margin-top: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 11px;" :style="{ color: lane.action.resultColor }">{{ lane.action.result }}</div>
+            <div style="font-size: 14.5px; font-weight: 500; line-height: 1.3; color: #171D1A;">{{ lane.action.title }}</div>
+            <div style="margin-top: 5px; font-weight: 500; font-size: 11px;" :style="{ color: lane.action.resultColor }">{{ lane.action.result }}</div>
           </div>
 
         </div>
       </div>
     </div>
 
-    <div style="text-align: center; margin-top: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #9A9A8C;">INGEST&nbsp;·&nbsp;DETECT&nbsp;·&nbsp;ACT&nbsp;·&nbsp;VERIFY</div>
+    <div style="text-align: center; margin-top: 22px; font-weight: 600; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #919C95;">INGEST&nbsp;·&nbsp;DETECT&nbsp;·&nbsp;ACT&nbsp;·&nbsp;VERIFY</div>
   </div>
 </template>

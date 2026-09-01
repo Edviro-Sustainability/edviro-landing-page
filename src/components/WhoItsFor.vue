@@ -5,7 +5,7 @@ type Tab = 'schools' | 'construction' | 'datacenters'
 
 const activeTab = ref<Tab>('schools')
 
-const tabColor = (t: Tab) => (activeTab.value === t ? '#1A1B14' : '#8A8A7C')
+const tabColor = (t: Tab) => (activeTab.value === t ? '#171D1A' : '#75817B')
 const tabWeight = (t: Tab) => (activeTab.value === t ? '600' : '500')
 const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transparent')
 </script>
@@ -14,10 +14,10 @@ const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transp
   <!-- WHO IT'S FOR (tabbed) -->
   <section id="how" style="padding: 30px 32px 116px; scroll-margin-top: 80px;">
     <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
-      <p style="margin: 0 0 22px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8A8A7C;">Who it's for</p>
+      <p style="margin: 0 0 22px; font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #75817B;">Who it's for</p>
 
       <!-- tab bar -->
-      <div style="display: flex; flex-wrap: wrap; gap: 30px; border-bottom: 1px solid #E3E0D5; margin-bottom: 44px;">
+      <div style="display: flex; flex-wrap: wrap; gap: 30px; border-bottom: 1px solid #D8DED9; margin-bottom: 44px;">
         <button
           type="button"
           style="appearance: none; background: none; border: none; padding: 0 0 14px; margin-bottom: -1px; font-family: inherit; font-size: 17px; cursor: pointer; transition: color 0.2s ease;"
@@ -44,51 +44,51 @@ const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transp
           <h2 style="margin: 0 0 22px; font-weight: 400; font-size: clamp(30px, 3.6vw, 44px); line-height: 1.07; letter-spacing: -0.03em;">Built for the people who run the building.</h2>
           <div style="display: flex; flex-direction: column; gap: 22px;">
             <div style="display: flex; gap: 16px;">
-              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">1</span>
+              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">1</span>
               <div>
                 <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">It plugs into what you already have</div>
-                <div style="font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">Your meters, your BMS, your utility bills. Edviro connects them all.</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">Your meters, your BMS, your utility bills. Edviro connects them all.</div>
               </div>
             </div>
             <div style="display: flex; gap: 16px;">
-              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">2</span>
+              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">2</span>
               <div>
                 <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">It does the audit for you</div>
-                <div style="font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">Energy consultations for every site. The moment something drifts, Edviro catches it, not at next quarter's audit.</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">Energy consultations for every site. The moment something drifts, Edviro catches it, not at next quarter's audit.</div>
               </div>
             </div>
             <div style="display: flex; gap: 16px;">
-              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">3</span>
+              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">3</span>
               <div>
                 <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">It hands you the fix, or just does it</div>
-                <div style="font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">A step-by-step work order in your pocket, or an autonomous setpoint change overnight.&nbsp;</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">A step-by-step work order in your pocket, or an autonomous setpoint change overnight.&nbsp;</div>
               </div>
             </div>
             <div style="display: flex; gap: 16px;">
-              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">4</span>
+              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">4</span>
               <div>
                 <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">It backs up your budget asks</div>
-                <div style="font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">Every fix feeds a digital twin of each school, so replace-or-repair and bond-season decisions come with modeled payback, not gut feel.</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">Every fix feeds a digital twin of each school, so replace-or-repair and bond-season decisions come with modeled payback, not gut feel.</div>
               </div>
             </div>
           </div>
         </div>
 
-        <div style="background: #16170F; border-radius: 22px; padding: 30px; box-shadow: 0 40px 80px -40px rgba(0,0,0,0.45);">
+        <div style="background: #101815; border-radius: 22px; padding: 30px; box-shadow: 0 40px 80px -40px rgba(0,0,0,0.45);">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #8E907F;">Edviro · Mobile</span>
-            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #16170F; background: #6FCF97; padding: 3px 9px; border-radius: 999px;">Auto-generated</span>
+            <span style="font-weight: 600; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #79867E;">Edviro · Mobile</span>
+            <span style="font-weight: 600; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #101815; background: #6FCF97; padding: 3px 9px; border-radius: 999px;">Auto-generated</span>
           </div>
-          <div style="background: #1F2017; border: 1px solid #2D2E22; border-radius: 14px; padding: 18px;">
-            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8E907F; margin-bottom: 8px;">WORK ORDER #4821 · Boiler plant</div>
-            <div style="font-size: 17px; font-weight: 600; color: #F4F2EC; line-height: 1.35; margin-bottom: 16px;">Boiler #2 short-cycling at 14 starts/hr. Check pump and reset differential.</div>
+          <div style="background: #17201B; border: 1px solid #26302A; border-radius: 14px; padding: 18px;">
+            <div style="font-weight: 600; font-size: 11px; color: #79867E; margin-bottom: 8px;">WORK ORDER #4821 · Boiler plant</div>
+            <div style="font-size: 17px; font-weight: 600; color: #EDF0EE; line-height: 1.35; margin-bottom: 16px;">Boiler #2 short-cycling at 14 starts/hr. Check pump and reset differential.</div>
             <div style="display: flex; flex-direction: column; gap: 10px;">
-              <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #C9CABA;"><span style="width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid #6FCF97; display: inline-flex; align-items: center; justify-content: center; color: #6FCF97; font-size: 11px;">✓</span> Isolate and inspect circulation pump</div>
-              <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #C9CABA;"><span style="width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid #6FCF97; display: inline-flex; align-items: center; justify-content: center; color: #6FCF97; font-size: 11px;">✓</span> Reset firing differential to spec</div>
-              <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #8E907F;"><span style="width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid #4A4B3C;"></span> Log starts/hr after 2-hr run</div>
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #C4CBC5;"><span style="width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid #6FCF97; display: inline-flex; align-items: center; justify-content: center; color: #6FCF97; font-size: 11px;">✓</span> Isolate and inspect circulation pump</div>
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #C4CBC5;"><span style="width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid #6FCF97; display: inline-flex; align-items: center; justify-content: center; color: #6FCF97; font-size: 11px;">✓</span> Reset firing differential to spec</div>
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #79867E;"><span style="width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid #39443E;"></span> Log starts/hr after 2-hr run</div>
             </div>
           </div>
-          <div style="margin-top: 16px; display: flex; align-items: center; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8E907F;">
+          <div style="margin-top: 16px; display: flex; align-items: center; justify-content: space-between; font-weight: 500; font-size: 11px; color: #79867E;">
             <span>Verifying in meter data…</span>
             <span style="color: #6FCF97;">est. −$2,100/yr</span>
           </div>
@@ -101,51 +101,51 @@ const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transp
           <h2 style="margin: 0 0 22px; font-weight: 400; font-size: clamp(30px, 3.6vw, 44px); line-height: 1.07; letter-spacing: -0.03em;">Baselining and M&amp;V, built into the build.</h2>
           <div style="display: flex; flex-direction: column; gap: 22px;">
             <div style="display: flex; gap: 16px;">
-              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">1</span>
+              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">1</span>
               <div>
                 <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">Independent baselining</div>
-                <div style="font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">Set a measured energy baseline before and during construction, so every savings claim holds up.</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">Set a measured energy baseline before and during construction, so every savings claim holds up.</div>
               </div>
             </div>
             <div style="display: flex; gap: 16px;">
-              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">2</span>
+              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">2</span>
               <div>
                 <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">Audit-grade M&amp;V</div>
-                <div style="font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">Verify performance against that baseline continuously, with reports owners and lenders trust.</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">Verify performance against that baseline continuously, with reports owners and lenders trust.</div>
               </div>
             </div>
             <div style="display: flex; gap: 16px;">
-              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">3</span>
+              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">3</span>
               <div>
                 <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">Maintenance agents from day one</div>
-                <div style="font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">The same agents that verify also catch faults and waste, so new buildings run as designed from handover.</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">The same agents that verify also catch faults and waste, so new buildings run as designed from handover.</div>
               </div>
             </div>
             <div style="display: flex; gap: 16px;">
-              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">4</span>
+              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">4</span>
               <div>
                 <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">Design model vs. as-built twin</div>
-                <div style="font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">The as-built digital twin is checked against the design model, so variance surfaces during the build, not after handover.</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">The as-built digital twin is checked against the design model, so variance surfaces during the build, not after handover.</div>
               </div>
             </div>
           </div>
         </div>
 
-        <div style="background: #16170F; border-radius: 22px; padding: 30px; box-shadow: 0 40px 80px -40px rgba(0,0,0,0.45);">
+        <div style="background: #101815; border-radius: 22px; padding: 30px; box-shadow: 0 40px 80px -40px rgba(0,0,0,0.45);">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #8E907F;">Edviro · M&amp;V</span>
-            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #16170F; background: #6FCF97; padding: 3px 9px; border-radius: 999px;">Audit-grade</span>
+            <span style="font-weight: 600; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #79867E;">Edviro · M&amp;V</span>
+            <span style="font-weight: 600; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #101815; background: #6FCF97; padding: 3px 9px; border-radius: 999px;">Audit-grade</span>
           </div>
-          <div style="background: #1F2017; border: 1px solid #2D2E22; border-radius: 14px; padding: 18px;">
-            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8E907F; margin-bottom: 8px;">BASELINE · Tower A · fit-out</div>
-            <div style="font-size: 17px; font-weight: 600; color: #F4F2EC; line-height: 1.35; margin-bottom: 16px;">Independent baseline locked. Measured load tracking 8% above the design model.</div>
+          <div style="background: #17201B; border: 1px solid #26302A; border-radius: 14px; padding: 18px;">
+            <div style="font-weight: 600; font-size: 11px; color: #79867E; margin-bottom: 8px;">BASELINE · Tower A · fit-out</div>
+            <div style="font-size: 17px; font-weight: 600; color: #EDF0EE; line-height: 1.35; margin-bottom: 16px;">Independent baseline locked. Measured load tracking 8% above the design model.</div>
             <div style="display: flex; flex-direction: column; gap: 10px;">
-              <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #C9CABA;"><span style="width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid #6FCF97; display: inline-flex; align-items: center; justify-content: center; color: #6FCF97; font-size: 11px;">✓</span> Baseline fit to metered data</div>
-              <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #C9CABA;"><span style="width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid #6FCF97; display: inline-flex; align-items: center; justify-content: center; color: #6FCF97; font-size: 11px;">✓</span> Variance flagged to the GC</div>
-              <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #8E907F;"><span style="width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid #4A4B3C;"></span> Issue M&amp;V report to owner</div>
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #C4CBC5;"><span style="width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid #6FCF97; display: inline-flex; align-items: center; justify-content: center; color: #6FCF97; font-size: 11px;">✓</span> Baseline fit to metered data</div>
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #C4CBC5;"><span style="width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid #6FCF97; display: inline-flex; align-items: center; justify-content: center; color: #6FCF97; font-size: 11px;">✓</span> Variance flagged to the GC</div>
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #79867E;"><span style="width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid #39443E;"></span> Issue M&amp;V report to owner</div>
             </div>
           </div>
-          <div style="margin-top: 16px; display: flex; align-items: center; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8E907F;">
+          <div style="margin-top: 16px; display: flex; align-items: center; justify-content: space-between; font-weight: 500; font-size: 11px; color: #79867E;">
             <span>Verifying against baseline…</span>
             <span style="color: #6FCF97;">lender-ready</span>
           </div>
@@ -158,51 +158,51 @@ const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transp
           <h2 style="margin: 0 0 22px; font-weight: 400; font-size: clamp(30px, 3.6vw, 44px); line-height: 1.07; letter-spacing: -0.03em;">Built for the sites where cooling is the constraint.</h2>
           <div style="display: flex; flex-direction: column; gap: 22px;">
             <div style="display: flex; gap: 16px;">
-              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">1</span>
+              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">1</span>
               <div>
                 <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">It models the site from data you already have</div>
-                <div style="font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">Power, cooling, and environmental telemetry already coming out of the site feed a physics-based thermal model. No new instrumentation.</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">Power, cooling, and environmental telemetry already coming out of the site feed a physics-based thermal model. No new instrumentation.</div>
               </div>
             </div>
             <div style="display: flex; gap: 16px;">
-              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">2</span>
+              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">2</span>
               <div>
                 <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">It answers the headroom question</div>
-                <div style="font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">How much cooling headroom the site actually has at today's load, and how much more it could take.</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">How much cooling headroom the site actually has at today's load, and how much more it could take.</div>
               </div>
             </div>
             <div style="display: flex; gap: 16px;">
-              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">3</span>
+              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">3</span>
               <div>
                 <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">It simulates density before you commit racks</div>
-                <div style="font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">Test higher rack densities and cooling scenarios against the model, not the live floor, and see where supply temperature becomes the constraint.</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">Test higher rack densities and cooling scenarios against the model, not the live floor, and see where supply temperature becomes the constraint.</div>
               </div>
             </div>
             <div style="display: flex; gap: 16px;">
-              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">4</span>
+              <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">4</span>
               <div>
                 <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">It proves itself on one live pod</div>
-                <div style="font-size: 15.5px; line-height: 1.55; color: #6B6C5E;">Pilot-scale by design: predictions are verified against measured data on a single pod before you plan capacity with them.</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">Pilot-scale by design: predictions are verified against measured data on a single pod before you plan capacity with them.</div>
               </div>
             </div>
           </div>
         </div>
 
-        <div style="background: #16170F; border-radius: 22px; padding: 30px; box-shadow: 0 40px 80px -40px rgba(0,0,0,0.45);">
+        <div style="background: #101815; border-radius: 22px; padding: 30px; box-shadow: 0 40px 80px -40px rgba(0,0,0,0.45);">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #8E907F;">Edviro · Thermal</span>
-            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #16170F; background: #6FCF97; padding: 3px 9px; border-radius: 999px;">Physics-based</span>
+            <span style="font-weight: 600; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #79867E;">Edviro · Thermal</span>
+            <span style="font-weight: 600; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #101815; background: #6FCF97; padding: 3px 9px; border-radius: 999px;">Physics-based</span>
           </div>
-          <div style="background: #1F2017; border: 1px solid #2D2E22; border-radius: 14px; padding: 18px;">
-            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8E907F; margin-bottom: 8px;">HEADROOM · Pod 3 · N+1 cooling</div>
-            <div style="font-size: 17px; font-weight: 600; color: #F4F2EC; line-height: 1.35; margin-bottom: 16px;">Cooling headroom 240 kW at design inlet. Supports +12 racks at 17 kW before ΔT becomes the constraint.</div>
+          <div style="background: #17201B; border: 1px solid #26302A; border-radius: 14px; padding: 18px;">
+            <div style="font-weight: 600; font-size: 11px; color: #79867E; margin-bottom: 8px;">HEADROOM · Pod 3 · N+1 cooling</div>
+            <div style="font-size: 17px; font-weight: 600; color: #EDF0EE; line-height: 1.35; margin-bottom: 16px;">Cooling headroom 240 kW at design inlet. Supports +12 racks at 17 kW before ΔT becomes the constraint.</div>
             <div style="display: flex; flex-direction: column; gap: 10px;">
-              <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #C9CABA;"><span style="width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid #6FCF97; display: inline-flex; align-items: center; justify-content: center; color: #6FCF97; font-size: 11px;">✓</span> Thermal model calibrated to site telemetry</div>
-              <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #C9CABA;"><span style="width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid #6FCF97; display: inline-flex; align-items: center; justify-content: center; color: #6FCF97; font-size: 11px;">✓</span> Density scenario simulated at N+1</div>
-              <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #8E907F;"><span style="width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid #4A4B3C;"></span> Verify against measured inlet temps</div>
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #C4CBC5;"><span style="width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid #6FCF97; display: inline-flex; align-items: center; justify-content: center; color: #6FCF97; font-size: 11px;">✓</span> Thermal model calibrated to site telemetry</div>
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #C4CBC5;"><span style="width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid #6FCF97; display: inline-flex; align-items: center; justify-content: center; color: #6FCF97; font-size: 11px;">✓</span> Density scenario simulated at N+1</div>
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #79867E;"><span style="width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid #39443E;"></span> Verify against measured inlet temps</div>
             </div>
           </div>
-          <div style="margin-top: 16px; display: flex; align-items: center; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8E907F;">
+          <div style="margin-top: 16px; display: flex; align-items: center; justify-content: space-between; font-weight: 500; font-size: 11px; color: #79867E;">
             <span>Verifying against live telemetry…</span>
             <span style="color: #6FCF97;">pilot: one live pod</span>
           </div>

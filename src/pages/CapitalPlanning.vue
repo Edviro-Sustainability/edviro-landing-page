@@ -63,11 +63,11 @@ usePageSeo({
     <section style="padding: 40px 32px 56px;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <div style="max-width: 820px;">
-          <p style="margin: 0 0 22px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8A8A7C;">Capital planning</p>
+          <p style="margin: 0 0 22px; font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #75817B;">Capital planning</p>
           <h1 style="margin: 0; font-weight: 400; font-size: clamp(36px, 5.4vw, 62px); line-height: 1.05; letter-spacing: -0.035em;">Test the project before you spend the budget.</h1>
-          <p style="margin: 26px 0 0; max-width: 640px; font-size: 19px; line-height: 1.6; color: #55564C;">Every bill, meter reading, BMS point, and work order Edviro touches builds a digital twin of your building. Use it to simulate replacements, retrofits, and schedule changes, and rank capital projects by real payback before committing a dollar.</p>
+          <p style="margin: 26px 0 0; max-width: 640px; font-size: 19px; line-height: 1.6; color: #4B5550;">Every bill, meter reading, BMS point, and work order Edviro touches builds a digital twin of your building. Use it to simulate replacements, retrofits, and schedule changes, and rank capital projects by real payback before committing a dollar.</p>
           <div style="margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap;">
-            <RouterLink :to="BOOK_DEMO_PATH" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #F4F2EC; background: var(--accent); padding: 13px 26px; border-radius: 999px;">Book a demo</RouterLink>
+            <RouterLink :to="BOOK_DEMO_PATH" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #EDF0EE; background: var(--accent); padding: 13px 26px; border-radius: 999px;">Book a demo</RouterLink>
           </div>
         </div>
       </div>
@@ -77,34 +77,34 @@ usePageSeo({
     <section style="padding: 20px 32px 60px;">
       <div style="max-width: 820px; margin: 0 auto; width: 100%;">
         <h2 style="margin: 0 0 16px; font-weight: 400; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.1; letter-spacing: -0.025em;">Capital decisions, made with evidence.</h2>
-        <p style="margin: 0 0 16px; font-size: 17px; line-height: 1.7; color: #55564C;">Most capital plans are built on equipment age, vendor quotes, and gut feel. The data that could answer the real questions — replace or repair? which retrofit pays back first? what does the new wing do to demand charges? — is scattered across bills, spreadsheets, BMS exports, and work-order systems where no one can use it.</p>
-        <p style="margin: 0; font-size: 17px; line-height: 1.7; color: #55564C;">Edviro already pulls that data into one place to run your buildings day to day. Capital planning is what it compounds into: a digital twin of each building, accurate enough to simulate an intervention and project its payback before you bring it to the board.</p>
+        <p style="margin: 0 0 16px; font-size: 17px; line-height: 1.7; color: #4B5550;">Most capital plans are built on equipment age, vendor quotes, and gut feel. The data that could answer the real questions — replace or repair? which retrofit pays back first? what does the new wing do to demand charges? — is scattered across bills, spreadsheets, BMS exports, and work-order systems where no one can use it.</p>
+        <p style="margin: 0; font-size: 17px; line-height: 1.7; color: #4B5550;">Edviro already pulls that data into one place to run your buildings day to day. Capital planning is what it compounds into: a digital twin of each building, accurate enough to simulate an intervention and project its payback before you bring it to the board.</p>
       </div>
     </section>
 
     <!-- HOW IT WORKS -->
-    <section style="padding: 50px 32px; background: #16170F; color: #F4F2EC;">
+    <section style="padding: 50px 32px; background: #101815; color: #EDF0EE;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
-        <p style="margin: 0 0 18px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8E907F;">How it works</p>
-        <h2 style="margin: 0 0 40px; font-weight: 400; font-size: clamp(28px, 3.8vw, 44px); line-height: 1.06; letter-spacing: -0.03em; color: #F8F7F1; max-width: 640px;">A twin that learns, simulations you can defend.</h2>
-        <div class="r-cols-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #2D2E22; border: 1px solid #2D2E22; border-radius: 16px; overflow: hidden;">
-          <div style="background: #1F2017; padding: 28px;">
-            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6FCF97; margin-bottom: 14px;">01 / Twin</div>
-            <h3 style="margin: 0 0 8px; font-size: 18px; font-weight: 600; color: #F4F2EC;">Build the model</h3>
-            <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #C9CABA;">Every data source Edviro connects and every fix it verifies feeds a living digital twin of each building. No extra setup, it comes from running your operations.</p>
+        <p style="margin: 0 0 18px; font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #79867E;">How it works</p>
+        <h2 style="margin: 0 0 40px; font-weight: 400; font-size: clamp(28px, 3.8vw, 44px); line-height: 1.06; letter-spacing: -0.03em; color: #F2F5F1; max-width: 640px;">A twin that learns, simulations you can defend.</h2>
+        <div class="r-cols-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #26302A; border: 1px solid #26302A; border-radius: 16px; overflow: hidden;">
+          <div style="background: #17201B; padding: 28px;">
+            <div style="font-weight: 600; font-size: 12px; color: #6FCF97; margin-bottom: 14px;">01 / Twin</div>
+            <h3 style="margin: 0 0 8px; font-size: 18px; font-weight: 600; color: #EDF0EE;">Build the model</h3>
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #C4CBC5;">Every data source Edviro connects and every fix it verifies feeds a living digital twin of each building. No extra setup, it comes from running your operations.</p>
           </div>
-          <div style="background: #1F2017; padding: 28px;">
-            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6FCF97; margin-bottom: 14px;">02 / Simulate</div>
-            <h3 style="margin: 0 0 8px; font-size: 18px; font-weight: 600; color: #F4F2EC;">Test the intervention</h3>
-            <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #C9CABA;">Run replacements, retrofits, schedule changes, and rate scenarios against the twin. See projected savings and payback from your real usage, not industry averages.</p>
+          <div style="background: #17201B; padding: 28px;">
+            <div style="font-weight: 600; font-size: 12px; color: #6FCF97; margin-bottom: 14px;">02 / Simulate</div>
+            <h3 style="margin: 0 0 8px; font-size: 18px; font-weight: 600; color: #EDF0EE;">Test the intervention</h3>
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #C4CBC5;">Run replacements, retrofits, schedule changes, and rate scenarios against the twin. See projected savings and payback from your real usage, not industry averages.</p>
           </div>
-          <div style="background: #1F2017; padding: 28px;">
-            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6FCF97; margin-bottom: 14px;">03 / Decide</div>
-            <h3 style="margin: 0 0 8px; font-size: 18px; font-weight: 600; color: #F4F2EC;">Rank and prove</h3>
-            <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #C9CABA;">Bring the board a prioritized capital plan with modeled payback for each option, then verified results after the work is done.</p>
+          <div style="background: #17201B; padding: 28px;">
+            <div style="font-weight: 600; font-size: 12px; color: #6FCF97; margin-bottom: 14px;">03 / Decide</div>
+            <h3 style="margin: 0 0 8px; font-size: 18px; font-weight: 600; color: #EDF0EE;">Rank and prove</h3>
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #C4CBC5;">Bring the board a prioritized capital plan with modeled payback for each option, then verified results after the work is done.</p>
           </div>
         </div>
-        <div style="margin-top: 28px; display: inline-flex; align-items: baseline; gap: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #8E907F;">
+        <div style="margin-top: 28px; display: inline-flex; align-items: baseline; gap: 12px; font-weight: 500; font-size: 12px; color: #79867E;">
           <span style="color: #6FCF97; font-size: 15px;">Replace vs. repair</span> answered from your own meter data, before the purchase order
         </div>
       </div>
@@ -115,17 +115,17 @@ usePageSeo({
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <h2 style="margin: 0 0 28px; font-weight: 400; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.1; letter-spacing: -0.025em;">Where simulation matters most</h2>
         <div class="r-cols-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
-          <RouterLink to="/solutions/schools" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #E3E0D5; border-radius: 16px; padding: 24px; background: #FBFAF6; display: block;">
+          <RouterLink to="/solutions/schools" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
             <div style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">Schools &rarr;</div>
-            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #6B6C5E;">Walk into budget and bond season with a ranked project list and the data behind it.</p>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #5F6B65;">Walk into budget and bond season with a ranked project list and the data behind it.</p>
           </RouterLink>
-          <RouterLink to="/solutions/data-centers" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #E3E0D5; border-radius: 16px; padding: 24px; background: #FBFAF6; display: block;">
+          <RouterLink to="/solutions/data-centers" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
             <div style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">Data centers &rarr;</div>
-            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #6B6C5E;">Find how many racks a site can take before cooling is the constraint — simulated before you commit.</p>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #5F6B65;">Find how many racks a site can take before cooling is the constraint — simulated before you commit.</p>
           </RouterLink>
-          <RouterLink to="/solutions/construction" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #E3E0D5; border-radius: 16px; padding: 24px; background: #FBFAF6; display: block;">
+          <RouterLink to="/solutions/construction" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
             <div style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">Construction &rarr;</div>
-            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #6B6C5E;">Compare the as-built twin to the design model and catch variance before handover.</p>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #5F6B65;">Compare the as-built twin to the design model and catch variance before handover.</p>
           </RouterLink>
         </div>
       </div>
@@ -142,6 +142,6 @@ usePageSeo({
   filter: brightness(1.12);
 }
 .card-link:hover {
-  border-color: #1a1b14 !important;
+  border-color: #171D1A !important;
 }
 </style>

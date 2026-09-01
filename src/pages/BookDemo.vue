@@ -101,11 +101,11 @@ function reportDemoIntent(): void {
     <section style="padding: 40px 32px 64px;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <div style="max-width: 780px;">
-          <p style="margin: 0 0 22px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8A8A7C;">Demo &amp; pricing</p>
+          <p style="margin: 0 0 22px; font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #75817B;">Demo &amp; pricing</p>
           <h1 style="margin: 0; font-weight: 400; font-size: clamp(36px, 5.4vw, 62px); line-height: 1.05; letter-spacing: -0.035em;">See Edviro run, then get a quote for <span style="color: var(--accent);">your sites</span>.</h1>
-          <p style="margin: 26px 0 0; max-width: 620px; font-size: 19px; line-height: 1.6; color: #55564C;">Thirty minutes with the founders: a walkthrough of the product, a conversation about your portfolio, and a quote scoped to exactly what you need.</p>
+          <p style="margin: 26px 0 0; max-width: 620px; font-size: 19px; line-height: 1.6; color: #4B5550;">Thirty minutes with the founders: a walkthrough of the product, a conversation about your portfolio, and a quote scoped to exactly what you need.</p>
           <div style="margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap;">
-            <a :href="DEMO_REDIRECT_PATH" target="_blank" rel="noopener" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #F4F2EC; background: var(--accent); padding: 13px 26px; border-radius: 999px;" @click="reportDemoIntent">Book a 30-minute demo</a>
+            <a :href="DEMO_REDIRECT_PATH" target="_blank" rel="noopener" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #EDF0EE; background: var(--accent); padding: 13px 26px; border-radius: 999px;" @click="reportDemoIntent">Book a 30-minute demo</a>
           </div>
         </div>
       </div>
@@ -116,10 +116,10 @@ function reportDemoIntent(): void {
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <h2 style="margin: 0 0 40px; font-weight: 400; font-size: clamp(28px, 3.6vw, 42px); line-height: 1.08; letter-spacing: -0.03em; max-width: 640px;">How it goes, from the call to your first report.</h2>
         <div class="r-cols-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
-          <div v-for="step in steps" :key="step.num" style="border-top: 1.5px solid #1A1B14; padding-top: 18px;">
-            <p style="margin: 0 0 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.16em; color: #8A8A7C;">{{ step.num }}</p>
+          <div v-for="step in steps" :key="step.num" style="border-top: 1.5px solid #171D1A; padding-top: 18px;">
+            <p style="margin: 0 0 12px; font-weight: 600; font-size: 12px; letter-spacing: 0.16em; color: #75817B;">{{ step.num }}</p>
             <h3 style="margin: 0 0 10px; font-size: 19px; font-weight: 600;">{{ step.title }}</h3>
-            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #6B6C5E;">{{ step.body }}</p>
+            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #5F6B65;">{{ step.body }}</p>
           </div>
         </div>
       </div>
@@ -129,38 +129,38 @@ function reportDemoIntent(): void {
     <section style="padding: 20px 32px 70px;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <div class="r-split" style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start;">
-          <div style="border: 1px solid #E3E0D5; border-radius: 16px; padding: 28px;">
-            <p style="margin: 0 0 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A8A7C;">The usual energy audit</p>
-            <p style="margin: 0; font-size: 16.5px; line-height: 1.62; color: #55564C;">An engineer walks the building for a week, hands over a PDF of recommendations, and invoices. The findings start going stale the day schedules change, and nobody verifies the fixes that did get made.</p>
+          <div style="border: 1px solid #D8DED9; border-radius: 16px; padding: 28px;">
+            <p style="margin: 0 0 14px; font-weight: 600; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #75817B;">The usual energy audit</p>
+            <p style="margin: 0; font-size: 16.5px; line-height: 1.62; color: #4B5550;">An engineer walks the building for a week, hands over a PDF of recommendations, and invoices. The findings start going stale the day schedules change, and nobody verifies the fixes that did get made.</p>
           </div>
-          <div style="border: 1.5px solid #1A1B14; border-radius: 16px; padding: 28px; background: #EFEDE4;">
-            <p style="margin: 0 0 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent);">With Edviro</p>
-            <p style="margin: 0; font-size: 16.5px; line-height: 1.62; color: #1A1B14;">The audit never stops. Edviro re-reads every bill and every interval, catches drift the week it starts, hands your team the fix, and confirms the savings in the meter data.</p>
+          <div style="border: 1.5px solid #171D1A; border-radius: 16px; padding: 28px; background: #E6EBE7;">
+            <p style="margin: 0 0 14px; font-weight: 600; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent);">With Edviro</p>
+            <p style="margin: 0; font-size: 16.5px; line-height: 1.62; color: #171D1A;">The audit never stops. Edviro re-reads every bill and every interval, catches drift the week it starts, hands your team the fix, and confirms the savings in the meter data.</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- WHAT THE DEMO COVERS -->
-    <section style="padding: 60px 32px; background: #16170F; color: #F4F2EC;">
+    <section style="padding: 60px 32px; background: #101815; color: #EDF0EE;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
-        <p style="margin: 0 0 18px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8E907F;">On the call</p>
-        <h2 style="margin: 0 0 36px; font-weight: 400; font-size: clamp(28px, 3.8vw, 44px); line-height: 1.06; letter-spacing: -0.03em; color: #F8F7F1; max-width: 700px;">The kinds of waste we will show you Edviro catching.</h2>
+        <p style="margin: 0 0 18px; font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #79867E;">On the call</p>
+        <h2 style="margin: 0 0 36px; font-weight: 400; font-size: clamp(28px, 3.8vw, 44px); line-height: 1.06; letter-spacing: -0.03em; color: #F2F5F1; max-width: 700px;">The kinds of waste we will show you Edviro catching.</h2>
         <div class="r-split" style="display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 40px; align-items: start;">
           <div>
-            <h3 style="margin: 0 0 14px; font-size: 18px; font-weight: 600; color: #F4F2EC;">Nothing to prepare</h3>
-            <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.62; color: #C9CABA;">No data pull, no install, and no access to your control system to sit through a demo. Bring the buildings you are worried about and whatever questions your team has.</p>
-            <a :href="DEMO_REDIRECT_PATH" target="_blank" rel="noopener" class="audit-btn" style="display: inline-block; font-size: 15px; font-weight: 500; text-decoration: none; color: #16170F; background: #F4F2EC; padding: 13px 26px; border-radius: 999px;" @click="reportDemoIntent">Book a 30-minute demo</a>
+            <h3 style="margin: 0 0 14px; font-size: 18px; font-weight: 600; color: #EDF0EE;">Nothing to prepare</h3>
+            <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.62; color: #C4CBC5;">No data pull, no install, and no access to your control system to sit through a demo. Bring the buildings you are worried about and whatever questions your team has.</p>
+            <a :href="DEMO_REDIRECT_PATH" target="_blank" rel="noopener" class="audit-btn" style="display: inline-block; font-size: 15px; font-weight: 500; text-decoration: none; color: #101815; background: #EDF0EE; padding: 13px 26px; border-radius: 999px;" @click="reportDemoIntent">Book a 30-minute demo</a>
           </div>
           <div>
-            <h3 style="margin: 0 0 14px; font-size: 18px; font-weight: 600; color: #F4F2EC;">What you will see</h3>
-            <ul style="margin: 0; padding: 0; list-style: none; display: grid; gap: 1px; background: #2D2E22; border: 1px solid #2D2E22; border-radius: 16px; overflow: hidden;">
-              <li style="background: #1F2017; padding: 20px 24px; font-size: 15.5px; line-height: 1.6; color: #C9CABA;">Where usage stops lining up with how a building is actually used, at night, on weekends, and over breaks.</li>
-              <li style="background: #1F2017; padding: 20px 24px; font-size: 15.5px; line-height: 1.6; color: #C9CABA;">What demand charges cost, and how much of that is spikes that could be shifted.</li>
-              <li style="background: #1F2017; padding: 20px 24px; font-size: 15.5px; line-height: 1.6; color: #C9CABA;">Billing and tariff problems: misapplied line items, and load that belongs on a different rate schedule.</li>
-              <li style="background: #1F2017; padding: 20px 24px; font-size: 15.5px; line-height: 1.6; color: #C9CABA;">How fixes get ranked by what pays back first, and how the savings are verified afterwards.</li>
+            <h3 style="margin: 0 0 14px; font-size: 18px; font-weight: 600; color: #EDF0EE;">What you will see</h3>
+            <ul style="margin: 0; padding: 0; list-style: none; display: grid; gap: 1px; background: #26302A; border: 1px solid #26302A; border-radius: 16px; overflow: hidden;">
+              <li style="background: #17201B; padding: 20px 24px; font-size: 15.5px; line-height: 1.6; color: #C4CBC5;">Where usage stops lining up with how a building is actually used, at night, on weekends, and over breaks.</li>
+              <li style="background: #17201B; padding: 20px 24px; font-size: 15.5px; line-height: 1.6; color: #C4CBC5;">What demand charges cost, and how much of that is spikes that could be shifted.</li>
+              <li style="background: #17201B; padding: 20px 24px; font-size: 15.5px; line-height: 1.6; color: #C4CBC5;">Billing and tariff problems: misapplied line items, and load that belongs on a different rate schedule.</li>
+              <li style="background: #17201B; padding: 20px 24px; font-size: 15.5px; line-height: 1.6; color: #C4CBC5;">How fixes get ranked by what pays back first, and how the savings are verified afterwards.</li>
             </ul>
-            <p style="margin: 18px 0 0; font-size: 15px; line-height: 1.6; color: #8E907F;">Then we scope your sites and quote from there.</p>
+            <p style="margin: 18px 0 0; font-size: 15px; line-height: 1.6; color: #79867E;">Then we scope your sites and quote from there.</p>
           </div>
         </div>
       </div>
@@ -169,38 +169,38 @@ function reportDemoIntent(): void {
     <!-- PRICING -->
     <section style="padding: 70px 32px 40px;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
-        <p style="margin: 0 0 18px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8A8A7C;">Pricing</p>
+        <p style="margin: 0 0 18px; font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #75817B;">Pricing</p>
         <h2 style="margin: 0 0 20px; font-weight: 400; font-size: clamp(28px, 3.8vw, 44px); line-height: 1.06; letter-spacing: -0.03em; max-width: 640px;">Pay for the part you are actually using.</h2>
-        <p style="margin: 0 0 20px; max-width: 660px; font-size: 17.5px; line-height: 1.62; color: #55564C;">Edviro is quoted per connected site and scoped to what you actually turn on, so a team that wants to see where money is leaking is not paying for capital planning. Start where the pain is and expand when the last step has paid for itself.</p>
-        <p style="margin: 0; max-width: 660px; font-size: 17.5px; line-height: 1.62; color: #55564C;">We work out the number on the call, once we know your portfolio and which sites you want connected.</p>
+        <p style="margin: 0 0 20px; max-width: 660px; font-size: 17.5px; line-height: 1.62; color: #4B5550;">Edviro is quoted per connected site and scoped to what you actually turn on, so a team that wants to see where money is leaking is not paying for capital planning. Start where the pain is and expand when the last step has paid for itself.</p>
+        <p style="margin: 0; max-width: 660px; font-size: 17.5px; line-height: 1.62; color: #4B5550;">We work out the number on the call, once we know your portfolio and which sites you want connected.</p>
       </div>
     </section>
 
     <!-- NO MODULE HELL -->
     <section style="padding: 20px 32px 90px;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
-        <div style="border: 1px solid #E3E0D5; border-radius: 16px; padding: 34px;">
+        <div style="border: 1px solid #D8DED9; border-radius: 16px; padding: 34px;">
           <div class="r-split" style="display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 32px; align-items: start;">
             <div>
               <h3 style="margin: 0 0 12px; font-size: 22px; font-weight: 600; letter-spacing: -0.01em;">What you will not get</h3>
-              <p style="margin: 0; font-size: 16px; line-height: 1.62; color: #6B6C5E;">Energy software has a habit of selling you a catalog and letting you sort out which half you needed.</p>
+              <p style="margin: 0; font-size: 16px; line-height: 1.62; color: #5F6B65;">Energy software has a habit of selling you a catalog and letting you sort out which half you needed.</p>
             </div>
             <div class="r-cols-2" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px;">
               <div>
                 <h4 style="margin: 0 0 8px; font-size: 16px; font-weight: 600;">No module maze</h4>
-                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #6B6C5E;">Nothing is bundled, and no module exists only to unlock the one you wanted.</p>
+                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #5F6B65;">Nothing is bundled, and no module exists only to unlock the one you wanted.</p>
               </div>
               <div>
                 <h4 style="margin: 0 0 8px; font-size: 16px; font-weight: 600;">No per-seat counting</h4>
-                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #6B6C5E;">Pricing follows sites, not headcount, so adding a maintenance tech costs nothing.</p>
+                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #5F6B65;">Pricing follows sites, not headcount, so adding a maintenance tech costs nothing.</p>
               </div>
               <div>
                 <h4 style="margin: 0 0 8px; font-size: 16px; font-weight: 600;">No install project first</h4>
-                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #6B6C5E;">No hardware order and no rip-and-replace before you see a single finding.</p>
+                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #5F6B65;">No hardware order and no rip-and-replace before you see a single finding.</p>
               </div>
               <div>
                 <h4 style="margin: 0 0 8px; font-size: 16px; font-weight: 600;">No unverifiable savings</h4>
-                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #6B6C5E;">Everything reports against a learned baseline, so the savings show up on the bill.</p>
+                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #5F6B65;">Everything reports against a learned baseline, so the savings show up on the bill.</p>
               </div>
             </div>
           </div>
@@ -211,12 +211,12 @@ function reportDemoIntent(): void {
     <FaqList eyebrow="Before you book" heading="Demo and pricing FAQ" :items="faqs" />
 
     <!-- CTA -->
-    <section style="padding: 100px 32px; background: var(--accent); color: #F4F2EC;">
+    <section style="padding: 100px 32px; background: var(--accent); color: #EDF0EE;">
       <div style="max-width: 820px; margin: 0 auto; width: 100%; text-align: center;">
-        <h2 style="margin: 0; font-weight: 400; font-size: clamp(34px, 5vw, 56px); line-height: 1.05; letter-spacing: -0.035em; color: #F8F7F1;">Book the thirty minutes.</h2>
-        <p style="margin: 24px auto 0; max-width: 560px; font-size: 18px; line-height: 1.6; color: rgba(244,242,236,0.78);">We will walk you through Edviro, talk through your sites, and tell you what it would cost. Bring whoever should hear it.</p>
+        <h2 style="margin: 0; font-weight: 400; font-size: clamp(34px, 5vw, 56px); line-height: 1.05; letter-spacing: -0.035em; color: #F2F5F1;">Book the thirty minutes.</h2>
+        <p style="margin: 24px auto 0; max-width: 560px; font-size: 18px; line-height: 1.6; color: rgba(237,240,238,0.78);">We will walk you through Edviro, talk through your sites, and tell you what it would cost. Bring whoever should hear it.</p>
         <div style="margin-top: 34px; display: flex; justify-content: center;">
-          <a :href="DEMO_REDIRECT_PATH" target="_blank" rel="noopener" class="cta-btn" style="font-size: 16px; font-weight: 600; text-decoration: none; color: var(--accent); background: #F4F2EC; padding: 15px 34px; border-radius: 999px;" @click="reportDemoIntent">Pick a time</a>
+          <a :href="DEMO_REDIRECT_PATH" target="_blank" rel="noopener" class="cta-btn" style="font-size: 16px; font-weight: 600; text-decoration: none; color: var(--accent); background: #EDF0EE; padding: 15px 34px; border-radius: 999px;" @click="reportDemoIntent">Pick a time</a>
         </div>
       </div>
     </section>
