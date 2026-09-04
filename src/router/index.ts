@@ -12,6 +12,11 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/SolutionSchools.vue'),
   },
   {
+    path: '/solutions/school-facilities-operations',
+    name: 'school-facilities-operations',
+    component: () => import('@/pages/SchoolFacilitiesOperations.vue'),
+  },
+  {
     path: '/solutions/real-estate',
     name: 'solutions-real-estate',
     component: () => import('@/pages/SolutionRealEstate.vue'),
@@ -47,21 +52,16 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/AboutPage.vue'),
   },
   {
-    // Every "Book a demo" CTA links here. The scheduler lives one click further,
-    // at /demo, and Calendly returns invitees to /demo-booked.
     path: '/book-a-demo',
     name: 'book-a-demo',
     component: () => import('@/pages/BookDemo.vue'),
   },
   {
-    // Thin interstitial that redirects to BOOKING_URL.
     path: '/demo',
     name: 'demo',
     component: () => import('@/pages/DemoRedirect.vue'),
   },
   {
-    // Calendly's post-booking redirect target, where the ad conversions for a
-    // confirmed booking are reported.
     path: '/demo-booked',
     name: 'demo-booked',
     component: () => import('@/pages/DemoBooked.vue'),

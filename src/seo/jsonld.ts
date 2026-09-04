@@ -14,7 +14,6 @@ export type JsonLd = Record<string, unknown>
 const ORG_ID = `${SITE_URL}/#organization`
 const WEBSITE_ID = `${SITE_URL}/#website`
 
-/** Edviro as an Organization. Referenced by `@id` from other entities. */
 export function organizationLd(): JsonLd {
   return {
     '@context': 'https://schema.org',
@@ -40,7 +39,6 @@ export function organizationLd(): JsonLd {
   }
 }
 
-/** The site itself. */
 export function websiteLd(): JsonLd {
   return {
     '@context': 'https://schema.org',
@@ -54,22 +52,30 @@ export function websiteLd(): JsonLd {
   }
 }
 
-/** The Edviro platform as a software product. */
 export function softwareApplicationLd(): JsonLd {
   return {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: SITE_NAME,
     applicationCategory: 'BusinessApplication',
-    applicationSubCategory: 'Energy Management Software',
+    applicationSubCategory:
+      'School Facilities Management, CMMS, Work Order, Asset Management, and Energy Management Software',
     operatingSystem: 'Web',
     url: SITE_URL,
     description: DEFAULT_DESCRIPTION,
+    featureList: [
+      'Energy monitoring and diagnostics',
+      'Native work-order management',
+      'Asset management and inspections',
+      'Integration with existing CMMS and building systems',
+      'Capital planning',
+      'Measurement and verification',
+    ],
     publisher: { '@id': ORG_ID },
     audience: {
       '@type': 'BusinessAudience',
       audienceType:
-        'Facilities managers, building owners, data center operators, and construction teams',
+        'K-12 facilities directors, maintenance managers, technicians, energy managers, superintendents, and school business officials',
     },
   }
 }
@@ -112,7 +118,6 @@ export function faqLd(items: FaqItem[]): JsonLd {
   }
 }
 
-/** A WebPage / Service style entity for marketing sub-pages. */
 export function serviceLd(opts: {
   name: string
   description: string
