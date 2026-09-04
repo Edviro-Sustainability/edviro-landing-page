@@ -41,34 +41,34 @@ const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transp
       <!-- SCHOOLS PANEL -->
       <div v-if="activeTab === 'schools'" class="r-split" style="display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 64px; align-items: center;">
         <div>
-          <h2 style="margin: 0 0 22px; font-weight: 400; font-size: clamp(30px, 3.6vw, 44px); line-height: 1.07; letter-spacing: -0.03em;">Built for the people who run the building.</h2>
+          <h2 style="margin: 0 0 22px; font-weight: 400; font-size: clamp(30px, 3.6vw, 44px); line-height: 1.07; letter-spacing: -0.03em;">Built for school maintenance and operations.</h2>
           <div style="display: flex; flex-direction: column; gap: 22px;">
             <div style="display: flex; gap: 16px;">
               <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">1</span>
               <div>
-                <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">It plugs into what you already have</div>
-                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">Your meters, your BMS, your utility bills. Edviro connects them all.</div>
+                <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">It connects the operating record</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">Bring requests, work orders, assets, inspections, schedules, energy, and supported BMS data into one usable context.</div>
               </div>
             </div>
             <div style="display: flex; gap: 16px;">
               <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">2</span>
               <div>
-                <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">It does the audit for you</div>
-                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">Energy consultations for every site. The moment something drifts, Edviro catches it, not at next quarter's audit.</div>
+                <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">It helps your team find the cause</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">Edviro connects the request with available history and building evidence so staff begin with a likely cause and supporting facts.</div>
               </div>
             </div>
             <div style="display: flex; gap: 16px;">
               <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">3</span>
               <div>
-                <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">It hands you the fix, or just does it</div>
-                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">A step-by-step work order in your pocket, or an autonomous setpoint change overnight.&nbsp;</div>
+                <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">It routes the work</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">Use Edviro's native work-order system or connect the CMMS your team keeps. Supported controls changes require the right integration, review, and authorization.</div>
               </div>
             </div>
             <div style="display: flex; gap: 16px;">
               <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">4</span>
               <div>
-                <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">It backs up your budget asks</div>
-                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">Every fix feeds a digital twin of each school, so replace-or-repair and bond-season decisions come with modeled payback, not gut feel.</div>
+                <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">It strengthens repair-or-replace decisions</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">Connect recurring failures, service history, energy performance, and modeled scenarios to a clearer capital case.</div>
               </div>
             </div>
           </div>
@@ -77,7 +77,7 @@ const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transp
         <div style="background: #101815; border-radius: 22px; padding: 30px; box-shadow: 0 40px 80px -40px rgba(0,0,0,0.45);">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
             <span style="font-weight: 600; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #79867E;">Edviro · Mobile</span>
-            <span style="font-weight: 600; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #101815; background: #6FCF97; padding: 3px 9px; border-radius: 999px;">Auto-generated</span>
+            <span style="font-weight: 600; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #101815; background: #6FCF97; padding: 3px 9px; border-radius: 999px;">Evidence attached</span>
           </div>
           <div style="background: #17201B; border: 1px solid #26302A; border-radius: 14px; padding: 18px;">
             <div style="font-weight: 600; font-size: 11px; color: #79867E; margin-bottom: 8px;">WORK ORDER #4821 · Boiler plant</div>
@@ -89,8 +89,8 @@ const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transp
             </div>
           </div>
           <div style="margin-top: 16px; display: flex; align-items: center; justify-content: space-between; font-weight: 500; font-size: 11px; color: #79867E;">
-            <span>Verifying in meter data…</span>
-            <span style="color: #6FCF97;">est. −$2,100/yr</span>
+            <span>Outcome review</span>
+            <span style="color: #6FCF97;">awaiting verification</span>
           </div>
         </div>
       </div>
@@ -98,7 +98,7 @@ const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transp
       <!-- CONSTRUCTION PANEL -->
       <div v-if="activeTab === 'construction'" class="r-split" style="display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 64px; align-items: center;">
         <div>
-          <h2 style="margin: 0 0 22px; font-weight: 400; font-size: clamp(30px, 3.6vw, 44px); line-height: 1.07; letter-spacing: -0.03em;">Baselining and M&amp;V, built into the build.</h2>
+          <h2 style="margin: 0 0 22px; font-weight: 400; font-size: clamp(30px, 3.6vw, 44px); line-height: 1.07; letter-spacing: -0.03em;">Baselining and M&amp;V for project handover.</h2>
           <div style="display: flex; flex-direction: column; gap: 22px;">
             <div style="display: flex; gap: 16px;">
               <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">1</span>
@@ -110,15 +110,15 @@ const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transp
             <div style="display: flex; gap: 16px;">
               <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">2</span>
               <div>
-                <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">Audit-grade M&amp;V</div>
-                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">Verify performance against that baseline continuously, with reports owners and lenders trust.</div>
+                <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">Defined M&amp;V workflow</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">Use an agreed baseline and reviewable reporting in workflows designed to support IPMVP-standard practices.</div>
               </div>
             </div>
             <div style="display: flex; gap: 16px;">
               <span style="flex: none; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px;">3</span>
               <div>
-                <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">Maintenance agents from day one</div>
-                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">The same agents that verify also catch faults and waste, so new buildings run as designed from handover.</div>
+                <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">Operational follow-through from day one</div>
+                <div style="font-size: 15.5px; line-height: 1.55; color: #5F6B65;">Connect verification, fault review, and accountable work so teams can investigate whether a new building is operating as intended.</div>
               </div>
             </div>
             <div style="display: flex; gap: 16px;">
@@ -134,7 +134,7 @@ const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transp
         <div style="background: #101815; border-radius: 22px; padding: 30px; box-shadow: 0 40px 80px -40px rgba(0,0,0,0.45);">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
             <span style="font-weight: 600; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #79867E;">Edviro · M&amp;V</span>
-            <span style="font-weight: 600; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #101815; background: #6FCF97; padding: 3px 9px; border-radius: 999px;">Audit-grade</span>
+            <span style="font-weight: 600; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #101815; background: #6FCF97; padding: 3px 9px; border-radius: 999px;">Reviewable</span>
           </div>
           <div style="background: #17201B; border: 1px solid #26302A; border-radius: 14px; padding: 18px;">
             <div style="font-weight: 600; font-size: 11px; color: #79867E; margin-bottom: 8px;">BASELINE · Tower A · fit-out</div>
@@ -147,7 +147,7 @@ const tabBorder = (t: Tab) => (activeTab.value === t ? 'var(--accent)' : 'transp
           </div>
           <div style="margin-top: 16px; display: flex; align-items: center; justify-content: space-between; font-weight: 500; font-size: 11px; color: #79867E;">
             <span>Verifying against baseline…</span>
-            <span style="color: #6FCF97;">lender-ready</span>
+            <span style="color: #6FCF97;">stakeholder-ready</span>
           </div>
         </div>
       </div>
