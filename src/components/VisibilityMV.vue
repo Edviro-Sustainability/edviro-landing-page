@@ -1,25 +1,24 @@
 <script setup lang="ts"></script>
 
 <template>
-  <!-- VISIBILITY / M&V -->
   <section id="mv" style="padding: 116px 32px; background: #101815; color: #EDF0EE; scroll-margin-top: 80px;">
     <div class="r-split" style="max-width: 1180px; margin: 0 auto; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;">
       <div>
-        <p style="margin: 0 0 18px; font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #79867E;">Visibility &amp; M&amp;V</p>
+        <p style="margin: 0 0 18px; font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #79867E;">Measurement and verification</p>
         <h2 style="margin: 0 0 22px; font-weight: 400; font-size: clamp(34px, 4.4vw, 50px); line-height: 1.05; letter-spacing: -0.03em; color: #F2F5F1;">Proof your board can read.</h2>
-        <p style="margin: 0 0 18px; font-size: 18px; line-height: 1.65; color: #C4CBC5;">Every action is measured against a learned baseline, so you can show exactly what changed, what it saved, and that it's still saving.</p>
-        <p style="margin: 0; font-size: 18px; line-height: 1.65; color: #C4CBC5;">Board-ready reports and audit-grade measurement and verification, generated automatically. And every verified fix updates the digital twin, so your next capital decision starts from better data.</p>
+        <p style="margin: 0 0 18px; font-size: 18px; line-height: 1.65; color: #C4CBC5;">Every completed intervention can be measured against a learned baseline, so the district can show what changed and whether the result persisted.</p>
+        <p style="margin: 0; font-size: 18px; line-height: 1.65; color: #C4CBC5;">Edviro is designed to support IPMVP-standard measurement and verification workflows and board-ready reporting. Verified outcomes also improve the operating history behind the next capital decision.</p>
       </div>
 
       <div style="background: #17201B; border: 1px solid #26302A; border-radius: 20px; padding: 28px;">
         <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 22px;">
           <div>
-            <div style="font-weight: 600; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #79867E;">Verified vs baseline · Lincoln HS</div>
+            <div style="font-weight: 600; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #79867E;">Illustrative baseline comparison</div>
             <div style="font-size: 30px; font-weight: 500; letter-spacing: -0.02em; color: #F2F5F1; margin-top: 8px;">Energy down, comfort held.</div>
           </div>
-          <div style="text-align: right; font-weight: 600; font-size: 11px; color: #6FCF97;">−21.4%<br /><span style="color: #79867E;">vs baseline</span></div>
+          <div style="text-align: right; font-weight: 600; font-size: 11px; color: #6FCF97;">Measured<br /><span style="color: #79867E;">vs baseline</span></div>
         </div>
-        <svg viewBox="0 0 460 180" style="width: 100%; height: auto; display: block;">
+        <svg viewBox="0 0 460 180" style="width: 100%; height: auto; display: block;" aria-label="Illustrative graph comparing predicted baseline with actual performance">
           <defs>
             <linearGradient id="sv" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stop-color="#6FCF97" stop-opacity="0.28"></stop>
