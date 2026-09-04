@@ -52,7 +52,7 @@ usePageSeo({
   <main>
     <section style="padding: 54px 32px 96px;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
-        <PageBreadcrumbs :items="[{ name: 'Home', path: '/' }, { name: 'School facilities operations' }]" />
+        <PageBreadcrumbs :items="[{ name: 'Home', path: '/' }, { name: 'School facilities operations', path }]" />
         <div style="max-width: 880px; margin-top: 44px;">
           <p style="margin: 0 0 18px; font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #75817B;">AI-powered facilities operations for schools</p>
           <h1 style="margin: 0; font-weight: 400; font-size: clamp(42px, 6vw, 70px); line-height: 1.04; letter-spacing: -0.035em;">One operating system for the buildings your district depends on.</h1>
