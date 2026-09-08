@@ -1,10 +1,12 @@
 # edviro-landing-page
 
-The Edviro marketing site (Vue 3 + Vite).
+The Edviro marketing site (Vue 3 + Vite, prerendered with vite-ssg, deployed on Netlify at `edviroenergy.com`).
+
+Positioning: Edviro is an **AI-powered facilities operations platform for schools** (technical category: AI-native operations and maintenance platform). Energy management is a major entry point, not the product boundary; the site's energy pages keep their URLs and intent, and the O&M story lives on `/solutions/school-facilities-operations/` and the work-order / CMMS / asset capability pages. Canonical copy lives in `src/seo/site.ts` and the "What is Edviro?" Notion page.
 
 ## The Edviro ecosystem
 
-Edviro is a K-12 school-district energy management platform. Six repos, one shared data plane:
+Edviro is an AI-powered facilities operations platform for K-12 school districts — energy monitoring, diagnostics, work orders, assets, and capital planning in one place. Six repos, one shared data plane:
 
 | Repo | What it is |
 |------|-----------|

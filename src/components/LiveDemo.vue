@@ -27,10 +27,16 @@ interface PoolItem {
   action: RawAction
 }
 
+// Illustrative scenarios only — no customer data. Control actions are tagged
+// "Approved" because every side effect is staged for human review first.
 const POOL: PoolItem[] = [
   {
+    alert: { src: 'Request · Front office', title: 'Room 214 too hot since Monday', detail: 'staff request', sev: '#6B5BA6', sevLabel: 'REQUEST' },
+    action: { type: 'Work order', title: 'Categorized HVAC · assigned to zone tech', result: 'Asset history and last service attached', tag: 'Assigned', green: false },
+  },
+  {
     alert: { src: 'Meter · Lincoln HS', title: 'Demand spike approaching tariff peak', detail: '4:12pm · +180 kW', sev: '#B5742A', sevLabel: 'PEAK' },
-    action: { type: 'BMS setpoint', title: 'Pre-cooled and shifted load off peak', result: 'Avoided $1,240 demand charge', tag: 'Acted', green: true },
+    action: { type: 'BMS setpoint', title: 'Pre-cooled and shifted load off peak', result: 'Avoided $1,240 demand charge', tag: 'Approved', green: true },
   },
   {
     alert: { src: 'BMS · Boiler plant', title: 'Boiler #2 short-cycling', detail: '14 starts / hr', sev: '#B14B3A', sevLabel: 'FAULT' },
@@ -38,15 +44,19 @@ const POOL: PoolItem[] = [
   },
   {
     alert: { src: 'Sensor · Gym B', title: 'CO₂ rising, ventilation running low', detail: '1,180 ppm', sev: '#3E6E8E', sevLabel: 'COMFORT' },
-    action: { type: 'Schedule', title: 'Ventilation schedule corrected', result: 'Comfort restored, no overrun', tag: 'Acted', green: true },
+    action: { type: 'Schedule', title: 'Ventilation schedule corrected', result: 'Comfort restored, no overrun', tag: 'Approved', green: true },
   },
   {
     alert: { src: 'Utility · District', title: 'Off-hours runtime billed all weekend', detail: '+38% vs baseline', sev: '#6B5BA6', sevLabel: 'ANOMALY' },
-    action: { type: 'M&V', title: 'Anomaly escalated and verified', result: 'Savings confirmed in meter data', tag: 'Verified', green: true },
+    action: { type: 'Verification', title: 'Anomaly escalated and verified', result: 'Savings confirmed in meter data', tag: 'Verified', green: true },
+  },
+  {
+    alert: { src: 'Inspection · RTU-7', title: 'Third belt failure in 12 months', detail: 'technician note', sev: '#B5742A', sevLabel: 'RECURRING' },
+    action: { type: 'Asset', title: 'Flagged for repair-or-replace review', result: 'Added to next capital cycle', tag: 'Planned', green: false },
   },
   {
     alert: { src: 'BMS · AHU-3', title: 'Damper stuck, heating and cooling at once', detail: 'since 2:00am', sev: '#B14B3A', sevLabel: 'FAULT' },
-    action: { type: 'Setpoint', title: 'Damper override sent, reheat stopped', result: 'Eliminated simultaneous waste', tag: 'Acted', green: true },
+    action: { type: 'Setpoint', title: 'Damper override sent, reheat stopped', result: 'Eliminated simultaneous waste', tag: 'Approved', green: true },
   },
   {
     alert: { src: 'Meter · Roosevelt MS', title: 'Overnight base load creeping up', detail: '+9 kW vs 30-day', sev: '#B5742A', sevLabel: 'DRIFT' },
@@ -54,18 +64,18 @@ const POOL: PoolItem[] = [
   },
   {
     alert: { src: 'Sensor · Library', title: 'Lights on with zero occupancy', detail: 'after 9:00pm', sev: '#3E6E8E', sevLabel: 'COMFORT' },
-    action: { type: 'Lighting', title: 'Lighting schedule tightened', result: 'Recurring savings booked', tag: 'Acted', green: true },
+    action: { type: 'Lighting', title: 'Lighting schedule tightened', result: 'Recurring savings booked', tag: 'Approved', green: true },
   },
   {
     alert: { src: 'Tariff · District', title: 'Rate change lands next billing cycle', detail: 'new peak window', sev: '#5F6B65', sevLabel: 'INFO' },
-    action: { type: 'Re-optimize', title: 'All schedules re-tuned to new tariff', result: 'Forecast $3.1k / mo saved', tag: 'Acted', green: true },
+    action: { type: 'Re-optimize', title: 'All schedules re-tuned to new tariff', result: 'Forecast $3.1k / mo saved', tag: 'Approved', green: true },
   },
   {
-    alert: { src: 'Twin · Boiler plant', title: 'Replace Boiler #2, or keep tuning it?', detail: 'capital review', sev: '#5F6B65', sevLabel: 'PLAN' },
-    action: { type: 'Simulation', title: 'Both options run against the digital twin', result: 'Tune-up wins: $2.1k/yr, 4-mo payback', tag: 'Simulated', green: true },
+    alert: { src: 'Model · Boiler plant', title: 'Replace Boiler #2, or keep tuning it?', detail: 'capital review', sev: '#5F6B65', sevLabel: 'PLAN' },
+    action: { type: 'Simulation', title: 'Both options run against the building model', result: 'Tune-up wins: $2.1k/yr, 4-mo payback', tag: 'Simulated', green: true },
   },
   {
-    alert: { src: 'Twin · Jefferson ES', title: 'New wing lands next fall', detail: 'load forecast', sev: '#5F6B65', sevLabel: 'PLAN' },
+    alert: { src: 'Model · Jefferson ES', title: 'New wing lands next fall', detail: 'load forecast', sev: '#5F6B65', sevLabel: 'PLAN' },
     action: { type: 'Simulation', title: 'Addition modeled against current tariff', result: 'Demand charges projected before design lock', tag: 'Simulated', green: true },
   },
 ]

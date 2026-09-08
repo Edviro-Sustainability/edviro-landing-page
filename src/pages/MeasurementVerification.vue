@@ -5,11 +5,18 @@ import PageBreadcrumbs from '@/components/PageBreadcrumbs.vue'
 import FaqList from '@/components/FaqList.vue'
 import { usePageSeo } from '@/seo/usePageSeo'
 import { breadcrumbLd, faqLd, serviceLd, organizationLd, type FaqItem } from '@/seo/jsonld'
-import { BOOK_DEMO_PATH } from '@/seo/site'
+import {
+  BOOK_DEMO_PATH,
+  CAPITAL_PLANNING_PATH,
+  FACILITIES_OPS_PATH,
+  MV_PATH,
+  SCHOOL_ENERGY_PATH,
+  WORK_ORDERS_PATH,
+} from '@/seo/site'
 
 const breadcrumbs = [
   { name: 'Home', path: '/' },
-  { name: 'Measurement & Verification', path: '/measurement-and-verification/' },
+  { name: 'Measurement and verification', path: MV_PATH },
 ]
 
 const faqs: FaqItem[] = [
@@ -31,23 +38,28 @@ const faqs: FaqItem[] = [
   {
     question: 'How does Edviro know its fixes actually saved energy?',
     answer:
-      'After Edviro acts, it checks its own work in the meter data and on the bill. If a change did not produce the expected savings against the baseline, Edviro flags it, so you only count savings that are real.',
+      'After a change is made, Edviro checks the meter data and the bill against the baseline. If the change did not produce the expected savings, Edviro flags it, so you only count savings that are real.',
+  },
+  {
+    question: 'Does verification apply to work orders, or only to energy projects?',
+    answer:
+      'Both. When a work order that came from a detected problem is closed—a boiler that was short-cycling, a schedule that was running all weekend—Edviro checks the subsequent building and energy data to confirm the problem actually stopped. If it did not, the work is reopened with the evidence attached rather than counted as done. The same discipline covers retrofits and capital projects after they are funded.',
   },
 ]
 
 usePageSeo({
-  title: 'Measurement & Verification (M&V)',
+  title: 'Measurement and Verification (M&V) for Buildings',
   description:
-    'Measurement and verification (M&V) explained: how Edviro learns a building energy baseline, measures every action against it, and generates audit-grade, board-ready proof of savings automatically.',
-  path: '/measurement-and-verification/',
+    'Measurement and verification (M&V) explained: how Edviro learns a building energy baseline, measures every fix and project against it, confirms that completed work resolved the problem, and generates board-ready proof of savings automatically.',
+  path: MV_PATH,
   jsonLd: [
     organizationLd(),
     breadcrumbLd(breadcrumbs),
     serviceLd({
       name: 'Edviro measurement and verification (M&V)',
       description:
-        'Automated, audit-grade measurement and verification of building energy savings against a learned baseline.',
-      path: '/measurement-and-verification/',
+        'Automated, audit-grade measurement and verification of building energy savings and completed maintenance work against a learned baseline.',
+      path: MV_PATH,
       serviceType: 'Measurement and verification',
     }),
     faqLd(faqs),
@@ -63,9 +75,9 @@ usePageSeo({
     <section style="padding: 40px 32px 56px;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <div style="max-width: 820px;">
-          <p style="margin: 0 0 22px; font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #75817B;">Measurement &amp; verification</p>
-          <h1 style="margin: 0; font-weight: 400; font-size: clamp(36px, 5.4vw, 62px); line-height: 1.05; letter-spacing: -0.035em;">Proof your board can read.</h1>
-          <p style="margin: 26px 0 0; max-width: 640px; font-size: 19px; line-height: 1.6; color: #4B5550;">Every action Edviro takes is measured against a learned baseline, so you can show exactly what changed, what it saved, and that it is still saving. Board-ready, audit-grade, generated automatically.</p>
+          <p style="margin: 0 0 22px; font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #75817B;">Measurement and verification</p>
+          <h1 style="margin: 0; font-weight: 400; font-size: clamp(36px, 5.4vw, 62px); line-height: 1.05; letter-spacing: -0.035em;">Measurement and verification your board can read.</h1>
+          <p style="margin: 26px 0 0; max-width: 640px; font-size: 19px; line-height: 1.6; color: #4B5550;">Every fix and every project is measured against a learned baseline of how the building behaved before, so you can show what changed, why it was done, what it cost, whether performance improved, and whether the savings persisted. Board-ready, audit-grade, generated automatically.</p>
           <div style="margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap;">
             <RouterLink :to="BOOK_DEMO_PATH" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #EDF0EE; background: var(--accent); padding: 13px 26px; border-radius: 999px;">Book a demo</RouterLink>
           </div>
@@ -78,7 +90,8 @@ usePageSeo({
       <div style="max-width: 820px; margin: 0 auto; width: 100%;">
         <h2 style="margin: 0 0 16px; font-weight: 400; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.1; letter-spacing: -0.025em;">What is measurement and verification?</h2>
         <p style="margin: 0 0 16px; font-size: 17px; line-height: 1.7; color: #4B5550;">Measurement and verification (M&amp;V) is how you prove energy savings with data instead of estimates. It works in three steps: establish a baseline of how a building would have used energy, measure what it actually uses after a change, and report the difference. Done well, M&amp;V turns "we think we saved" into "here is exactly what we saved, and here is the proof."</p>
-        <p style="margin: 0; font-size: 17px; line-height: 1.7; color: #4B5550;">Traditional M&amp;V is slow and manual, done once per project by a consultant. Edviro makes it continuous: every fix is verified against a live baseline the moment it lands, and the reporting is generated for you.</p>
+        <p style="margin: 0 0 16px; font-size: 17px; line-height: 1.7; color: #4B5550;">Traditional M&amp;V is slow and manual, done once per project by a consultant. Edviro makes it continuous: every fix is verified against a live baseline the moment it lands, and the reporting is generated for you.</p>
+        <p style="margin: 0; font-size: 17px; line-height: 1.7; color: #4B5550;">It is not only for energy projects. When a <RouterLink :to="WORK_ORDERS_PATH" class="text-link" style="color: var(--accent); text-decoration: none; font-weight: 500;">work order</RouterLink> that came from a detected problem is closed, Edviro checks the building and energy data afterwards to confirm the problem actually stopped—the last step of the <RouterLink :to="FACILITIES_OPS_PATH" class="text-link" style="color: var(--accent); text-decoration: none; font-weight: 500;">facilities operations loop</RouterLink>, and the evidence that makes <RouterLink :to="CAPITAL_PLANNING_PATH" class="text-link" style="color: var(--accent); text-decoration: none; font-weight: 500;">capital planning</RouterLink> defensible.</p>
       </div>
     </section>
 
@@ -115,8 +128,8 @@ usePageSeo({
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <h2 style="margin: 0 0 28px; font-weight: 400; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.1; letter-spacing: -0.025em;">Where M&amp;V matters most</h2>
         <div class="r-cols-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
-          <RouterLink to="/solutions/schools/" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
-            <div style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">Schools &rarr;</div>
+          <RouterLink :to="SCHOOL_ENERGY_PATH" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
+            <div style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">School energy management &rarr;</div>
             <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #5F6B65;">Show the board verified savings across every site, not quarterly estimates.</p>
           </RouterLink>
           <RouterLink to="/solutions/data-centers/" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
@@ -143,5 +156,8 @@ usePageSeo({
 }
 .card-link:hover {
   border-color: #171D1A !important;
+}
+.text-link:hover {
+  text-decoration: underline;
 }
 </style>

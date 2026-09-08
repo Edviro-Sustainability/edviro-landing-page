@@ -2,6 +2,7 @@ import {
   SITE_URL,
   SITE_NAME,
   DEFAULT_DESCRIPTION,
+  BRAND_PROMISE,
   CONTACT_EMAIL,
   absoluteUrl,
   canonicalUrl,
@@ -25,9 +26,19 @@ export function organizationLd(): JsonLd {
     url: SITE_URL,
     logo: absoluteUrl(LOGO_PATH),
     description: DEFAULT_DESCRIPTION,
+    slogan: BRAND_PROMISE,
     email: CONTACT_EMAIL,
     sameAs: SOCIAL_URLS,
     foundingDate: '2024',
+    knowsAbout: [
+      'School facilities operations and maintenance',
+      'Work order management',
+      'Asset management',
+      'Preventive maintenance',
+      'Energy management',
+      'Measurement and verification',
+      'Capital planning',
+    ],
     founder: [
       { '@type': 'Person', name: 'Hursh', jobTitle: 'Founder & CEO' },
       { '@type': 'Person', name: 'Tanuj', jobTitle: 'Co-founder & CTO' },
@@ -54,22 +65,39 @@ export function websiteLd(): JsonLd {
   }
 }
 
-/** The Edviro platform as a software product. */
+/**
+ * The Edviro platform as a software product. The sub-category and feature
+ * list describe the whole platform (facilities operations and maintenance),
+ * not only the energy-management entry point. Every feature listed here is
+ * visibly described on the homepage; keep the two in sync and never add
+ * ratings, prices, integrations, or outcomes that are not on the page.
+ */
 export function softwareApplicationLd(): JsonLd {
   return {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: SITE_NAME,
     applicationCategory: 'BusinessApplication',
-    applicationSubCategory: 'Energy Management Software',
+    applicationSubCategory: 'Facilities Management and CMMS Software',
     operatingSystem: 'Web',
     url: SITE_URL,
     description: DEFAULT_DESCRIPTION,
     publisher: { '@id': ORG_ID },
+    featureList: [
+      'Work orders',
+      'Asset management',
+      'Inspections',
+      'Preventive maintenance',
+      'Mobile field workflows',
+      'Energy management',
+      'Project and budget management',
+      'Capital planning',
+      'Measurement and verification',
+    ],
     audience: {
       '@type': 'BusinessAudience',
       audienceType:
-        'Facilities managers, building owners, data center operators, and construction teams',
+        'School district facilities, maintenance, and business teams; building owners; construction teams; data center operators',
     },
   }
 }

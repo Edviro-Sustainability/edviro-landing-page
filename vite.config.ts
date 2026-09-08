@@ -20,6 +20,9 @@ import { BOOKING_URL, DEMO_REDIRECT_PATH, IUSD_DEMO_PATH, IUSD_DEMO_URL } from '
  * /iusd-sustainability-demo forwards to the IUSD community dashboard demo
  * (edviro-community-template on Cloudflare Workers). No prerendered page exists
  * there, so no `!` is needed; the splat rule keeps deep links working.
+ *
+ * /home is a legacy path that has no route (it would 404); 301 it to the
+ * homepage so old links and any indexed copies consolidate on `/`.
  */
 function netlifyRedirects(): Plugin {
   let isSsrBuild = false
@@ -39,7 +42,9 @@ function netlifyRedirects(): Plugin {
         source:
           `${DEMO_REDIRECT_PATH}  ${BOOKING_URL}  302!\n` +
           `${IUSD_DEMO_PATH}  ${IUSD_DEMO_URL}  302\n` +
-          `${IUSD_DEMO_PATH}/*  ${IUSD_DEMO_URL}/:splat  302\n`,
+          `${IUSD_DEMO_PATH}/*  ${IUSD_DEMO_URL}/:splat  302\n` +
+          `/home  /  301\n` +
+          `/home/  /  301\n`,
       })
     },
   }

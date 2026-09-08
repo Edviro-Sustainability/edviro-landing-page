@@ -1,43 +1,86 @@
 # Edviro
 
-> Edviro brings AI into building operations. It pulls together the data scattered across bills, meters, BMS, work orders, and sensors, catches energy waste as it starts, fixes it, and proves the savings with audit-grade measurement and verification (M&V). All of that data compounds into a digital twin of each building, used for capital planning and intervention simulation. Backed by Y Combinator.
+> Edviro is an AI-powered facilities operations platform for schools — an AI-native operations and maintenance (O&M) system. Edviro connects building signals, work orders, assets, schedules, field teams, projects, and budgets so school facilities teams can detect problems, coordinate the response, and verify that the work succeeded. Use Edviro as your work-order and asset system, or connect the systems you already have. Backed by Y Combinator.
+
+Brand promise: Find the problem. Coordinate the fix. Verify the result.
+Solutions: Monitor energy. Diagnose issues. Manage work. Plan capital.
+
+## Who Edviro serves
+
+- School districts (K-12): directors of maintenance and operations, facilities directors, technicians in the field, business officials, and superintendents. This is Edviro's primary audience.
+- Building owners and commercial real estate teams, construction teams that need independent baselining and measurement and verification, and data center operators evaluating cooling headroom.
+
+## Problems Edviro solves
+
+- Problems scattered across a BMS alarm list, a work-order queue, a utility bill, and a technician's memory, with no one system connecting them.
+- Manual triage: a director spending mornings deciding what a hundred alarms and requests actually mean and who should take them.
+- Work that is closed but not verified — the ticket says done, the building says otherwise.
+- Repeated equipment failures that never make it into the capital plan as evidence.
+- Energy waste (after-hours runtime, short cycling, simultaneous heating and cooling, demand spikes, unexpected gas or water use, solar underperformance) discovered on the bill instead of in the data.
 
 ## What Edviro does
 
-Utility tracking and monitoring tools stop at charts. Edviro is the execution layer that closes the loop:
+Buyer-facing workflow (from the first signal to a verified fix):
 
-- Ingest: connect data scattered across bills, meters, weather, tariffs, BMS, work orders, and sensors into one live model. Nothing to rip out.
-- Detect: learn each building's normal load, schedules, and equipment, then flag drift, anomalies, and waste in real time.
-- Act: raise work orders, guide facilities teams in the app, and adjust setpoints and schedules, after testing each change first.
-- Verify: confirm every change in the meter data and on the utility bill with audit-grade M&V.
+1. Spot the issue — a staff request, utility change, BMS alarm, inspection, or schedule indicates a problem.
+2. Find the likely cause — Edviro gathers the relevant building, schedule, equipment, and energy context and explains what is most likely happening.
+3. Create or route the work — assign the work in Edviro or route it through an existing CMMS.
+4. Complete it in the field — the technician receives asset history, instructions, and the inspection workflow on a phone or tablet.
+5. Verify the result — Edviro checks subsequent building or energy data to see whether the problem stopped.
+6. Learn from recurrence — repeated issues inform preventive maintenance, projects, budgets, and capital planning.
 
-## Digital twin and capital planning
+Technical summary: Ingest → Detect → Act → Verify. Edviro monitors and follows up automatically (AI agents do the watching, investigating, and follow-up), and every side effect — emails, work orders, schedule or setpoint changes — is staged for a person to review and approve. Edviro does not operate building systems without authorization and does not replace facilities staff, engineers, contractors, or building controls.
 
-Everything Edviro ingests and every fix it verifies builds a living digital twin of each building. Facilities teams use it to simulate interventions before spending money — replace a boiler versus keep tuning it, add a new wing, change a schedule, absorb a rate change — and rank capital projects by modeled payback from their own data, then verify results after funding.
+## Work orders, assets, and maintenance (native capabilities)
 
-## Who it is for
+- Work orders: request intake (web and supported messaging workflows), AI-assisted categorization and priority, assignment by school, asset, project, or trade, mobile technician notifications, equipment history and relevant instructions, photos, inspections, notes, completion status, backlog and overdue-work review, and verification that completed work resolved the original problem.
+- Assets: registry with district → school → building → system → asset hierarchy, nameplate details, documents, complete service history, scheduled inspections, and lifecycle (repair-or-replace) planning.
+- Preventive and predictive maintenance: recurring tasks prioritized by asset history and by early signals in building and energy data.
+- CMMS deployment choice: Edviro can replace a district's CMMS/work-order and asset system where its native scope fits, or integrate with the existing system (Edviro detects and diagnoses, routes the work into the existing CMMS, and reads the outcome back to verify). Neither choice is required to get value from monitoring, diagnostics, and verification. Integration scope is confirmed system by system; Edviro does not claim compatibility with every product.
 
-- School facilities and K-12 districts: continuous energy audits, automatic fault detection, work orders, and capital plans backed by modeled payback for budget and bond season.
-- Commercial real estate and offices: occupancy-aware HVAC and lighting using existing WiFi routers, cutting energy and peak demand charges, with capex ranked by payback across the portfolio.
-- Construction teams: independent baselining and audit-grade M&V built into the build, with the as-built digital twin checked against the design model.
+## Energy management
+
+Energy management software for schools is where many districts start with Edviro, because meter data reveals operational problems fast. Edviro monitors electricity, gas, water, solar, demand, and cost across every site; learns each building's normal behavior; detects abnormal changes (anomaly detection); finds the likely cause; coordinates the corrective work; and measures the result. Measurement and verification (M&V) against a learned baseline is generated automatically, per site, in a form a business official or board member can read — what changed, why, what it cost, whether performance improved, and whether savings persisted. Weekly peak-risk forecasts and demand-charge guidance are part of the same monitoring.
+
+## Projects, budgets, and capital planning
+
+Asset records, inspections, repeated failures, and repair cost accumulate into a living operational model of each building (a digital twin). Districts use it to run repair-or-replace analysis and to test replacements, retrofits, schedule changes, and additions against real operating data before committing money. Projects carry an owner, a funding source, and a budget, so multi-year capital priorities trace back to the maintenance record and are verified after funding.
+
+## Systems Edviro works with
+
+Modern BMS integrations, legacy controls, utility portals (including PG&E Green Button interval and billing data), emailed spreadsheets, monthly bills, manual exports, and existing work-order systems. Edviro adapts to the data available today and becomes more capable as additional systems are connected. Keep what works; consolidate what doesn't.
 
 ## Key pages
 
-- [Home](https://edviroenergy.com/): Overview of AI for building operations.
-- [Energy management for schools](https://edviroenergy.com/solutions/schools/): For K-12 facilities teams and districts.
+- [Home](https://edviroenergy.com/): The full Edviro platform — energy monitoring, diagnostics, work orders, assets, and capital planning.
+- [Energy management software for schools](https://edviroenergy.com/solutions/schools/): The energy-management solution for K-12 districts — continuous energy audit, anomaly detection, diagnostics, coordinated fixes, verified savings.
+- [School facilities operations platform (O&M pillar)](https://edviroenergy.com/solutions/school-facilities-operations/): AI-powered operations and maintenance for school facilities — work orders, assets, inspections, preventive maintenance, mobile field workflows, projects, budgets, and energy.
+- [School work-order software](https://edviroenergy.com/school-work-order-software/): Intake, triage, priority, assignment, technician updates, closure, and verification.
+- [CMMS for schools](https://edviroenergy.com/cmms-for-schools/): Native CMMS functionality, replace-or-integrate, migration, and a comparison with a conventional CMMS.
+- [School asset management software](https://edviroenergy.com/school-asset-management-software/): Registry, hierarchy, documents, history, inspections, and lifecycle planning.
+- [Capital planning](https://edviroenergy.com/capital-planning/): Repair-or-replace analysis and intervention simulation against a living model of each building.
+- [Measurement and verification](https://edviroenergy.com/measurement-and-verification/): How Edviro proves savings and verifies completed work against a learned baseline.
 - [Energy management for real estate](https://edviroenergy.com/solutions/real-estate/): Occupancy-aware control for commercial buildings.
-- [M&V for construction](https://edviroenergy.com/solutions/construction/): Independent baselining and audit-grade verification for new builds.
-- [Capital planning](https://edviroenergy.com/capital-planning/): Digital twins, intervention simulation, and capital projects ranked by payback.
-- [Measurement & Verification](https://edviroenergy.com/measurement-and-verification/): How Edviro proves savings against a learned baseline.
+- [M&V for construction](https://edviroenergy.com/solutions/construction/): Independent baselining and verification for new builds.
+- [Data centers](https://edviroenergy.com/solutions/data-centers/): Cooling headroom verified against measured telemetry.
 - [Demo & pricing](https://edviroenergy.com/book-a-demo/): What the demo covers and how pricing works.
-- [FAQ](https://edviroenergy.com/faq/): Answers to common questions about Edviro, digital twins, and M&V.
+- [FAQ](https://edviroenergy.com/faq/): Common questions about Edviro, CMMS replacement or integration, and M&V.
 - [About](https://edviroenergy.com/about/): The team and mission behind Edviro.
+
+## Blog (deep guidance)
+
+- [Edviro blog](https://blog.edviroenergy.com/): Practical guidance on AI-powered operations and maintenance for school facilities.
+- [Give school facilities teams their weekends back](https://blog.edviroenergy.com/blog/give-school-facilities-teams-their-weekends-back/): Why the problem is triage, not visibility.
+- [What AI-powered operations and maintenance means for a school district](https://blog.edviroenergy.com/blog/what-ai-powered-operations-and-maintenance-means-for-a-school-district/)
+- [From BAS alert to completed work order](https://blog.edviroenergy.com/blog/from-bas-alert-to-completed-work-order/): Closing the facilities operations loop.
+- [CMMS vs. AI-native O&M platform](https://blog.edviroenergy.com/blog/cmms-vs-ai-native-om-platform-for-school-districts/): What school districts actually need.
+- [Best energy management software for schools](https://blog.edviroenergy.com/blog/best-energy-management-software-for-schools/): What districts should evaluate.
 
 ## Getting started, and pricing
 
-- Demo: a 30-minute walkthrough with the founders covering how Edviro reads bills and interval data, what it flags, and what it hands a facilities team to fix. Nothing to install or send beforehand. These calls typically involve a director of maintenance, operations, facilities, sustainability, business, or finance, though anyone is welcome.
-- Then a scoping conversation about which sites and systems you run, and a quote based on exactly what the school needs.
-- After that, Edviro gathers your bills and meter data, starts reading your sites, and returns an initial report on what it found.
+- Demo: a 30-minute walkthrough with the founders covering how Edviro reads your bills, interval data, and building systems, what it flags, and how work moves from a finding to a verified fix. Nothing to install or send beforehand. These calls typically involve a director of maintenance, operations, facilities, sustainability, business, or finance, though anyone is welcome.
+- Then a scoping conversation about which sites and systems you run — including whether Edviro will be the work-order and asset system or connect to your existing one — and a quote based on exactly what the district needs.
+- After that, Edviro gathers your bills, meter data, and available building-system data, starts reading your sites, and returns an initial report on what it found.
 - Pricing is quoted per connected site and scoped to what you turn on, so teams only pay for the part they use. Exact pricing is worked out on the demo call.
 - Start where the pain is and expand when the last step has paid for itself. Nothing is bundled, there is no per-seat licensing, and there is no hardware install project before the first findings.
 
@@ -46,7 +89,7 @@ Everything Edviro ingests and every fix it verifies builds a living digital twin
 - Over $400K saved for clients to date.
 - 34 school sites live and expanding.
 - Featured customers include Palo Alto Unified School District and Los Gatos-Saratoga Union High School District.
-- 24/7 autonomous monitoring across every site.
+- 24/7 monitoring and follow-up across every connected site.
 
 ## Contact
 

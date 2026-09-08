@@ -5,16 +5,37 @@
  */
 export const SITE_URL = 'https://edviroenergy.com'
 export const SITE_NAME = 'Edviro'
-export const SITE_TAGLINE = 'AI for building operations'
+/** Buyer-friendly category. Used in social-image alt text and the hero eyebrow. */
+export const SITE_TAGLINE = 'AI-powered facilities operations for schools'
+/** Secondary brand statement (footer). */
+export const BRAND_STATEMENT = 'AI for the people who run the buildings.'
+/** Brand promise. */
+export const BRAND_PROMISE = 'Find the problem. Coordinate the fix. Verify the result.'
 
+/** Canonical company definition — the one sentence every surface (site, blog, llms.txt) inherits. */
 export const DEFAULT_DESCRIPTION =
-  'Edviro puts AI across your fragmented building data — bills, meters, BMS, and work orders — then catches waste, fixes it, proves the savings with audit-grade M&V, and builds a digital twin for capital planning.'
+  'Edviro connects building signals, work orders, assets, schedules, field teams, projects, and budgets so school facilities teams can detect problems, coordinate the response, and verify that the work succeeded.'
 
 export const DEFAULT_OG_IMAGE = '/og-image.png'
 export const LOGO_PATH = '/logo-icon.png'
 
 export const CONTACT_EMAIL = 'founders@edviroenergy.com'
 export const BLOG_URL = 'https://blog.edviroenergy.com'
+
+/**
+ * Canonical solution destinations. Nav, footer, llms.txt, the sitemap and the
+ * blog all link to these, so keep the paths stable. The school energy page is
+ * the ranking energy-management URL — never repoint it.
+ */
+export const SCHOOL_ENERGY_PATH = '/solutions/schools/'
+export const FACILITIES_OPS_PATH = '/solutions/school-facilities-operations/'
+export const WORK_ORDERS_PATH = '/school-work-order-software/'
+export const CMMS_PATH = '/cmms-for-schools/'
+export const ASSETS_PATH = '/school-asset-management-software/'
+export const CAPITAL_PLANNING_PATH = '/capital-planning/'
+export const MV_PATH = '/measurement-and-verification/'
+export const FAQ_PATH = '/faq/'
+export const ABOUT_PATH = '/about/'
 
 /**
  * Public profiles, used for the footer links and Organization `sameAs`. The X

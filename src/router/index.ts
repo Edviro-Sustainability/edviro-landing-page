@@ -7,9 +7,31 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/HomePage.vue'),
   },
   {
+    // The ranking energy-management URL. Never repoint or repurpose it; the
+    // O&M pillar below is a separate page with a separate intent.
     path: '/solutions/schools',
     name: 'solutions-schools',
     component: () => import('@/pages/SolutionSchools.vue'),
+  },
+  {
+    path: '/solutions/school-facilities-operations',
+    name: 'solutions-school-facilities-operations',
+    component: () => import('@/pages/SolutionSchoolFacilitiesOperations.vue'),
+  },
+  {
+    path: '/school-work-order-software',
+    name: 'school-work-order-software',
+    component: () => import('@/pages/SchoolWorkOrderSoftware.vue'),
+  },
+  {
+    path: '/cmms-for-schools',
+    name: 'cmms-for-schools',
+    component: () => import('@/pages/CmmsForSchools.vue'),
+  },
+  {
+    path: '/school-asset-management-software',
+    name: 'school-asset-management-software',
+    component: () => import('@/pages/SchoolAssetManagementSoftware.vue'),
   },
   {
     path: '/solutions/real-estate',

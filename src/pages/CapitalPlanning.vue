@@ -5,18 +5,30 @@ import PageBreadcrumbs from '@/components/PageBreadcrumbs.vue'
 import FaqList from '@/components/FaqList.vue'
 import { usePageSeo } from '@/seo/usePageSeo'
 import { breadcrumbLd, faqLd, serviceLd, organizationLd, type FaqItem } from '@/seo/jsonld'
-import { BOOK_DEMO_PATH } from '@/seo/site'
+import {
+  ASSETS_PATH,
+  BOOK_DEMO_PATH,
+  CAPITAL_PLANNING_PATH,
+  FACILITIES_OPS_PATH,
+  MV_PATH,
+  SCHOOL_ENERGY_PATH,
+} from '@/seo/site'
 
 const breadcrumbs = [
   { name: 'Home', path: '/' },
-  { name: 'Capital Planning', path: '/capital-planning/' },
+  { name: 'Capital planning', path: CAPITAL_PLANNING_PATH },
 ]
 
 const faqs: FaqItem[] = [
   {
     question: 'What is a digital twin of a building?',
     answer:
-      'A digital twin is a living model of how your building actually behaves, built from the data Edviro already collects: bills, meters, BMS points, weather, tariffs, occupancy, and every work order and fix. It is not a 3D drawing. It is a model accurate enough to answer "what happens if we change this?" before you change it.',
+      'A digital twin is a living operational model of how your building actually behaves, built from the data Edviro already collects: bills, meters, BMS points, weather, tariffs, occupancy, asset records, and every work order and fix. It is not a 3D drawing. It is a model accurate enough to answer "what happens if we change this?" before you change it.',
+  },
+  {
+    question: 'Where does the maintenance history in the capital plan come from?',
+    answer:
+      'From the work itself. Every work order, inspection, repair, and cost is logged against the asset as the team completes it, so repeated failures and rising repair cost show up on the equipment record automatically. Edviro flags those patterns for repair-or-replace review and carries the evidence into projects and multi-year priorities—no separate data-gathering exercise before budget season.',
   },
   {
     question: 'What kinds of interventions can Edviro simulate?',
@@ -36,18 +48,18 @@ const faqs: FaqItem[] = [
 ]
 
 usePageSeo({
-  title: 'Capital Planning & Intervention Simulation',
+  title: 'Capital Planning for School Facilities',
   description:
-    'Edviro builds a digital twin of each building from your bills, meters, BMS, and work orders, then simulates interventions — replacements, retrofits, schedule changes — so you can rank capital projects by real payback before spending a dollar.',
-  path: '/capital-planning/',
+    'Edviro turns asset history, work orders, bills, meters, and BMS data into a living model of each building, then simulates replacements, retrofits, and schedule changes so districts can rank capital projects by real payback before spending a dollar.',
+  path: CAPITAL_PLANNING_PATH,
   jsonLd: [
     organizationLd(),
     breadcrumbLd(breadcrumbs),
     serviceLd({
       name: 'Edviro capital planning and intervention simulation',
       description:
-        'Digital-twin-based simulation of building interventions and capital projects, ranked by projected payback and verified after the fact.',
-      path: '/capital-planning/',
+        'Simulation of building interventions and capital projects against a living operational model of each building, ranked by projected payback, connected to maintenance history, and verified after the fact.',
+      path: CAPITAL_PLANNING_PATH,
       serviceType: 'Capital planning',
     }),
     faqLd(faqs),
@@ -65,7 +77,7 @@ usePageSeo({
         <div style="max-width: 820px;">
           <p style="margin: 0 0 22px; font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #75817B;">Capital planning</p>
           <h1 style="margin: 0; font-weight: 400; font-size: clamp(36px, 5.4vw, 62px); line-height: 1.05; letter-spacing: -0.035em;">Test the project before you spend the budget.</h1>
-          <p style="margin: 26px 0 0; max-width: 640px; font-size: 19px; line-height: 1.6; color: #4B5550;">Every bill, meter reading, BMS point, and work order Edviro touches builds a digital twin of your building. Use it to simulate replacements, retrofits, and schedule changes, and rank capital projects by real payback before committing a dollar.</p>
+          <p style="margin: 26px 0 0; max-width: 640px; font-size: 19px; line-height: 1.6; color: #4B5550;">Every bill, meter reading, BMS point, asset record, and work order Edviro touches builds a living operational model of your building—a digital twin. Use it to simulate replacements, retrofits, and schedule changes, and rank capital projects by real payback before committing a dollar.</p>
           <div style="margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap;">
             <RouterLink :to="BOOK_DEMO_PATH" class="book-btn" style="font-size: 15px; font-weight: 500; text-decoration: none; color: #EDF0EE; background: var(--accent); padding: 13px 26px; border-radius: 999px;">Book a demo</RouterLink>
           </div>
@@ -78,7 +90,8 @@ usePageSeo({
       <div style="max-width: 820px; margin: 0 auto; width: 100%;">
         <h2 style="margin: 0 0 16px; font-weight: 400; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.1; letter-spacing: -0.025em;">Capital decisions, made with evidence.</h2>
         <p style="margin: 0 0 16px; font-size: 17px; line-height: 1.7; color: #4B5550;">Most capital plans are built on equipment age, vendor quotes, and gut feel. The data that could answer the real questions — replace or repair? which retrofit pays back first? what does the new wing do to demand charges? — is scattered across bills, spreadsheets, BMS exports, and work-order systems where no one can use it.</p>
-        <p style="margin: 0; font-size: 17px; line-height: 1.7; color: #4B5550;">Edviro already pulls that data into one place to run your buildings day to day. Capital planning is what it compounds into: a digital twin of each building, accurate enough to simulate an intervention and project its payback before you bring it to the board.</p>
+        <p style="margin: 0 0 16px; font-size: 17px; line-height: 1.7; color: #4B5550;">Edviro already pulls that data into one place to run your buildings day to day. Capital planning is what it compounds into: a living operational model of each building, accurate enough to simulate an intervention and project its payback before you bring it to the board.</p>
+        <p style="margin: 0; font-size: 17px; line-height: 1.7; color: #4B5550;">The maintenance side feeds the plan directly. <RouterLink :to="ASSETS_PATH" class="text-link" style="color: var(--accent); text-decoration: none; font-weight: 500;">Asset records and equipment history</RouterLink> accumulate as work orders and inspections are completed; repeated failures and rising repair cost flag equipment for repair-or-replace review; and projects carry an owner, a funding source, and a budget so the multi-year priority list traces back to what actually happened in the buildings. That is the connection between today's work order and tomorrow's <RouterLink :to="FACILITIES_OPS_PATH" class="text-link" style="color: var(--accent); text-decoration: none; font-weight: 500;">facilities operations</RouterLink> plan.</p>
       </div>
     </section>
 
@@ -86,22 +99,22 @@ usePageSeo({
     <section style="padding: 50px 32px; background: #101815; color: #EDF0EE;">
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <p style="margin: 0 0 18px; font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #79867E;">How it works</p>
-        <h2 style="margin: 0 0 40px; font-weight: 400; font-size: clamp(28px, 3.8vw, 44px); line-height: 1.06; letter-spacing: -0.03em; color: #F2F5F1; max-width: 640px;">A twin that learns, simulations you can defend.</h2>
+        <h2 style="margin: 0 0 40px; font-weight: 400; font-size: clamp(28px, 3.8vw, 44px); line-height: 1.06; letter-spacing: -0.03em; color: #F2F5F1; max-width: 640px;">A model that learns, simulations you can defend.</h2>
         <div class="r-cols-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #26302A; border: 1px solid #26302A; border-radius: 16px; overflow: hidden;">
           <div style="background: #17201B; padding: 28px;">
-            <div style="font-weight: 600; font-size: 12px; color: #6FCF97; margin-bottom: 14px;">01 / Twin</div>
+            <div style="font-weight: 600; font-size: 12px; color: #6FCF97; margin-bottom: 14px;">01 / Model</div>
             <h3 style="margin: 0 0 8px; font-size: 18px; font-weight: 600; color: #EDF0EE;">Build the model</h3>
-            <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #C4CBC5;">Every data source Edviro connects and every fix it verifies feeds a living digital twin of each building. No extra setup, it comes from running your operations.</p>
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #C4CBC5;">Every data source Edviro connects, every work order, and every fix it verifies feeds a living operational model of each building. No extra setup, it comes from running your operations.</p>
           </div>
           <div style="background: #17201B; padding: 28px;">
             <div style="font-weight: 600; font-size: 12px; color: #6FCF97; margin-bottom: 14px;">02 / Simulate</div>
             <h3 style="margin: 0 0 8px; font-size: 18px; font-weight: 600; color: #EDF0EE;">Test the intervention</h3>
-            <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #C4CBC5;">Run replacements, retrofits, schedule changes, and rate scenarios against the twin. See projected savings and payback from your real usage, not industry averages.</p>
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #C4CBC5;">Run replacements, retrofits, schedule changes, and rate scenarios against the model. See projected savings and payback from your real usage, not industry averages.</p>
           </div>
           <div style="background: #17201B; padding: 28px;">
             <div style="font-weight: 600; font-size: 12px; color: #6FCF97; margin-bottom: 14px;">03 / Decide</div>
             <h3 style="margin: 0 0 8px; font-size: 18px; font-weight: 600; color: #EDF0EE;">Rank and prove</h3>
-            <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #C4CBC5;">Bring the board a prioritized capital plan with modeled payback for each option, then verified results after the work is done.</p>
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #C4CBC5;">Bring the board a prioritized capital plan with modeled payback for each option, then <RouterLink :to="MV_PATH" class="text-link" style="color: #6FCF97; text-decoration: none; font-weight: 500;">verified results</RouterLink> after the work is done.</p>
           </div>
         </div>
         <div style="margin-top: 28px; display: inline-flex; align-items: baseline; gap: 12px; font-weight: 500; font-size: 12px; color: #79867E;">
@@ -115,7 +128,7 @@ usePageSeo({
       <div style="max-width: 1180px; margin: 0 auto; width: 100%;">
         <h2 style="margin: 0 0 28px; font-weight: 400; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.1; letter-spacing: -0.025em;">Where simulation matters most</h2>
         <div class="r-cols-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
-          <RouterLink to="/solutions/schools/" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
+          <RouterLink :to="SCHOOL_ENERGY_PATH" class="card-link" style="text-decoration: none; color: inherit; border: 1px solid #D8DED9; border-radius: 16px; padding: 24px; background: #F9FAF9; display: block;">
             <div style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">Schools &rarr;</div>
             <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #5F6B65;">Walk into budget and bond season with a ranked project list and the data behind it.</p>
           </RouterLink>
@@ -143,5 +156,8 @@ usePageSeo({
 }
 .card-link:hover {
   border-color: #171D1A !important;
+}
+.text-link:hover {
+  text-decoration: underline;
 }
 </style>

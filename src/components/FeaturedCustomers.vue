@@ -4,16 +4,16 @@ import lgsuhsdLogo from '@/assets/img/lgsuhsd-logo.png'
 </script>
 
 <template>
-  <!-- FEATURED CUSTOMERS -->
+  <!-- FEATURED CUSTOMERS — logo strip directly under the hero -->
   <section
     id="customers"
     aria-label="Featured customers"
-    style="padding: 0 32px 116px; scroll-margin-top: 80px"
+    style="padding: 24px 32px 56px; scroll-margin-top: 80px"
   >
     <div style="max-width: 1180px; margin: 0 auto; width: 100%">
       <p
         style="
-          margin: 0 0 44px;
+          margin: 0 0 32px;
           font-weight: 600;
           font-size: 12px;
           letter-spacing: 0.2em;
